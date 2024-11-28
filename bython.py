@@ -1,6 +1,9 @@
 import argparse
 import os
 
+from bython_compiler.create_low_level_code import create_low_level_code
+from bython_compiler.create_machine_code import create_machine_code
+
 
 def compile_bython(input_file, output_file, verbose=False):
     """
@@ -22,11 +25,13 @@ def compile_bython(input_file, output_file, verbose=False):
     # Example logic: Read the input file (implement actual parsing/compilation logic)
     with open(input_file, 'r') as infile:
         source_code = infile.read()
+        # split by line
+        source_code = source_code.split("\n")
         if verbose:
             print("Source code read successfully:")
             print(source_code)
 
-    compiled_output = ["todo", "todo2"]
+    compiled_output = create_machine_code(create_low_level_code(source_code))
 
     # Write the compiled output to the output file
     with open(output_file, 'w') as outfile:
