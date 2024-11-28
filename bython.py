@@ -1,6 +1,7 @@
 import argparse
 import os
 
+from bython_compiler.create_blueprint import create_blueprint
 from bython_compiler.create_low_level_code import create_low_level_code
 from bython_compiler.create_machine_code import create_machine_code
 
@@ -31,12 +32,16 @@ def compile_bython(input_file, output_file, verbose=False):
             print("Source code read successfully:")
             print(source_code)
 
-    compiled_output = create_machine_code(create_low_level_code(source_code))
+    compiled_output, compiled_output_str = create_machine_code(create_low_level_code(source_code))
+    blueprint = create_blueprint(compiled_output)
 
     # Write the compiled output to the output file
     with open(output_file, 'w') as outfile:
-        for line in compiled_output:
+        for line in compiled_output_str:
             outfile.write(line + "\n")  # Write each string to a new line
+
+    with open(output_file[:-3] + "bp", 'w') as outfile:
+        outfile.write(blueprint)
 
     if verbose:
         print(f"Compilation completed. Output written to: {output_file}")

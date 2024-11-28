@@ -112,7 +112,7 @@ def create_machine_code(code: list[str]):
     machine_code_str = []
     for line in machine_code:
         machine_code_str.append(f"C={line["C"]},0={line["0"]},1={line["1"]},2={line["2"]},I={line["I"]}")
-    return machine_code_str
+    return machine_code, machine_code_str
 
 
 def parse_two_ops(first_op, second_op, machine_line):

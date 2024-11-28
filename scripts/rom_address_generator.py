@@ -1,6 +1,6 @@
 import json
 
-from scripts.ram_address_generator import blueprint_to_json, json_to_blueprint
+from bython_compiler.create_blueprint import blueprint_to_json, json_to_blueprint
 
 
 def change_addresses(base_json, start_address=0):
