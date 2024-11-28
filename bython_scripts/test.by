@@ -1,0 +1,4 @@
+# first bython code
+r1 = 23
+disp[1] = r1
+exit(success)
