@@ -45,7 +45,16 @@ def if_else_replacement(code: list[str]):
     i = 0
     while i < len(code):
         line = code[i]
-        if line.strip().startswith("if"):
+        labels = []
+        cleaned_line = line.strip()
+        while cleaned_line.startswith("&"):
+            new_label, cleaned_line = cleaned_line.split(" ", maxsplit=1)
+            cleaned_line = cleaned_line.strip()
+            labels.append(new_label)
+        labels = " ".join(labels)
+        if labels != "":
+            labels += " "
+        if cleaned_line.strip().startswith("if"):
             indent = get_indent(line)
             assert get_indent(code[i + 1]) == indent + 4
             j = i + 1
@@ -68,9 +77,9 @@ def if_else_replacement(code: list[str]):
                     code[j] = "&" + label + " " + code[j]
                 if_counter += 1
                 # replace if statement
-                condition = line.strip()[2:-1].strip()
+                condition = line[line.find("if"):][2:-1].strip()
                 cmp_cmd, antiflag = get_cmp_and_flag(condition, antiflag=True)
-                code[i] = " " * indent + cmp_cmd
+                code[i] = " " * indent + labels + cmp_cmd
                 code.insert(i + 1, " " * indent + f"jump({label}, {antiflag})")
                 i = 0
         else:
@@ -82,7 +91,7 @@ def label_replacement(code):
     label_dict = {}
     for i, line in enumerate(code):
         while code[i].strip().startswith("&"):
-            label, rest_line = line.split(" ", maxsplit=1)
+            label, rest_line = code[i].split(" ", maxsplit=1)
             label = label.strip()[1:]
             label_dict[label] = i
             code[i] = rest_line

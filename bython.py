@@ -33,6 +33,10 @@ def compile_bython(input_file, output_file, verbose=False, intermediate=False):
             # print(source_code)
 
     low_level_code = create_low_level_code(source_code)
+    if intermediate:
+        with open(output_file[:-3] + "bas", 'w') as outfile:
+            for line in low_level_code:
+                outfile.write(line + "\n")  # Write each string to a new line
     compiled_output, compiled_output_str = create_machine_code(low_level_code)
     blueprint = create_blueprint(compiled_output)
 
@@ -40,9 +44,6 @@ def compile_bython(input_file, output_file, verbose=False, intermediate=False):
         # Write the compiled output to the output file
         with open(output_file, 'w') as outfile:
             for line in compiled_output_str:
-                outfile.write(line + "\n")  # Write each string to a new line
-        with open(output_file[:-3] + "bas", 'w') as outfile:
-            for line in low_level_code:
                 outfile.write(line + "\n")  # Write each string to a new line
 
     with open(output_file[:-3] + "bp", 'w') as outfile:
