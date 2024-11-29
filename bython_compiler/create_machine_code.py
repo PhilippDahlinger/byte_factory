@@ -12,7 +12,6 @@ def create_machine_code(code: list[str]):
     for i, line in enumerate(code):
         machine_line = {"C": 0, "0": 0, "1": 0, "2": 0, "I": 0}
         if "=" in line:
-            # TODO check for comparisons like "==", "<=", ...
             left_side = line.split("=", 1)[0].strip().lower()
             right_side = line.split("=", 1)[1].strip().lower()
             # register write back
@@ -43,23 +42,7 @@ def create_machine_code(code: list[str]):
                     machine_line["I"] = int(right_side)
                     resolved = True
 
-                # ALU
-                # basic alu ops
-                concatenate_symbols = ["+", "-", "*", "/", "%", "**", "place_holder", "place_holder", "&", "|", "^",
-                                       "<<", ">>"]
                 if not resolved:
-                    for c_s in concatenate_symbols:
-                        if c_s in right_side:
-                            if c_s == "*" and "**" in right_side:
-                                # it's actually power, not mult
-                                continue
-                            first_op, second_op = [x.strip() for x in right_side.split(c_s)]
-                            parse_two_ops(first_op, second_op, machine_line)
-                            # determine opcode
-                            c_s_index = concatenate_symbols.index(c_s)
-                            machine_line["C"] = c_s_index + 2
-                            resolved = True
-                            break
                     # min and max
                     if "min" in right_side or "max" in right_side:
                         args = right_side[right_side.find("(") + 1: right_side.rfind(")")]
@@ -75,17 +58,22 @@ def create_machine_code(code: list[str]):
                     if "mem" in right_side:
                         machine_line["C"] = 18
                         machine_line["1"], machine_line["I"] = parse_address(right_side)
+                        resolved = True
                     elif right_side.startswith("int_user"):
                         machine_line["C"] = 23
                         machine_line["1"], machine_line["I"] = parse_address(right_side)
+                        resolved = True
                     elif right_side.startswith("user"):
                         machine_line["C"] = 24
                         machine_line["1"], machine_line["I"] = parse_address(right_side)
+                        resolved = True
                     elif "rom" in right_side:
                         machine_line["C"] = 22
                         machine_line["1"], machine_line["I"] = parse_address(right_side)
+                        resolved = True
                     elif "pop" in right_side:
                         machine_line["C"] = 21
+                        resolved = True
                     elif "random" in right_side:
                         raise NotImplementedError()
                     elif "cmov" in right_side:
@@ -95,9 +83,27 @@ def create_machine_code(code: list[str]):
                         parse_op_a(first_op, machine_line)
                         assert is_int(second_op), f"Line{i}: Second Operator has to be numeric"
                         machine_line["2"] = int(second_op)
-                        # parse_two_ops(first_op, second_op, machine_line)
-                    else:
-                        raise AssertionError(f"Line {i + 1}: Right side {right_side} is wrong")
+                        resolved = True
+                if not resolved:
+                        # ALU
+                        # basic alu ops
+                        concatenate_symbols = ["+", "-", "*", "/", "%", "**", "place_holder", "place_holder", "&", "|",
+                                               "^",
+                                               "<<", ">>"]
+                        for c_s in concatenate_symbols:
+                            if c_s in right_side:
+                                if c_s == "*" and "**" in right_side:
+                                    # it's actually power, not mult
+                                    continue
+                                first_op, second_op = [x.strip() for x in right_side.split(c_s)]
+                                parse_two_ops(first_op, second_op, machine_line)
+                                # determine opcode
+                                c_s_index = concatenate_symbols.index(c_s)
+                                machine_line["C"] = c_s_index + 2
+                                resolved = True
+                                break
+                if not resolved:
+                    raise AssertionError(f"Line {i + 1}: Right side {right_side} is wrong")
         else:
             # no "=" in line
             if "nop" in line:
@@ -166,13 +172,17 @@ def parse_op_b(op, machine_line):
 
 
 def parse_address(complete_term):
-    address = complete_term[complete_term.find("[") + 1: complete_term.rfind("]")]
+    address = complete_term[complete_term.find("[") + 1: complete_term.rfind("]")].strip()
     if "+" in address:
         reg, imm = address.split("+")
+        reg = reg.strip()
+        imm = imm.strip()
         reg_address = REG_ADDRESSES[reg]
         imm = int(imm)
     elif "-" in address:
         reg, imm = address.split("-")
+        reg = reg.strip()
+        imm = imm.strip()
         reg_address = REG_ADDRESSES[reg]
         imm = -int(imm)
     else:
