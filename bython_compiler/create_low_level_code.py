@@ -25,18 +25,18 @@ def cmov_replacement(code):
 
 
 def create_low_level_code(source_code: list[str]):
-    print_code(source_code)
+    # print_code(source_code)
     source_code = remove_comments(source_code)
-    print_code(source_code)
+    # print_code(source_code)
     source_code = if_else_replacement(source_code)
-    print_code(source_code)
+    # print_code(source_code)
     source_code = while_replacement(source_code)
     source_code = remove_white_space(source_code)
-    print_code(source_code)
+    # print_code(source_code)
     source_code = jump_if_replacement(source_code)
     source_code = cmov_replacement(source_code)
     source_code = label_replacement(source_code)
-    print_code(source_code)
+    # print_code(source_code)
 
     return source_code
 
