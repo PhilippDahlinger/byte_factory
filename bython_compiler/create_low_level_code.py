@@ -10,20 +10,6 @@ Replaces:
 """
 
 
-def while_replacement(code):
-    return code
-
-
-def jump_if_replacement(code):
-    return code
-
-
-def cmov_replacement(code):
-    return code
-
-
-
-
 def create_low_level_code(source_code: list[str]):
     # print_code(source_code)
     source_code = remove_comments(source_code)
@@ -44,16 +30,7 @@ def if_else_replacement(code: list[str]):
     if_counter = 0
     i = 0
     while i < len(code):
-        line = code[i]
-        labels = []
-        cleaned_line = line.strip()
-        while cleaned_line.startswith("&"):
-            new_label, cleaned_line = cleaned_line.split(" ", maxsplit=1)
-            cleaned_line = cleaned_line.strip()
-            labels.append(new_label)
-        labels = " ".join(labels)
-        if labels != "":
-            labels += " "
+        cleaned_line, labels, line = clean_line_extract_labels(code, i)
         if cleaned_line.strip().startswith("if"):
             indent = get_indent(line)
             assert get_indent(code[i + 1]) == indent + 4
@@ -110,6 +87,63 @@ def if_else_replacement(code: list[str]):
                 i = 0
         else:
             i += 1
+    return code
+
+
+def clean_line_extract_labels(code, i):
+    line = code[i]
+    labels = []
+    cleaned_line = line.strip()
+    while cleaned_line.startswith("&"):
+        new_label, cleaned_line = cleaned_line.split(" ", maxsplit=1)
+        cleaned_line = cleaned_line.strip()
+        labels.append(new_label)
+    labels = " ".join(labels)
+    if labels != "":
+        labels += " "
+    return cleaned_line, labels, line
+
+
+def while_replacement(code):
+    while_counter = 0
+    i = 0
+    while i < len(code):
+        cleaned_line, labels, line = clean_line_extract_labels(code, i)
+        if cleaned_line.strip().startswith("while"):
+            indent = get_indent(line)
+            assert get_indent(code[i + 1]) == indent + 4
+            j = i + 1
+            while get_indent(code[j]) > indent:
+                # in if block, remove 1 indent level, since we resolve this if clause
+                code[j] = code[j][4:]
+                j += 1
+                if j == len(code):
+                    # reached end of file
+                    break
+            end_label = f"end_while_{while_counter}"
+            start_label = f"start_while_{while_counter}"
+            if j == len(code):
+                code.append("&" + end_label + " nop")
+            else:
+                code[j] = insert_label(code[j], end_label)
+            while_counter += 1
+            # replace while statement
+            condition = line[line.find("while"):][5:-1].strip()
+            cmp_cmd, antiflag = get_cmp_and_flag(condition, antiflag=True)
+            code[i] = " " * indent + labels +f"&{start_label} " + cmp_cmd
+            code.insert(i + 1, " " * indent + f"jump({end_label}, {antiflag})")
+            code.insert(j + 1, " " * indent + f"jump({start_label})")
+            i = 0
+        else:
+            i += 1
+    return code
+
+
+def jump_if_replacement(code):
+    return code
+
+
+def cmov_replacement(code):
     return code
 
 def insert_label(line, label):
