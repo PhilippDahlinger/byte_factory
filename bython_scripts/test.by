@@ -1,8 +1,10 @@
 r1 = user[1]
-if r1 >= 0:
+if r1 > 0:
     r2 = 1
-    disp[1] = r2
 else:
-    r2 = -1
-    disp[1] = r2
+    if r1 == 0:
+        r2 = 23
+    else:
+        r2 = -1
+disp[1] = r2
 exit(success)

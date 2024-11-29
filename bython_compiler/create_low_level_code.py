@@ -83,17 +83,17 @@ def if_else_replacement(code: list[str]):
                     if j == len(code):
                         # reached end of file
                         break
-                    if j == len(code):
-                        code.append("&" + end_if_label + " nop")
-                    else:
-                        code[j] = insert_label(code[j], end_if_label)
-                    if_counter += 1
-                    # replace if statement
-                    condition = line[line.find("if"):][2:-1].strip()
-                    cmp_cmd, antiflag = get_cmp_and_flag(condition, antiflag=True)
-                    code[i] = " " * indent + labels + cmp_cmd
-                    code.insert(i + 1, " " * indent + f"jump({else_label}, {antiflag})")
-                    i = 0
+                if j == len(code):
+                    code.append("&" + end_if_label + " nop")
+                else:
+                    code[j] = insert_label(code[j], end_if_label)
+                if_counter += 1
+                # replace if statement
+                condition = line[line.find("if"):][2:-1].strip()
+                cmp_cmd, antiflag = get_cmp_and_flag(condition, antiflag=True)
+                code[i] = " " * indent + labels + cmp_cmd
+                code.insert(i + 1, " " * indent + f"jump({else_label}, {antiflag})")
+                i = 0
             else:
                 # if case, label line j
                 label = f"end_if_{if_counter}"
