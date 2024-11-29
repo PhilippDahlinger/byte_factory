@@ -35,8 +35,8 @@ def compile_bython(input_file, output_file, verbose=False, intermediate=False):
     low_level_code = create_low_level_code(source_code)
     if intermediate:
         with open(output_file[:-3] + "bas", 'w') as outfile:
-            for line in low_level_code:
-                outfile.write(line + "\n")  # Write each string to a new line
+            for i, line in enumerate(low_level_code):
+                outfile.write(f"[{i}] " + line + "\n")  # Write each string to a new line
     compiled_output, compiled_output_str = create_machine_code(low_level_code)
     blueprint = create_blueprint(compiled_output)
 

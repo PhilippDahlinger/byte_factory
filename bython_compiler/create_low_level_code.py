@@ -67,14 +67,40 @@ def if_else_replacement(code: list[str]):
                     break
             if code[j].startswith(" " * indent + "else:"):
                 # if-else case
-                raise NotImplementedError()
+                # label next line with else label
+                assert get_indent(code[j+1]) == indent + 4, "Else block not correct"
+                else_label = f"else_{if_counter}"
+                end_if_label = f"end_if_{if_counter}"
+                code[j+1] = insert_label(code[j+1], else_label)
+                # replace else statement with jump to end if
+                code[j] = " " * indent + f"jump({end_if_label})"
+                j = j +1
+                # else block
+                while get_indent(code[j]) > indent:
+                    # in else block, remove 1 indent level, since we resolve this else clause
+                    code[j] = code[j][4:]
+                    j += 1
+                    if j == len(code):
+                        # reached end of file
+                        break
+                    if j == len(code):
+                        code.append("&" + end_if_label + " nop")
+                    else:
+                        code[j] = insert_label(code[j], end_if_label)
+                    if_counter += 1
+                    # replace if statement
+                    condition = line[line.find("if"):][2:-1].strip()
+                    cmp_cmd, antiflag = get_cmp_and_flag(condition, antiflag=True)
+                    code[i] = " " * indent + labels + cmp_cmd
+                    code.insert(i + 1, " " * indent + f"jump({else_label}, {antiflag})")
+                    i = 0
             else:
                 # if case, label line j
                 label = f"end_if_{if_counter}"
                 if j == len(code):
                     code.append("&" + label + " nop")
                 else:
-                    code[j] = "&" + label + " " + code[j]
+                    code[j] = insert_label(code[j], label)
                 if_counter += 1
                 # replace if statement
                 condition = line[line.find("if"):][2:-1].strip()
@@ -86,6 +112,12 @@ def if_else_replacement(code: list[str]):
             i += 1
     return code
 
+def insert_label(line, label):
+    assert not label.startswith("&")
+    # find first char which is not whitespace
+    start_index = len(line) - len(line.lstrip())
+    output = line[:start_index] + "&" + label.strip() + " " + line[start_index:]
+    return output
 
 def label_replacement(code):
     label_dict = {}
@@ -114,9 +146,9 @@ def label_replacement(code):
 def get_cmp_and_flag(condition, antiflag=True):
     # split condition
     if antiflag:
-        comparators = {"==": 2, "!=": 1, ">": 6, ">=": 5, "<": 4, "<=": 3}
+        comparators = {"==": 2, "!=": 1, ">=": 5, "<=": 3, ">": 6, "<": 4}
     else:
-        comparators = {"==": 1, "!=": 2, ">": 3, ">=": 4, "<": 5, "<=": 6}
+        comparators = {"==": 1, "!=": 2, ">=": 4, "<=": 6, ">": 3, "<": 5}
     for c in comparators.keys():
         if c in condition:
             r1, r2 = condition.split(c, maxsplit=1)

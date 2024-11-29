@@ -1,7 +1,8 @@
-r1 = 1
-r2 = 1
-r3 = 1
-if r1 == r2:
-    if r2 == r3:
-        disp[1] = 1
+r1 = user[1]
+if r1 >= 0:
+    r2 = 1
+    disp[1] = r2
+else:
+    r2 = -1
+    disp[1] = r2
 exit(success)

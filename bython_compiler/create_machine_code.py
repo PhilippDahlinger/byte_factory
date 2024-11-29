@@ -47,56 +47,56 @@ def create_machine_code(code: list[str]):
                 # basic alu ops
                 concatenate_symbols = ["+", "-", "*", "/", "%", "**", "place_holder", "place_holder", "&", "|", "^",
                                        "<<", ">>"]
-                for c_s in concatenate_symbols:
-                    if c_s in right_side:
-                        if c_s == "*" and "**" in right_side:
-                            # it's actually power, not mult
-                            continue
-                        first_op, second_op = [x.strip() for x in right_side.split(c_s)]
+                if not resolved:
+                    for c_s in concatenate_symbols:
+                        if c_s in right_side:
+                            if c_s == "*" and "**" in right_side:
+                                # it's actually power, not mult
+                                continue
+                            first_op, second_op = [x.strip() for x in right_side.split(c_s)]
+                            parse_two_ops(first_op, second_op, machine_line)
+                            # determine opcode
+                            c_s_index = concatenate_symbols.index(c_s)
+                            machine_line["C"] = c_s_index + 2
+                            resolved = True
+                            break
+                    # min and max
+                    if "min" in right_side or "max" in right_side:
+                        args = right_side[right_side.find("(") + 1: right_side.rfind(")")]
+                        first_op, second_op = [x.strip() for x in args.split(",")]
                         parse_two_ops(first_op, second_op, machine_line)
-                        # determine opcode
-                        c_s_index = concatenate_symbols.index(c_s)
-                        machine_line["C"] = c_s_index + 2
                         resolved = True
-                        break
-                # min and max
-                if "min" in right_side or "max" in right_side:
-                    args = right_side[right_side.find("(") + 1: right_side.rfind(")")]
-                    first_op, second_op = [x.strip() for x in args.split(",")]
-                    parse_two_ops(first_op, second_op, machine_line)
-                    resolved = True
-                if "min" in right_side:
-                    machine_line["C"] = 8
-                if "max" in right_side:
-                    machine_line["C"] = 9
-
-                # LOAD
-                if "mem" in right_side:
-                    machine_line["C"] = 18
-                    machine_line["1"], machine_line["I"] = parse_address(right_side)
-                elif right_side.startswith("int_user"):
-                    machine_line["C"] = 23
-                    machine_line["1"], machine_line["I"] = parse_address(right_side)
-                elif right_side.startswith("user"):
-                    machine_line["C"] = 24
-                    machine_line["1"], machine_line["I"] = parse_address(right_side)
-                elif "rom" in right_side:
-                    machine_line["C"] = 22
-                    machine_line["1"], machine_line["I"] = parse_address(right_side)
-                elif "pop" in right_side:
-                    machine_line["C"] = 21
-                elif "random" in right_side:
-                    raise NotImplementedError()
-                elif "cmov" in right_side:
-                    machine_line["C"] = 15
-                    args = line[line.find("(") + 1: line.rfind(")")]
-                    first_op, second_op = [x.strip() for x in args.split(",")]
-                    parse_op_a(first_op, machine_line)
-                    assert is_int(second_op), f"Line{i}: Second Operator has to be numeric"
-                    machine_line["2"] = int(second_op)
-                    # parse_two_ops(first_op, second_op, machine_line)
-                else:
-                    if not resolved:
+                    if "min" in right_side:
+                        machine_line["C"] = 8
+                    if "max" in right_side:
+                        machine_line["C"] = 9
+                if not resolved:
+                    # LOAD
+                    if "mem" in right_side:
+                        machine_line["C"] = 18
+                        machine_line["1"], machine_line["I"] = parse_address(right_side)
+                    elif right_side.startswith("int_user"):
+                        machine_line["C"] = 23
+                        machine_line["1"], machine_line["I"] = parse_address(right_side)
+                    elif right_side.startswith("user"):
+                        machine_line["C"] = 24
+                        machine_line["1"], machine_line["I"] = parse_address(right_side)
+                    elif "rom" in right_side:
+                        machine_line["C"] = 22
+                        machine_line["1"], machine_line["I"] = parse_address(right_side)
+                    elif "pop" in right_side:
+                        machine_line["C"] = 21
+                    elif "random" in right_side:
+                        raise NotImplementedError()
+                    elif "cmov" in right_side:
+                        machine_line["C"] = 15
+                        args = line[line.find("(") + 1: line.rfind(")")]
+                        first_op, second_op = [x.strip() for x in args.split(",")]
+                        parse_op_a(first_op, machine_line)
+                        assert is_int(second_op), f"Line{i}: Second Operator has to be numeric"
+                        machine_line["2"] = int(second_op)
+                        # parse_two_ops(first_op, second_op, machine_line)
+                    else:
                         raise AssertionError(f"Line {i + 1}: Right side {right_side} is wrong")
         else:
             # no "=" in line
