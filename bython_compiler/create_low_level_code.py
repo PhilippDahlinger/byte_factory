@@ -92,7 +92,7 @@ def label_replacement(code):
             if "," in line:
                 label_or_op = line[line.find("(") + 1:line.find(",")]
             else:
-                label_or_op = line[line.find("(" + 1):line.find(")")].strip()
+                label_or_op = line[line.find("(") + 1:line.find(")")].strip()
             assert not label_or_op.startswith("&"), f"Line {i}; Don't write the '&' before the label when using it in a jump command"
             if label_or_op in label_dict:
                 if "," in line:

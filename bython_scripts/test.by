@@ -1,5 +1,8 @@
-r1 = 3
-r2 = user[1]
-if r1 < r2:
-    disp[1] = 1
+r1 = 1
+r2 = 1
+&start r3 = r2
+r2 = r1 + r2
+r1 = r3
+disp[1] = r2
+jump(start)
 exit(success)
