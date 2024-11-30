@@ -8,6 +8,8 @@ Replaces:
 - While
 - Function calls
 """
+from bython_compiler.create_machine_code import is_int
+
 
 
 def create_low_level_code(source_code: list[str]):
@@ -18,15 +20,39 @@ def create_low_level_code(source_code: list[str]):
     print_code(source_code)
     source_code = while_replacement(source_code)
     print_code(source_code)
-
     source_code = remove_white_space(source_code)
     # print_code(source_code)
     source_code = jump_if_replacement(source_code)
     source_code = cmov_replacement(source_code)
     source_code = label_replacement(source_code)
-    # print_code(source_code)
+    print_code(source_code)
+    source_code = optimize_nop(source_code)
+    print_code(source_code)
 
     return source_code
+
+def optimize_nop(code):
+    i = 0
+    while i < len(code):
+        line = code[i]
+        if line.startswith("nop"):
+            del code[i]
+            for j in range(len(code)):
+                if code[j].startswith("jump"):
+                    if "," in code[j]:
+                        jump_address = code[j][code[j].find("(") + 1: code[j].find(",")].strip()
+                    else:
+                        jump_address = code[j][code[j].find("(") + 1: code[j].find(")")].strip()
+                    if is_int(jump_address) and int(jump_address) > i:
+                        new_jump_address = str(int(jump_address) - 1)
+                        if "," in code[j]:
+                            code[j] = code[j][:code[j].find("(") + 1] + new_jump_address + code[j][code[j].find(","):]
+                        else:
+                            code[j] = code[j][:code[j].find("(") + 1] + new_jump_address + code[j][code[j].find(")"):]
+            i = 0
+        else:
+            i += 1
+    return code
 
 def if_else_replacement(code: list[str]):
     if_counter = 0
