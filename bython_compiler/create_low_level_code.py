@@ -15,8 +15,10 @@ def create_low_level_code(source_code: list[str]):
     source_code = remove_comments(source_code)
     # print_code(source_code)
     source_code = if_else_replacement(source_code)
-    # print_code(source_code)
+    print_code(source_code)
     source_code = while_replacement(source_code)
+    print_code(source_code)
+
     source_code = remove_white_space(source_code)
     # print_code(source_code)
     source_code = jump_if_replacement(source_code)
@@ -63,7 +65,12 @@ def if_else_replacement(code: list[str]):
                 if j == len(code):
                     code.append("&" + end_if_label + " nop")
                 else:
-                    code[j] = insert_label(code[j], end_if_label)
+                    # check if line j is less indent then line i. if thats the case
+                    # we have to insert nop since we would jump out of another block
+                    if get_indent(code[j]) < indent:
+                        code.insert(j, insert_label(" " * indent + "nop", end_if_label))
+                    else:
+                        code[j] = insert_label(code[j], end_if_label)
                 if_counter += 1
                 # replace if statement
                 condition = line[line.find("if"):][2:-1].strip()
@@ -77,7 +84,12 @@ def if_else_replacement(code: list[str]):
                 if j == len(code):
                     code.append("&" + label + " nop")
                 else:
-                    code[j] = insert_label(code[j], label)
+                    # check if line j is less indent then line i. if thats the case
+                    # we have to insert nop since we would jump out of another block
+                    if get_indent(code[j]) < indent:
+                        code.insert(j, insert_label(" " * indent + "nop", label))
+                    else:
+                        code[j] = insert_label(code[j], label)
                 if_counter += 1
                 # replace if statement
                 condition = line[line.find("if"):][2:-1].strip()
@@ -125,7 +137,10 @@ def while_replacement(code):
             if j == len(code):
                 code.append("&" + end_label + " nop")
             else:
-                code[j] = insert_label(code[j], end_label)
+                if get_indent(code[j]) < indent:
+                    code.insert(j, insert_label(" " * indent + "nop", end_label))
+                else:
+                    code[j] = insert_label(code[j], end_label)
             while_counter += 1
             # replace while statement
             condition = line[line.find("while"):][5:-1].strip()
@@ -208,5 +223,5 @@ def remove_white_space(code):
 def print_code(code):
     print("-------------------------")
     for i, line in enumerate(code):
-        print(f"[{i}] " + line)
+        print(f"[{i:03d}] " + line)
     print("-------------------------")

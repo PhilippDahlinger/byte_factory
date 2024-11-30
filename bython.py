@@ -36,7 +36,7 @@ def compile_bython(input_file, output_file, verbose=False, intermediate=False):
     if intermediate:
         with open(output_file[:-3] + "bas", 'w') as outfile:
             for i, line in enumerate(low_level_code):
-                outfile.write(f"[{i}] " + line + "\n")  # Write each string to a new line
+                outfile.write(f"[{i:03d}] " + line + "\n")  # Write each string to a new line
     compiled_output, compiled_output_str = create_machine_code(low_level_code)
     blueprint = create_blueprint(compiled_output)
 
@@ -50,7 +50,7 @@ def compile_bython(input_file, output_file, verbose=False, intermediate=False):
         outfile.write(blueprint)
 
     if verbose:
-        print(f"Compilation completed. Output written to: {output_file[:-3] + "bp"},  {output_file}, and {output_file[:-3] + "bas"}")
+        print(f"Compilation completed. Output written to: {output_file[:-3] + 'bp'},  {output_file}, and {output_file[:-3] + 'bas'}")
 
 
 def main():
