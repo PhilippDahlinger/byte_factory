@@ -16,6 +16,8 @@ def create_low_level_code(source_code: list[str]):
     # print_code(source_code)
     source_code = remove_comments(source_code)
     # print_code(source_code)
+    source_code = function_call_replacement(source_code)
+    print_code(source_code)
     source_code = if_else_replacement(source_code)
     print_code(source_code)
     source_code = while_replacement(source_code)
@@ -53,6 +55,65 @@ def optimize_nop(code):
         else:
             i += 1
     return code
+
+
+def function_call_replacement(code: list[str]):
+    # gather all functions used
+    functions = []
+    for line in code:
+        if line.startswith("def "):
+            func = line[line.find("def ") + 3:-3].strip()
+            assert func not in functions, f"Function name {func} used multiple times."
+            functions.append(func)
+    # replace calls
+    i = 0
+    while i < len(code):
+        line = code[i]
+        start_again = False
+        for func in functions:
+            if line.strip().startswith(func + "()"):
+                # replace it with
+                # r13 = pc + 3
+                # push(r13)
+                # jump(func)
+                indent = get_indent(line)
+                code[i] = " " * indent + "r13 = pc + 3"
+                code.insert(i + 1, " " * indent + "push(r13)")
+                code.insert(i + 2, " " * indent + f"jump({func})")
+                start_again = True
+                break
+        if start_again:
+            i = 0
+        else:
+            i += 1
+
+    # replace bodies
+    i = 0
+    while i < len(code):
+        line = code[i]
+        start_again = False
+        for func in functions:
+            if line.startswith(f"def {func}():"):
+                code[i] = f"&{func} nop"
+                assert get_indent(code[i+1]) == 4
+                j = i + 1
+                while j < len(code) and get_indent(code[j]) >= 4:
+                    # indent 4 to the left
+                    code[j] = code[j][4:]
+                    # check return
+                    if code[j].strip().startswith("return"):
+                        # return statement, replace it with pop
+                        code[j] = " " * get_indent(code[j]) + "pc = pop()"
+                    j += 1
+                start_again = True
+                break
+        if start_again:
+            i = 0
+        else:
+            i += 1
+
+    return code
+
 
 def if_else_replacement(code: list[str]):
     if_counter = 0

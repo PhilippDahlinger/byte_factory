@@ -1,0 +1,10 @@
+r1 = 5
+func()
+exit(success)
+
+def func():
+    disp[1] = r1
+    r1 = r1 - 1
+    if r1 > 0:
+        func()
+    return

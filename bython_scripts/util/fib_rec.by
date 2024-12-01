@@ -1,0 +1,13 @@
+r1 = user[1]
+r2 = fib(r1)
+disp[1] = r2
+
+def fib(r10):
+    if r10 <= 2:
+        return 1
+    r10 = r10 - 1
+    r3 = fib(r10)
+    r10 = r10 - 1
+    r4 = fib(r10)
+    r3 = r3 + r4
+    return r3
