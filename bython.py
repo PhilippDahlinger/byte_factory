@@ -29,7 +29,7 @@ def compile_bython(input_file, output_file, verbose=False, intermediate=False):
         # split by line
         source_code = source_code.split("\n")
         if verbose:
-            print("Source code read successfully:")
+            print("Source code read successfully.")
             # print(source_code)
 
     low_level_code = create_low_level_code(source_code)

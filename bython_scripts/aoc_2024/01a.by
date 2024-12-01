@@ -1,0 +1,16 @@
+r10 = load_data()
+disp[1] = r10
+exit(success)
+
+def load_data():
+    r1 = 1
+    r2 = rom[r1]
+    while r2 != -1:
+        mem[r1] = r2
+        r1 = r1 + 1
+        r2 = rom[r1]
+    r1 = r1 - 1
+    return r1
+
+
+

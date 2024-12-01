@@ -17,19 +17,19 @@ def create_low_level_code(source_code: list[str]):
     source_code = remove_comments(source_code)
     # print_code(source_code)
     source_code = function_call_replacement(source_code)
-    print_code(source_code)
+    # print_code(source_code)
     source_code = if_else_replacement(source_code)
-    print_code(source_code)
+    # print_code(source_code)
     source_code = while_replacement(source_code)
-    print_code(source_code)
+    # print_code(source_code)
     source_code = remove_white_space(source_code)
     # print_code(source_code)
     source_code = jump_if_replacement(source_code)
     source_code = cmov_replacement(source_code)
     source_code = label_replacement(source_code)
-    print_code(source_code)
+    # print_code(source_code)
     source_code = optimize_nop(source_code)
-    print_code(source_code)
+    # print_code(source_code)
 
     return source_code
 
@@ -66,6 +66,8 @@ def function_call_replacement(code: list[str]):
             assert func not in functions, f"Function name {func} used multiple times."
             params = line[line.find("(") + 1:line.find(")")].split(",")
             params = [x.strip() for x in params]
+            if params == [""]:
+                params = []
             functions[func] = params
     # replace calls
     i = 0
@@ -88,6 +90,8 @@ def function_call_replacement(code: list[str]):
                 return_reg = line.split("=")[0].strip()
                 args = line[line.find("(") + 1:line.find(")")].split(",")
                 args = [x.strip() for x in args]
+                if args == [""]:
+                    args = []
                 assert len(args) == len(functions[func]), f"Line {i}: Number of given arguments does not match function definition"
                 del code[i]
                 for s in range(FUNCTION_STATE_SIZE):
