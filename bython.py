@@ -51,6 +51,8 @@ def compile_bython(input_file, output_file, verbose=False, intermediate=False):
 
     if verbose:
         print(f"Compilation completed. Output written to: {output_file[:-3] + 'bp'},  {output_file}, and {output_file[:-3] + 'bas'}")
+        print("BLUEPRINT:")
+        print(blueprint)
 
 
 def main():
