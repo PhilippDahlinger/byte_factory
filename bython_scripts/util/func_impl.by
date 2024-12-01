@@ -1,0 +1,9 @@
+r1 = user[1]
+r2 = func(r1)
+disp[1] = r1
+disp[2] = r2
+exit(success)
+
+def func(r1):
+    r1 = r1 + 1
+    return r1

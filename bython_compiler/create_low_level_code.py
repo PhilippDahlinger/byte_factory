@@ -1,4 +1,4 @@
-
+FUNCTION_STATE_SIZE = 4
 
 """
 Replaces:
@@ -59,27 +59,46 @@ def optimize_nop(code):
 
 def function_call_replacement(code: list[str]):
     # gather all functions used
-    functions = []
+    functions = {}
     for line in code:
         if line.startswith("def "):
-            func = line[line.find("def ") + 3:-3].strip()
+            func = line[line.find("def ") + 3:line.find("(")].strip()
             assert func not in functions, f"Function name {func} used multiple times."
-            functions.append(func)
+            params = line[line.find("(") + 1:line.find(")")].split(",")
+            params = [x.strip() for x in params]
+            functions[func] = params
     # replace calls
     i = 0
     while i < len(code):
         line = code[i]
         start_again = False
         for func in functions:
-            if line.strip().startswith(func + "()"):
-                # replace it with
-                # r13 = pc + 3
+            if "def" not in line and func + "(" in line:
+                # replace it with:
+                # push(r1)
+                # push(r2)
+                # push(r3)
+                # push(r_{function_state_size})
+                # r13 = pc + 4  # 3 + number of args
                 # push(r13)
+                # # arguments
+                # push(r1)
                 # jump(func)
                 indent = get_indent(line)
-                code[i] = " " * indent + "r13 = pc + 3"
-                code.insert(i + 1, " " * indent + "push(r13)")
-                code.insert(i + 2, " " * indent + f"jump({func})")
+                return_reg = line.split("=")[0].strip()
+                args = line[line.find("(") + 1:line.find(")")].split(",")
+                args = [x.strip() for x in args]
+                assert len(args) == len(functions[func]), f"Line {i}: Number of given arguments does not match function definition"
+                del code[i]
+                for s in range(FUNCTION_STATE_SIZE):
+                    code.insert(i + s, " " * indent + f"push(r{s + 1})")
+
+                code.insert(i + FUNCTION_STATE_SIZE, " " * indent + f"r13 = pc + {3 + len(args)}")
+                code.insert(i + FUNCTION_STATE_SIZE + 1, " " * indent + "push(r13)")
+                for i_arg, arg in enumerate(args):
+                    code.insert(i + FUNCTION_STATE_SIZE + 2 + i_arg, " " * indent + f"push({arg})")
+                code.insert(i + FUNCTION_STATE_SIZE + 2 + len(args), " " * indent + f"jump({func})")
+                code.insert(i + FUNCTION_STATE_SIZE + 3 + len(args), " " * indent + f"{return_reg} = pop()")
                 start_again = True
                 break
         if start_again:
@@ -93,17 +112,35 @@ def function_call_replacement(code: list[str]):
         line = code[i]
         start_again = False
         for func in functions:
-            if line.startswith(f"def {func}():"):
+            if line.startswith(f"def {func}"):
                 code[i] = f"&{func} nop"
                 assert get_indent(code[i+1]) == 4
                 j = i + 1
+                # insert args, reversed since stack
+                for p in reversed(functions[func]):
+                    code.insert(j, f"{p} = pop()")
+                    j += 1
                 while j < len(code) and get_indent(code[j]) >= 4:
                     # indent 4 to the left
                     code[j] = code[j][4:]
                     # check return
                     if code[j].strip().startswith("return"):
-                        # return statement, replace it with pop
-                        code[j] = " " * get_indent(code[j]) + "pc = pop()"
+                        # return statement, save it in r12, get jump back address, create initial state
+                        return_reg = code[j][code[j].find("return") + 6:].strip()
+                        return_indent = get_indent(code[j])
+                        code[j] = " " * return_indent + f"r12 = {return_reg}"
+                        # jump back address
+                        code.insert(j + 1, " " * return_indent + f"r13 = pop()")
+                        j += 1
+                        # state
+                        for s in reversed(range(FUNCTION_STATE_SIZE)):
+                            code.insert(j + 1, " " * return_indent + f"r{s + 1} = pop()")
+                            j += 1
+                        # push return
+                        code.insert(j + 1, " " * return_indent + f"push(r12)")
+                        j += 1
+                        code.insert(j + 1, " " * return_indent + f"jump(r13)")
+                        j += 1
                     j += 1
                 start_again = True
                 break
