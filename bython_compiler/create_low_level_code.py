@@ -87,6 +87,7 @@ def function_call_replacement(code: list[str]):
                 # push(r1)
                 # jump(func)
                 indent = get_indent(line)
+                # TODO: catch labels here!!
                 return_reg = line.split("=")[0].strip()
                 args = line[line.find("(") + 1:line.find(")")].split(",")
                 args = [x.strip() for x in args]
@@ -195,10 +196,7 @@ def if_else_replacement(code: list[str]):
                 else:
                     # check if line j is less indent then line i. if thats the case
                     # we have to insert nop since we would jump out of another block
-                    if get_indent(code[j]) < indent:
-                        code.insert(j, insert_label(" " * indent + "nop", end_if_label))
-                    else:
-                        code[j] = insert_label(code[j], end_if_label)
+                    code.insert(j, insert_label(" " * indent + "nop", end_if_label))
                 if_counter += 1
                 # replace if statement
                 condition = line[line.find("if"):][2:-1].strip()
@@ -212,12 +210,7 @@ def if_else_replacement(code: list[str]):
                 if j == len(code):
                     code.append("&" + label + " nop")
                 else:
-                    # check if line j is less indent then line i. if thats the case
-                    # we have to insert nop since we would jump out of another block
-                    if get_indent(code[j]) < indent:
-                        code.insert(j, insert_label(" " * indent + "nop", label))
-                    else:
-                        code[j] = insert_label(code[j], label)
+                    code.insert(j, insert_label(" " * indent + "nop", label))
                 if_counter += 1
                 # replace if statement
                 condition = line[line.find("if"):][2:-1].strip()
@@ -265,13 +258,10 @@ def while_replacement(code):
             if j == len(code):
                 code.append("&" + end_label + " nop")
             else:
-                if get_indent(code[j]) < indent:
-                    code.insert(j, insert_label(" " * indent + "nop", end_label))
-                else:
-                    code[j] = insert_label(code[j], end_label)
+                code.insert(j, insert_label(" " * indent + "nop", end_label))
             while_counter += 1
             # replace while statement
-            condition = line[line.find("while"):][5:-1].strip()
+            condition = line[line.find("while"): line.find(":")][5:].strip()
             cmp_cmd, antiflag = get_cmp_and_flag(condition, antiflag=True)
             code[i] = " " * indent + labels +f"&{start_label} " + cmp_cmd
             code.insert(i + 1, " " * indent + f"jump({end_label}, {antiflag})")
