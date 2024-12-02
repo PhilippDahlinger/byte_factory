@@ -1,0 +1,56 @@
+r1 = 1
+r10 = 0  # number of correct rows
+while r1 <= 12:  # 2 * number of rows
+    disp[1] = r1
+    r2 = load_row(r1)  # row length
+    r2 = r2 - 1 # want row length -1
+    r3 = 1  # index over row
+    r4 = mem[1] # first number
+    r5 = mem[2] # second number
+    if r4 < r5:  # monotonic increase
+        while r3 <= r2:  # iterate over row[:-1]
+            r4 = mem[r3]
+            r5 = mem[r3 + 1]
+            r6 = r5 - r4
+            if r6 < 1:
+                jump(wrong)
+            if r6 > 3:
+                jump(wrong)
+            r3 = r3 + 1
+    else:  # monotonic decrease
+        while r3 <= r2:  # iterate over row[:-1]
+            r5 = mem[r3]
+            r4 = mem[r3 + 1]
+            r6 = r5 - r4
+            if r6 < 1:
+                jump(wrong)
+            if r6 > 3:
+                jump(wrong)
+            r3 = r3 + 1
+    r10 = r10 + 1 # correct row
+    &wrong r1 = r1 + 2  # next row index
+    disp[2] = r10
+
+
+
+
+def load_row(r1):
+    r2 = rom[r1]
+    r1 = rom[r1 + 1]
+    r3 = 0
+    while r3 < 4:
+        r4 = r2 & 127
+        r2 >> 7
+        mem[r3 + 1] = r4
+        r3 = r3 + 1
+    r3 = 0
+    while r3 < 4:
+        r4 = r1 & 127
+        r1 >> 7
+        if r4 == 0:
+            return r3 + 4
+        mem[r3 + 5] = r4
+        r3 = r3 + 1
+    return r3 + 4
+
+
