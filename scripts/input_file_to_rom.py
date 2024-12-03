@@ -15,7 +15,7 @@ def set_drom_values(entity, code):
             break
 
 if __name__ == "__main__":
-    input_file = "aoc_2024_inputs/02_test.txt"
+    input_file = "aoc_2024_inputs/02.txt"
     # outputs = encode_char(input_file)
     # test = decode_char(outputs)
     outputs = encode_int(input_file, new_line_marker=False)

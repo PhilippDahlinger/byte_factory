@@ -1,6 +1,6 @@
 r1 = 1
 r10 = 0  # number of correct rows
-while r1 <= 12:  # 2 * number of rows
+while r1 <= 2000:  # 2 * number of rows
     r2 = load_row(r1)  # row length
     r2 = r2 - 1 # want row length -1
     r3 = 1  # index over row
