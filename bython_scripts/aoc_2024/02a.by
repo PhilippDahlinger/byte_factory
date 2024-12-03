@@ -1,7 +1,6 @@
 r1 = 1
 r10 = 0  # number of correct rows
 while r1 <= 12:  # 2 * number of rows
-    disp[1] = r1
     r2 = load_row(r1)  # row length
     r2 = r2 - 1 # want row length -1
     r3 = 1  # index over row
@@ -29,9 +28,9 @@ while r1 <= 12:  # 2 * number of rows
             r3 = r3 + 1
     r10 = r10 + 1 # correct row
     &wrong r1 = r1 + 2  # next row index
-    disp[2] = r10
-
-
+nop
+disp[1] = r10
+exit(success)
 
 
 def load_row(r1):
@@ -40,13 +39,13 @@ def load_row(r1):
     r3 = 0
     while r3 < 4:
         r4 = r2 & 127
-        r2 >> 7
+        r2 = r2 >> 7
         mem[r3 + 1] = r4
         r3 = r3 + 1
     r3 = 0
     while r3 < 4:
         r4 = r1 & 127
-        r1 >> 7
+        r1 = r1 >> 7
         if r4 == 0:
             return r3 + 4
         mem[r3 + 5] = r4

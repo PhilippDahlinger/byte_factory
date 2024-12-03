@@ -8,5 +8,5 @@ r2 = 0
 while r2 < r1:
     r3 = mem[r2 + 1]
     disp[1] = r3
-    r2 = r2 + 1
+    r2 = r2 + 1a
 exit(success)

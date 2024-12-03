@@ -199,7 +199,7 @@ def if_else_replacement(code: list[str]):
                     code.insert(j, insert_label(" " * indent + "nop", end_if_label))
                 if_counter += 1
                 # replace if statement
-                condition = line[line.find("if"):][2:-1].strip()
+                condition = line[line.find("if"):line.find(":")][2:].strip()
                 cmp_cmd, antiflag = get_cmp_and_flag(condition, antiflag=True)
                 code[i] = " " * indent + labels + cmp_cmd
                 code.insert(i + 1, " " * indent + f"jump({else_label}, {antiflag})")
@@ -213,7 +213,7 @@ def if_else_replacement(code: list[str]):
                     code.insert(j, insert_label(" " * indent + "nop", label))
                 if_counter += 1
                 # replace if statement
-                condition = line[line.find("if"):][2:-1].strip()
+                condition = line[line.find("if"):line.find(":")][2:].strip()
                 cmp_cmd, antiflag = get_cmp_and_flag(condition, antiflag=True)
                 code[i] = " " * indent + labels + cmp_cmd
                 code.insert(i + 1, " " * indent + f"jump({label}, {antiflag})")
