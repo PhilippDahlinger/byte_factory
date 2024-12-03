@@ -1,55 +1,52 @@
 r1 = 1
 r10 = 0  # number of correct rows
 while r1 <= 2000:  # 2 * number of rows
-    r2 = load_row(r1)  # row length
-    r2 = r2 - 1 # want row length -1
-    r3 = 1  # index over row
-    r4 = mem[1] # first number
-    r5 = mem[2] # second number
-    if r4 < r5:  # monotonic increase
-        while r3 <= r2:  # iterate over row[:-1]
-            r4 = mem[r3]
-            r5 = mem[r3 + 1]
-            r6 = r5 - r4
+    r2 = rom[r1]
+    r3 = rom[r1 + 1]
+    r4 = 0
+    while r4 < 4:
+        r5 = r2 & 127
+        r2 = r2 >> 7
+        mem[r4 + 1] = r5
+        r4 = r4 + 1
+    r4 = 0
+    while r4 < 4:
+        r5 = r3 & 127
+        r3 = r3 >> 7
+        if r5 == 0:
+            jump(end_parse)
+        mem[r4 + 5] = r5
+        r4 = r4 + 1
+    nop
+    &end_parse r2 = r4 + 3 # want row length -1
+    r7 = 1  # index over row
+    r8 = mem[1] # first number
+    r9 = mem[2] # second number
+    if r8 < r9:  # monotonic increase
+        while r7 <= r2:  # iterate over row[:-1]
+            r8 = mem[r7]
+            r9 = mem[r7 + 1]
+            r6 = r9 - r8
             if r6 < 1:
                 jump(wrong)
             if r6 > 3:
                 jump(wrong)
-            r3 = r3 + 1
+            r7 = r7 + 1
     else:  # monotonic decrease
-        while r3 <= r2:  # iterate over row[:-1]
-            r5 = mem[r3]
-            r4 = mem[r3 + 1]
-            r6 = r5 - r4
+        while r7 <= r2:  # iterate over row[:-1]
+            r9 = mem[r7]
+            r8 = mem[r7 + 1]
+            r6 = r9 - r8
             if r6 < 1:
                 jump(wrong)
             if r6 > 3:
                 jump(wrong)
-            r3 = r3 + 1
+            r7 = r7 + 1
     r10 = r10 + 1 # correct row
     &wrong r1 = r1 + 2  # next row index
 nop
 disp[1] = r10
 exit(success)
 
-
-def load_row(r1):
-    r2 = rom[r1]
-    r1 = rom[r1 + 1]
-    r3 = 0
-    while r3 < 4:
-        r4 = r2 & 127
-        r2 = r2 >> 7
-        mem[r3 + 1] = r4
-        r3 = r3 + 1
-    r3 = 0
-    while r3 < 4:
-        r4 = r1 & 127
-        r1 = r1 >> 7
-        if r4 == 0:
-            return r3 + 4
-        mem[r3 + 5] = r4
-        r3 = r3 + 1
-    return r3 + 4
 
 

@@ -47,7 +47,7 @@ def encode_int(input_file, bits=7, numbers_per_code=4, new_line_marker=False):
             current_output = 0
             i = 0
             numbers = line.split(" ")
-            numbers = [int(n) for n in numbers]
+            numbers = [int(n) for n in numbers if n != ""]
             if new_line_marker:
                 numbers.append(2**bits - 1)
             for n in numbers:
