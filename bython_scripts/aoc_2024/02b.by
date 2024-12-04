@@ -17,11 +17,17 @@ exit(success)
 def check_row(r1, r2):
     # r1: start, r2: end address of the row
     # can use regs r1-r9
+    r2 = r2 + 1
     r3 = mem[2] # first number,  but swapped to save one mem instruction
     r4 = mem[1] # second number
     r5 = 1  # 1: can remove one number, 0: cannot remove one number
     if r3 == r4:
         # assumption that first 2 numbers are correct is violated -> direct game over. Will check in the reverse path
+        return 0
+    r6 = r3 - r4
+    if r6 > 3:
+        return 0
+    if r6 < -3:
         return 0
     if r3 > r4: # monotonic increase
         r1 = 3 # first two numbers already loaded in, load in the second
