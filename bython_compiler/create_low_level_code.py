@@ -1,3 +1,5 @@
+import re
+
 FUNCTION_STATE_SIZE = 4
 
 """
@@ -9,7 +11,6 @@ Replaces:
 - Function calls
 """
 from bython_compiler.create_machine_code import is_int
-
 
 
 def create_low_level_code(source_code: list[str]):
@@ -32,6 +33,7 @@ def create_low_level_code(source_code: list[str]):
     # print_code(source_code)
 
     return source_code
+
 
 def optimize_nop(code):
     i = 0
@@ -93,7 +95,8 @@ def function_call_replacement(code: list[str]):
                 args = [x.strip() for x in args]
                 if args == [""]:
                     args = []
-                assert len(args) == len(functions[func]), f"Line {i}: Number of given arguments does not match function definition"
+                assert len(args) == len(
+                    functions[func]), f"Line {i}: Number of given arguments does not match function definition"
                 del code[i]
                 for s in range(FUNCTION_STATE_SIZE):
                     code.insert(i + s, " " * indent + f"push(r{s + 1})")
@@ -119,7 +122,7 @@ def function_call_replacement(code: list[str]):
         for func in functions:
             if line.startswith(f"def {func}"):
                 code[i] = f"&{func} nop"
-                assert get_indent(code[i+1]) == 4
+                assert get_indent(code[i + 1]) == 4
                 j = i + 1
                 # insert args, reversed since stack
                 for p in reversed(functions[func]):
@@ -176,13 +179,13 @@ def if_else_replacement(code: list[str]):
             if code[j].startswith(" " * indent + "else:"):
                 # if-else case
                 # label next line with else label
-                assert get_indent(code[j+1]) == indent + 4, "Else block not correct"
+                assert get_indent(code[j + 1]) == indent + 4, "Else block not correct"
                 else_label = f"else_{if_counter}"
                 end_if_label = f"end_if_{if_counter}"
-                code[j+1] = insert_label(code[j+1], else_label)
+                code[j + 1] = insert_label(code[j + 1], else_label)
                 # replace else statement with jump to end if
                 code[j] = " " * indent + f"jump({end_if_label})"
-                j = j +1
+                j = j + 1
                 # else block
                 while get_indent(code[j]) > indent:
                     # in else block, remove 1 indent level, since we resolve this else clause
@@ -263,7 +266,7 @@ def while_replacement(code):
             # replace while statement
             condition = line[line.find("while"): line.find(":")][5:].strip()
             cmp_cmd, antiflag = get_cmp_and_flag(condition, antiflag=True)
-            code[i] = " " * indent + labels +f"&{start_label} " + cmp_cmd
+            code[i] = " " * indent + labels + f"&{start_label} " + cmp_cmd
             code.insert(i + 1, " " * indent + f"jump({end_label}, {antiflag})")
             code.insert(j + 1, " " * indent + f"jump({start_label})")
             i = 0
@@ -277,7 +280,32 @@ def jump_if_replacement(code):
 
 
 def cmov_replacement(code):
+    # replaces stuff like r1 = r2 if r3 < r4
+    i = 0
+    while i < len(code):
+        cleaned_line, labels, line = clean_line_extract_labels(code, i)
+        match = re.search(r'(?<![<>=])=(?![<>=])', cleaned_line)
+        if match:
+            left_side, right_side = cleaned_line[:match.start()].strip(), cleaned_line[match.start() + 1:]
+            # test if "if" in right side:
+            if "if" in right_side:
+                # cmov
+                body, condition = right_side.split("if", maxsplit=1)
+                condition = condition.strip()
+                body = body.strip()
+                cmp_command, flag = get_cmp_and_flag(condition, antiflag=False)
+                indent = get_indent(line)
+                del code[i]
+                code.insert(i, " " * indent + labels + cmp_command)
+                code.insert(i + 1, " " * indent + f"{left_side} = cmov({body}, {flag})")
+                i = 0
+            else:
+                i += 1
+                continue
+        else:
+            i += 1
     return code
+
 
 def insert_label(line, label):
     assert not label.startswith("&")
@@ -285,6 +313,7 @@ def insert_label(line, label):
     start_index = len(line) - len(line.lstrip())
     output = line[:start_index] + "&" + label.strip() + " " + line[start_index:]
     return output
+
 
 def label_replacement(code):
     label_dict = {}
@@ -301,7 +330,8 @@ def label_replacement(code):
                 label_or_op = line[line.find("(") + 1:line.find(",")]
             else:
                 label_or_op = line[line.find("(") + 1:line.find(")")].strip()
-            assert not label_or_op.startswith("&"), f"Line {i}; Don't write the '&' before the label when using it in a jump command"
+            assert not label_or_op.startswith(
+                "&"), f"Line {i}; Don't write the '&' before the label when using it in a jump command"
             if label_or_op in label_dict:
                 if "," in line:
                     code[i] = line[:line.find("(") + 1] + str(label_dict[label_or_op]) + line[line.find(","):]
@@ -327,9 +357,13 @@ def get_cmp_and_flag(condition, antiflag=True):
 def get_indent(line):
     return len(line) - len(line.lstrip(' '))
 
+
 def remove_comments(code: list[str]):
     code = [line.split("#", 1)[0] for line in code]
+    relevant_lines = [i for i in range(len(code)) if code[i].strip() != ""]
+    code = [line for i, line in enumerate(code) if i in relevant_lines]
     return code
+
 
 def remove_white_space(code):
     # Strip leading and trailing whitespace
@@ -337,6 +371,7 @@ def remove_white_space(code):
     relevant_lines = [i for i in range(len(code)) if code[i] != ""]
     code = [line for i, line in enumerate(code) if i in relevant_lines]
     return code
+
 
 def print_code(code):
     print("-------------------------")
