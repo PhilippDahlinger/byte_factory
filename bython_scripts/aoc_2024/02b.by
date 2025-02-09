@@ -6,7 +6,7 @@ while r1 <= r2:  # 2 * number of rows
     r3 = load_data(r1)  # length of row - 1
     r4 = check_row(1, r3)  # start index is 1, last index r3
     if r4 == 0:
-        r3 = 17 - r3  # start index of reversed row
+        r3 = 16 - r3  # start index of reversed row
         r4 = check_row(r3, 16)
     r10 = r10 + r4
     r1 = r1 + 2
@@ -18,8 +18,8 @@ def check_row(r1, r2):
     # r1: start, r2: end address of the row
     # can use regs r1-r9
     r2 = r2 + 1
-    r3 = mem[2] # first number,  but swapped to save one mem instruction
-    r4 = mem[1] # second number
+    r3 = mem[r1 + 1] # first number,  but swapped to save one mem instruction
+    r4 = mem[r1] # second number
     r5 = 1  # 1: can remove one number, 0: cannot remove one number
     if r3 == r4:
         # assumption that first 2 numbers are correct is violated -> direct game over. Will check in the reverse path
@@ -30,9 +30,9 @@ def check_row(r1, r2):
     if r6 < -3:
         return 0
     if r3 > r4: # monotonic increase
-        r1 = 3 # first two numbers already loaded in, load in the second
+        r1 = r1 + 2 # first two numbers already loaded in, load in the second
         r4 = mem[r1]
-        while r1 <= r2:
+        while r1 < r2:
             r6 = r4 - r3  # check for error in difference r6
             r7 = 0
             r8 = 0
@@ -53,9 +53,9 @@ def check_row(r1, r2):
                 r4 = mem[r1 + 1] # will load random stuff in last iteration, but thats ok, we dont use it
             r1 = r1 + 1
     else:  # monotonic decrease
-        r1 = 3 # first two numbers already loaded in, load in the second
+        r1 = r1 + 2 # first two numbers already loaded in, load in the second
         r4 = mem[r1]
-        while r1 <= r2:
+        while r1 < r2:
             r6 = r3 - r4  # check for error in difference r6
             r7 = 0
             r8 = 0
