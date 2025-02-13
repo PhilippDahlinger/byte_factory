@@ -1,7 +1,7 @@
 import os
 
 from bython_compiler.create_low_level_code import remove_white_space, remove_comments
-from factorisco_assember.assembler_util import get_text_segment, tokenize
+from factorisco_assember.assembler_util import get_text_segment, tokenize, replace_pseudo_instructions
 
 
 def assemble(assembly_code):
@@ -12,8 +12,10 @@ def assemble(assembly_code):
     ...
     # tokenize and replace .globl _start with j _start
     code = tokenize(code)
+    # replace pseudo instructions
+    code = replace_pseudo_instructions(code)
     print("stop")
-    # entry point
+
 
 
 
