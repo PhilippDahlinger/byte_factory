@@ -1,25 +1,72 @@
-code = [
-    {"opcode": 1, "rd": 1,"add_opcode": 1, "rs1": 1,"rs2": None, "imm": 1},
-    {"opcode": 1, "rd": 2,"add_opcode": 1, "rs1": 2,"rs2": None, "imm": 1},
-    {"opcode": 1, "rd": 1,"add_opcode": 2, "rs1": 1,"rs2": 2, "imm": None},
-    {"opcode": 1, "rd": 2,"add_opcode": 2, "rs1": 1,"rs2": 2, "imm": None},
-    {"opcode": 1, "rd": 3,"add_opcode": None, "rs1": None,"rs2": None, "imm": -2},
-]
+def convert_to_word(line):
+    opcode = line["opcode"]
+    if (opcode < 20 and line["add_opcode"] == 1) or opcode == 23 or opcode == 24:
+        # I Instruction
+        assert -2 ** 11 <= line["imm"] < 2 ** 11
+        # imm
+        word = line["imm"] & 0xFFF
+        # rs1
+        word = ((word << 5) + line["rs1"]) & 0xFFFFFFFF
+        # add opcode
+        word = ((word << 3) + line["add_opcode"]) & 0xFFFFFFFF
+        # rd
+        word = ((word << 5) + line["rd"]) & 0xFFFFFFFF
+        # opcode
+        word = ((word << 7) + line["opcode"]) & 0xFFFFFFFF
+    elif opcode < 20 and line["add_opcode"] == 2:
+        # R Instruction
+        word = line["rs2"] & 0xFFFFFFFF
+        word = ((word << 5) + line["rs1"]) & 0xFFFFFFFF
+        # add opcode
+        word = ((word << 3) + line["add_opcode"]) & 0xFFFFFFFF
+        # rd
+        word = ((word << 5) + line["rd"]) & 0xFFFFFFFF
+        # opcode
+        word = ((word << 7) + line["opcode"]) & 0xFFFFFFFF
+    elif 20 <= opcode <= 22 or opcode == 30:
+        # U Instruction
+        # view input as shifted 12 bits to the left
+        word = line["imm"] & 0xFFFFF
+        word = ((word << 5) + line["rd"]) & 0xFFFFFFFF
+        # opcode
+        word = ((word << 7) + line["opcode"]) & 0xFFFFFFFF
+    elif 25 <= opcode <= 26:
+        # S Instruction
+        upper_imm = line["imm"] & 0xFE0
+        lower_imm = line["imm"] & 0x01F
+        word = upper_imm
+        # rs2
+        word = ((word << 7) + line["rs2"]) & 0xFFFFFFFF
+        # rs1
+        word = ((word << 5) + line["rs1"]) & 0xFFFFFFFF
+        # add opcode
+        word = ((word << 3) + line["add_opcode"]) & 0xFFFFFFFF
+        # lower imm
+        word = ((word << 5) + lower_imm) & 0xFFFFFFFF
+        # opcode
+        word = ((word << 7) + line["opcode"]) & 0xFFFFFFFF
+    else:
+        raise ValueError(f"Wrong combination of opcode and add_opcode: {line}")
+    return word
 
 
-def add_and_shift(x, shift, y):
-    result = ((x << shift) + y) & 0xFFFFFFFF  # Ensure 32-bit wraparound
-    if result & 0x80000000:  # Check if negative in 32-bit signed range
-        result -= 0x100000000  # Convert to negative
-    return result
+
+
+if __name__ == "__main__":
+    code = [
+        {"opcode": 1, "rd": 1, "add_opcode": 1, "rs1": 0, "rs2": None, "imm": 1},
+        {"opcode": 1, "rd": 2, "add_opcode": 1, "rs1": 0, "rs2": None, "imm": 1},
+        {"opcode": 1, "rd": 1, "add_opcode": 2, "rs1": 1, "rs2": 2, "imm": None},
+        {"opcode": 1, "rd": 2, "add_opcode": 2, "rs1": 1, "rs2": 2, "imm": None},
+        {"opcode": 22, "rd": 3, "add_opcode": None, "rs1": None, "rs2": None, "imm": -2},
+    ]
+    output_words = []
+
+    for line in code:
+        output_words.append(convert_to_word(line))
+    for line, word in zip(code, output_words):
+        print(line, word, f"{word:0b}")
 
 
 
 
-# Example usage:
-a = 2**29   # Some number
-b = 200    # Number to add
-shift = 1  # Number of bits to shift
-
-res = add_and_shift(a, shift, b)
-print(res)  # Output will be in signed 32-bit range
