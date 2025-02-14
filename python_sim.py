@@ -38,34 +38,36 @@ def pop():
 
 
 def cmov(r1, r2):
-     # todo
+    # todo
+    ...
 
 
-pc = 0
-r1 = 0
-r2 = 0
-r3 = 0
-r4 = 0
-r5 = 0
-r6 = 0
-r7 = 0
-r8 = 0
-r9 = 0
-r10 = 0
-r11 = 0
-r12 = 0
-r13 = 0
-flag = None
-stack = []
-user = [0] * 8
+if __name__ == "__main__":
+    pc = 0
+    r1 = 0
+    r2 = 0
+    r3 = 0
+    r4 = 0
+    r5 = 0
+    r6 = 0
+    r7 = 0
+    r8 = 0
+    r9 = 0
+    r10 = 0
+    r11 = 0
+    r12 = 0
+    r13 = 0
+    flag = None
+    stack = []
+    user = [0] * 8
 
-bas_code = load_bas("output/test.bas")
-rom = main()
-mem = [0] * 2000
+    bas_code = load_bas("output/test.bas")
+    rom = main()
+    mem = [0] * 2000
 
-while True:
-    instruction = bas_code[pc]
-    print(instruction)
-    pc += 1
-    # match = re.search(r'(?<![<>=])=(?![<>=])', instruction)
-    exec(instruction)
+    while True:
+        instruction = bas_code[pc]
+        print(instruction)
+        pc += 1
+        # match = re.search(r'(?<![<>=])=(?![<>=])', instruction)
+        exec(instruction)

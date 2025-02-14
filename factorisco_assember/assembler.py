@@ -1,7 +1,8 @@
 import os
 
 from bython_compiler.create_low_level_code import remove_white_space, remove_comments
-from factorisco_assember.assembler_util import get_text_segment, tokenize, replace_pseudo_instructions
+from factorisco_assember.assembler_util import get_text_segment, tokenize, replace_pseudo_instructions, collect_labels, \
+    replace_labels, replace_reg_names, replace_instructions
 
 
 def assemble(assembly_code):
@@ -14,11 +15,9 @@ def assemble(assembly_code):
     code = tokenize(code)
     # replace pseudo instructions
     code = replace_pseudo_instructions(code)
-    print("stop")
-
-
-
-
+    labels, code = collect_labels(code)
+    code = replace_labels(code, labels)
+    machine_code = replace_instructions(code)
     return machine_code
 
 
