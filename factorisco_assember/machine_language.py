@@ -47,26 +47,30 @@ def convert_to_word(line):
         word = ((word << 7) + line["opcode"]) & 0xFFFFFFFF
     else:
         raise ValueError(f"Wrong combination of opcode and add_opcode: {line}")
+    if word >= 2**31:
+        # interpret as negative number
+        word -= 2**32
     return word
 
-
-
-
-if __name__ == "__main__":
-    code = [
-        {"opcode": 1, "rd": 1, "add_opcode": 1, "rs1": 0, "rs2": None, "imm": 1},
-        {"opcode": 1, "rd": 2, "add_opcode": 1, "rs1": 0, "rs2": None, "imm": 1},
-        {"opcode": 1, "rd": 1, "add_opcode": 2, "rs1": 1, "rs2": 2, "imm": None},
-        {"opcode": 1, "rd": 2, "add_opcode": 2, "rs1": 1, "rs2": 2, "imm": None},
-        {"opcode": 22, "rd": 3, "add_opcode": None, "rs1": None, "rs2": None, "imm": -2},
-    ]
+def create_machine_code(code):
     output_words = []
-
     for line in code:
         output_words.append(convert_to_word(line))
-    for line, word in zip(code, output_words):
-        print(line, word, f"{word:0b}")
+    # for line, word in zip(code, output_words):
+    #     print(line, word, f"{word:0b}")
+    return output_words
 
+
+# if __name__ == "__main__":
+#     code = [
+#         {"opcode": 1, "rd": 1, "add_opcode": 1, "rs1": 0, "rs2": None, "imm": 1},
+#         {"opcode": 1, "rd": 2, "add_opcode": 1, "rs1": 0, "rs2": None, "imm": 1},
+#         {"opcode": 1, "rd": 1, "add_opcode": 2, "rs1": 1, "rs2": 2, "imm": None},
+#         {"opcode": 1, "rd": 2, "add_opcode": 2, "rs1": 1, "rs2": 2, "imm": None},
+#         {"opcode": 22, "rd": 3, "add_opcode": None, "rs1": None, "rs2": None, "imm": -2},
+#     ]
+#
+#
 
 
 

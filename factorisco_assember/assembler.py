@@ -2,10 +2,12 @@ import os
 
 from bython_compiler.create_low_level_code import remove_white_space, remove_comments
 from factorisco_assember.assembler_util import get_text_segment, tokenize, replace_pseudo_instructions, collect_labels, \
-    replace_labels, replace_reg_names, replace_instructions
+    replace_labels, replace_instructions
+from factorisco_assember.input_encodings.create_data_blueprint import create_data_blueprint
+from factorisco_assember.machine_language import create_machine_code
 
 
-def assemble(assembly_code):
+def assemble(assembly_code, output_file):
     assembly_code = remove_comments(assembly_code)
     assembly_code = remove_white_space(assembly_code)
     code = get_text_segment(assembly_code)
@@ -17,15 +19,19 @@ def assemble(assembly_code):
     code = replace_pseudo_instructions(code)
     labels, code = collect_labels(code)
     code = replace_labels(code, labels)
-    machine_code = replace_instructions(code)
-    return machine_code
+    code = replace_instructions(code)
+    machine_code = create_machine_code(code)
+    create_data_blueprint(machine_code, output_file=output_file)
+    return True
 
 
 if __name__ == "__main__":
-    input_file = os.path.join("factorisco_v_assembly", "hello_world.s")
+    file_name = "fib_1"
+    input_file = os.path.join("factorisco_v_assembly", f"{file_name}.s")
+    output_file = os.path.join("output", "factorisco", f"{file_name}.txt")
     with open(input_file, 'r') as infile:
         source_code = infile.read()
         # split by line
         source_code = source_code.split("\n")
         print("Source code read successfully.")
-    machine_code = assemble(source_code)
+    assemble(source_code, output_file)

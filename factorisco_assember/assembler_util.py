@@ -416,13 +416,14 @@ def replace_instructions(code):
             }
         elif opcode == 30:
             assert len(tokens) == 1,  f"Invalid number of arguments for instruction `{instr}` in line {i}"
+            # set reg and imm since it is handled internally as U instruction
             machine_code = {
                 "opcode": opcode,
-                "rd": None,
+                "rd": 0,
                 "add_opcode": add_opcode,
                 "rs1": None,
                 "rs2": None,
-                "imm": None,
+                "imm": 0,
             }
         else:
             raise AssertionError(f"Instruction {instr} invalid in line {i}")
