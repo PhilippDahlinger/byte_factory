@@ -312,7 +312,7 @@ def replace_instructions(code):
         assert "(" in combined_token, f"sw/lw requires combined `<offset>(<rs2>)` as last argument, but got `{combined_token}` in line {i}"
         assert ")" == combined_token[
             -1], f"sw/lw requires combined `<offset>(<rs2>)` as last argument, but got `{combined_token}` in line {i}"
-        split_token = combined_token.split("(")
+        split_token = combined_token[:-1].split("(")
         assert len(
             split_token) == 2, f"sw requires combined `<offset>(<rs2>)` as last argument, but got `{combined_token}` in line {i}"
         imm = get_imm(split_token[0])

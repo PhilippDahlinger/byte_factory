@@ -29,13 +29,13 @@ if __name__ == "__main__":
     # xs = list(set(xs))
     # xs.sort()
     xs = [-61, -54, -43, -36]
-    address = 1
+    address = 0
     for x in xs:
         for y in ys:
             for sub_x in [0, 2, 4]:
                 base_json = change_addresses(base_json, x + sub_x, y, address)
             print(f"changed address {address}")
-            address = address + 1
+            address = address + 4
 
     print(json_to_blueprint(base_json))
     # entities = base_json["blueprint"]["entities"]
