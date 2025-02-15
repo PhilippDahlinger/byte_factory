@@ -140,6 +140,7 @@ def tokenize(code):
     for i, line in enumerate(code):
         tokens = line.split(" ")
         tokens = [x.strip() for x in tokens]
+        tokens = [x for x in tokens if x != ""]
         assert len(tokens) > 0, f"Error parsing empty line {i}: `{line}`"
         if tokens[0] == ".globl" and tokens[1] == "_start":
             # entry point def: jump to start
@@ -185,17 +186,23 @@ def replace_pseudo_instructions(code):
         elif instr == "li":
             assert len(tokens) == 3, f"Wrong numbers of arguments for `li` in line {i}"
             try:
-                imm = int(tokens[-1])
+                imm = int(tokens[2])
+                label_imm = False
             except ValueError:
-                raise ValueError(f"Error parsing immediate value {tokens[-1]} in line {i}")
-            is_split, upper, lower = split_up_imm(imm)
-            if is_split:
-                # 2 lines
-                output.append(["lui", tokens[1], str(upper)])
-                output.append(["addi", tokens[1], tokens[1], str(lower)])
+                # label as imm
+                label_imm = True
+            if label_imm:
+                # right no support with LUI -> TODO
+                output.append(["addi", tokens[1], "zero", tokens[2]])
             else:
-                # directly addi
-                output.append(["addi", tokens[1], "zero", str(lower)])
+                is_split, upper, lower = split_up_imm(imm)
+                if is_split:
+                    # 2 lines
+                    output.append(["lui", tokens[1], str(upper)])
+                    output.append(["addi", tokens[1], tokens[1], str(lower)])
+                else:
+                    # directly addi
+                    output.append(["addi", tokens[1], "zero", str(lower)])
         elif instr == "neg":
             assert len(tokens) == 3, f"Wrong numbers of arguments for `neg` in line {i}"
             output.append(["sub", tokens[1], "zero", tokens[2]])
@@ -293,6 +300,18 @@ def replace_labels(code, labels):
             ref_abs_address = labels[ref_label]
             ref_rel_address = ref_abs_address - address
             tokens[-1] = str(ref_rel_address)
+        elif tokens[0] == "addi" and tokens[2] == "zero":
+            try:
+                normal_imm = int(tokens[-1])
+                normal_imm = True
+            except ValueError:
+                normal_imm = False
+            if not normal_imm:
+                # load absolute label address
+                ref_label = tokens[-1]
+                assert ref_label in labels, f"Label `{ref_label}` referenced in line {i}, but not defined in code."
+                ref_abs_address = labels[ref_label]
+                tokens[-1] = str(ref_abs_address)
         address += 4
     return code
 
