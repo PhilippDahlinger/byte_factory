@@ -33,10 +33,11 @@ def convert_to_word(line):
     elif 25 <= opcode <= 26:
         # S Instruction
         upper_imm = line["imm"] & 0xFE0
+        upper_imm = upper_imm >> 5
         lower_imm = line["imm"] & 0x01F
         word = upper_imm
         # rs2
-        word = ((word << 7) + line["rs2"]) & 0xFFFFFFFF
+        word = ((word << 5) + line["rs2"]) & 0xFFFFFFFF
         # rs1
         word = ((word << 5) + line["rs1"]) & 0xFFFFFFFF
         # add opcode
