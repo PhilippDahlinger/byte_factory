@@ -22,15 +22,15 @@ def assemble(assembly_code, output_file):
     code = replace_instructions(code)
     machine_code = create_machine_code(code)
     for i, line in enumerate(code):
-        print(f"{i * 4}: {line}")
+        print(f"{i}: {line}")
     for i, line in enumerate(machine_code):
-        print(f"{i * 4}: {line}")
+        print(f"{i}: {line}")
     create_data_blueprint(machine_code, output_file=output_file)
     return True
 
 
 if __name__ == "__main__":
-    file_name = "fib_3"
+    file_name = "fib_1"
     input_file = os.path.join("factorisco_v_assembly", f"{file_name}.s")
     output_file = os.path.join("output", "factorisco", f"{file_name}.txt")
     with open(input_file, 'r') as infile:

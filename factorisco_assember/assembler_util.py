@@ -286,7 +286,7 @@ def collect_labels(code):
             # don't output the label line
         else:
             output_code.append(tokens)
-            address += 4
+            address += 1
     return labels, output_code
 
 
@@ -312,7 +312,7 @@ def replace_labels(code, labels):
                 assert ref_label in labels, f"Label `{ref_label}` referenced in line {i}, but not defined in code."
                 ref_abs_address = labels[ref_label]
                 tokens[-1] = str(ref_abs_address)
-        address += 4
+        address += 1
     return code
 
 def replace_instructions(code):
