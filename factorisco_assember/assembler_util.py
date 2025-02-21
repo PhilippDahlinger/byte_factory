@@ -192,7 +192,7 @@ def replace_pseudo_instructions(code):
                 # label as imm
                 label_imm = True
             if label_imm:
-                # right no support with LUI -> TODO
+                # right now no support with LUI -> TODO
                 output.append(["addi", tokens[1], "zero", tokens[2]])
             else:
                 is_split, upper, lower = split_up_imm(imm)
@@ -247,12 +247,12 @@ def replace_pseudo_instructions(code):
             output.append(["jalr", "zero", "0(ra)"])
         elif instr == "push":
             assert len(tokens) == 2, f"Wrong numbers of arguments for `push` in line {i}"
-            output.append(["addi", "sp", "sp", "-4"])
+            output.append(["addi", "sp", "sp", "-1"])
             output.append(["sw", tokens[1], "0(sp)"])
         elif instr == "pop":
             assert len(tokens) == 2, f"Wrong numbers of arguments for `pop` in line {i}"
             output.append(["lw", tokens[1], "0(sp)"])
-            output.append(["addi", "sp", "sp", "4"])
+            output.append(["addi", "sp", "sp", "1"])
         # implement more if needed
         else:
             # no pseudo instruction
