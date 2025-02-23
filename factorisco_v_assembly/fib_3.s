@@ -3,7 +3,7 @@
 
 _start:
 	li sp, 1596
-	li a0, 5
+	li a0, 10
 	call fib_dp
 	halt
 	nop
@@ -20,14 +20,14 @@ fib_dp:
 	li t0, 0
 _loop:
 	beq t0, a0, _end_loop
-	sw zero, 100(t0)
+	sw zero, 300(t0)
 	addi t0, t0, 1
 	j _loop
 _end_loop:
 	# first 2 values are known: 1 and 1
 	li t0, 1
-	sw t0, 100(zero)
-	sw t0, 104(zero)
+	sw t0, 300(zero)
+	sw t0, 301(zero)
 	# _fib_dp works with a0 - 1
 	subi a0, a0, 1
 	push ra
@@ -38,11 +38,10 @@ _end_loop:
 	
 _fib_dp:
 	# check if already computed
-	lw t0, 100(a0)
+	lw t0, 300(a0)
 	# if not 0 -> already computed, return that directly
 	bnez t0, _base_case
 	# else: compute number and store it before returning
-	li s7, 100
 	push s0
 	push s1
 	# store index in s1
@@ -58,7 +57,7 @@ _fib_dp:
 	call _fib_dp
 	add a0, a0, s0  # a0 = result
 	# store result, index is s1
-	sw a0, 100(s1)
+	sw a0, 300(s1)
 	pop ra
 	pop s1
 	pop s0
