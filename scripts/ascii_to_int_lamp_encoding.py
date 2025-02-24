@@ -13,6 +13,7 @@ class ASCIIGUI:
         # Create a dropdown to select a character
         self.char_var = tk.StringVar(self.root)
         self.char_var.set(chr(32))  # Set default to space
+        self.char_var.trace_add("write", self.refresh_button_colors)
 
         # Label to show the current character being modified
         self.char_label = tk.Label(self.root, text=f"Current Character: {self.char_var.get()}")
@@ -73,9 +74,8 @@ class ASCIIGUI:
         self.encodings[char][row][col] = not self.encodings[char][row][col]
         self.refresh_button_colors()
 
-    def refresh_button_colors(self):
+    def refresh_button_colors(self, *args):
         char = self.char_var.get()
-        print(f"Refreshing {char}")
         for row in range(7):
             for col in range(5):
                 color = 'black' if self.encodings[char][row][col] else 'white'
@@ -105,3 +105,6 @@ class ASCIIGUI:
 
 if __name__ == "__main__":
     ASCIIGUI()
+
+#XXXXXXXXXXXXXX
+#!0l1"#$%,.1457<=
