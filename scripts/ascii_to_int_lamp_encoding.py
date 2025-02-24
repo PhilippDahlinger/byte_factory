@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from tkinter import messagebox
 import json
@@ -55,7 +56,7 @@ class ASCIIGUI:
         return [[False for _ in range(5)] for _ in range(7)]
 
     # Load font encodings from a JSON file (if exists)
-    def load_encodings(self, file="font_encodings.json"):
+    def load_encodings(self, file=os.path.join("output", "font_encodings.json")):
         try:
             with open(file, "r") as f:
                 return json.load(f)
@@ -64,7 +65,7 @@ class ASCIIGUI:
                     range(32, 127)}  # Create a default for all printable ASCII chars
 
     # Save font encodings to a JSON file
-    def save_encodings(self, encodings, file="font_encodings.json"):
+    def save_encodings(self, encodings, file=os.path.join("output", "font_encodings.json")):
         with open(file, "w") as f:
             json.dump(encodings, f)
 
@@ -107,4 +108,4 @@ if __name__ == "__main__":
     ASCIIGUI()
 
 #XXXXXXXXXXXXXX
-#!0l1"#$%,.1457<=
+#!0l1"#$%,.1457<=AEIdDaAbBceCfFgGhHjJkKmMnNpPqQrRsStTuUvVwWxXyYzZkK
