@@ -30,7 +30,7 @@ def assemble(assembly_code, output_file):
 
 
 if __name__ == "__main__":
-    file_name = "fib_4"
+    file_name = "hello_world_2"
     input_file = os.path.join("factorisco_v_assembly", f"{file_name}.s")
     output_file = os.path.join("output", "factorisco", f"{file_name}.txt")
     with open(input_file, 'r') as infile:

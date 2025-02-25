@@ -4,12 +4,12 @@ import keyboard
 import pyautogui
 
 # Initialize the counter
-counter = 1
+counter = 65
 
 def on_insert_press():
     global counter
     pyautogui.write(str(counter))  # Type the current number
-    counter *= 2  # Increment the counter
+    counter += 1  # Increment the counter
     time.sleep(0.5)  # Wait for a short moment
 
 # Listen for the "insert" key press
