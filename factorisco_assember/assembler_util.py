@@ -187,22 +187,20 @@ def replace_pseudo_instructions(code):
             assert len(tokens) == 3, f"Wrong numbers of arguments for `li` in line {i}"
             try:
                 imm = int(tokens[2])
-                label_imm = False
             except ValueError:
-                # label as imm
-                label_imm = True
-            if label_imm:
-                # right now no support with LUI -> TODO
-                output.append(["addi", tokens[1], "zero", tokens[2]])
+                raise AssertionError(f"Only immediate values are supported for `li` in line {i}")
+            # if label_imm:
+            #     # right now no support with LUI -> TODO
+            #     output.append(["addi", tokens[1], "zero", tokens[2]])
+            # else:
+            is_split, upper, lower = split_up_imm(imm)
+            if is_split:
+                # 2 lines
+                output.append(["lui", tokens[1], str(upper)])
+                output.append(["addi", tokens[1], tokens[1], str(lower)])
             else:
-                is_split, upper, lower = split_up_imm(imm)
-                if is_split:
-                    # 2 lines
-                    output.append(["lui", tokens[1], str(upper)])
-                    output.append(["addi", tokens[1], tokens[1], str(lower)])
-                else:
-                    # directly addi
-                    output.append(["addi", tokens[1], "zero", str(lower)])
+                # directly addi
+                output.append(["addi", tokens[1], "zero", str(lower)])
         elif instr == "neg":
             assert len(tokens) == 3, f"Wrong numbers of arguments for `neg` in line {i}"
             output.append(["sub", tokens[1], "zero", tokens[2]])
@@ -238,7 +236,10 @@ def replace_pseudo_instructions(code):
             assert len(tokens) == 1, f"Wrong numbers of arguments for `nop` in line {i}"
             output.append(["addi", "zero", "zero", "0"])
         elif instr == "la":
-            raise NotImplementedError()
+            assert len(tokens) == 3, f"Wrong numbers of arguments for `la` in line {i}"
+            # always split up in 2 instructions, but don't replace it yet, since the label has to be defined later
+            output.append(["la", tokens[1], tokens[2]])
+            output.append(["nop"])
         elif instr == "call":
             assert len(tokens) == 2, f"Wrong numbers of arguments for `call` in line {i}"
             output.append(["jal", "ra", tokens[1]])
@@ -258,16 +259,6 @@ def replace_pseudo_instructions(code):
             # no pseudo instruction
             output.append(tokens)
     return output
-
-def replace_reg_names(code):
-    # DEPRECATED, INFER REG NUMBER DIRECTLY, POSSIBLY FROM NICKNAME
-
-
-    for i, tokens in enumerate(code):
-        for j in range(len(tokens)):
-            if tokens[j] in riscv_reg_translator:
-                tokens[j] = riscv_reg_translator[tokens[j]]
-    return code
 
 
 def collect_labels(code):
@@ -300,18 +291,14 @@ def replace_labels(code, labels):
             ref_abs_address = labels[ref_label]
             ref_rel_address = ref_abs_address - address
             tokens[-1] = str(ref_rel_address)
-        elif tokens[0] == "addi" and tokens[2] == "zero":
-            try:
-                normal_imm = int(tokens[-1])
-                normal_imm = True
-            except ValueError:
-                normal_imm = False
-            if not normal_imm:
-                # load absolute label address
-                ref_label = tokens[-1]
-                assert ref_label in labels, f"Label `{ref_label}` referenced in line {i}, but not defined in code."
-                ref_abs_address = labels[ref_label]
-                tokens[-1] = str(ref_abs_address)
+            # TODO: medium and big jumps
+        elif tokens[0] == "la":
+            ref_label = tokens[-1]
+            assert ref_label in labels, f"Label `{ref_label}` referenced in line {i}, but not defined in code."
+            ref_abs_address = labels[ref_label]
+            ref_rel_address = ref_abs_address - address
+            _, _, lower = split_up_imm(ref_abs_address)
+            tokens[-1] = str(lower)
         address += 1
     return code
 
