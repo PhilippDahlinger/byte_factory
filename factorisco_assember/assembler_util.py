@@ -1,3 +1,5 @@
+import re
+
 instruction_key_words = ["add", "addi", "and", "andi", "auipc", "beq", "bge", "bgeu", "blt", "bltu", "bne", "div",
                          "divu", "ecall", "add", "j", "jal", "jalr", "lb", "lbu", "lh", "lhu", "lui", "lw", "mul",
                          "mulh", "mulhsu", "mulhu", "or", "ori", "rem", "addi", "remu", "sb", "sh", "sll", "slli",
@@ -138,10 +140,13 @@ def tokenize(code):
     _start_found = False
     _start_label_found = False
     for i, line in enumerate(code):
-        tokens = line.split(" ")
-        tokens = [x.strip() for x in tokens]
-        tokens = [x for x in tokens if x != ""]
-        assert len(tokens) > 0, f"Error parsing empty line {i}: `{line}`"
+        match = re.match(r"(\S+)(?:\s+(.+))?", line)  # The argument part is now optional
+        if match:
+            instruction = match.group(1)
+            args = [arg.strip() for arg in match.group(2).split(",")] if match.group(2) else []
+            tokens = [instruction, *args]
+        else:
+            raise AssertionError(f"Error parsing empty line {i}: `{line}`")
         if tokens[0] == ".globl" and tokens[1] == "_start":
             # entry point def: jump to start
             _start_found = True
@@ -153,19 +158,6 @@ def tokenize(code):
                 _start_label_found = True
             assert ":" not in tokens[0][:-1], f"label `{line}` in line {i} contains illegal character `:`"
             assert len(tokens) == 1, f"Label definition `{line}` in line {i} contains multiple words"
-        # instructions
-        assert "," not in tokens[0], f"Error parsing line {i}: `{line}`"
-        smaller_tokens = [tokens[0]]
-        for arg in tokens[1:]:
-            if "," in arg:
-                split_tokens = arg.split(",")
-                split_tokens = [x.strip() for x in split_tokens]
-                split_tokens = [x for x in split_tokens if x != ""]
-                smaller_tokens += split_tokens
-            else:
-                smaller_tokens.append(arg)
-        tokens = smaller_tokens
-        # more checks?
         output.append(tokens)
     assert _start_found and _start_label_found, "Could not find `.globl _start` in the code. Needs to present to define the entry point"
     return output
@@ -290,8 +282,13 @@ def replace_labels(code, labels):
             assert ref_label in labels, f"Label `{ref_label}` referenced in line {i}, but not defined in code."
             ref_abs_address = labels[ref_label]
             ref_rel_address = ref_abs_address - address
+            if tokens[0] == "jal":
+                # maximum range for signed 20 bit immediate:
+                assert -2**19 <= ref_rel_address < 2**19
+            else:
+                # maximum range for signed 12 bit immediate:
+                assert -2**11 <= ref_rel_address < 2**11
             tokens[-1] = str(ref_rel_address)
-            # TODO: medium and big jumps
         elif tokens[0] == "la":
             ref_label = tokens[-1]
             assert ref_label in labels, f"Label `{ref_label}` referenced in line {i}, but not defined in code."

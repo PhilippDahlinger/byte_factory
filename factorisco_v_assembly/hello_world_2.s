@@ -39,19 +39,19 @@ _start:
 	li t0, 68 # D
 	sw t0, 7(zero)
 	# refresh display
-	sw zero 12(zero)
+	sw zero, 12(zero)
 	# sleep
-	li a0 10
+	li a0, 10
 	call _sleep
 	li t0, 1
 	sw t0, 9(zero)
-	sw zero 12(zero)
-	li a0 10
+	sw zero, 12(zero)
+	li a0, 10
 	call _sleep
 	# clear row
-	sw zero 11(zero)
+	sw zero, 11(zero)
 	# refresh
-	sw zero 12(zero)
+	sw zero, 12(zero)
 	halt
 	nop
 	nop
