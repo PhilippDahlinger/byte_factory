@@ -290,12 +290,18 @@ def replace_labels(code, labels):
                 assert -2**11 <= ref_rel_address < 2**11
             tokens[-1] = str(ref_rel_address)
         elif tokens[0] == "la":
+            # Replace with
+            # auipc rd, %pcrel_hi(label)  # Load upper 20 bits (relative to PC)
+            # addi  rd, rd, %pcrel_lo(label)  # Load lower 12 bits
             ref_label = tokens[-1]
             assert ref_label in labels, f"Label `{ref_label}` referenced in line {i}, but not defined in code."
             ref_abs_address = labels[ref_label]
             ref_rel_address = ref_abs_address - address
-            _, _, lower = split_up_imm(ref_abs_address)
-            tokens[-1] = str(lower)
+            _, higher, lower = split_up_imm(ref_rel_address)
+            tokens[0] = "auipc"
+            tokens[-1] = str(higher)
+            assert code[i+1] == ["nop"], f"Problems decoding `la` instruction in line {i}"
+            code[i+1] = ["addi", tokens[1], tokens[1], str(lower)]
         address += 1
     return code
 
