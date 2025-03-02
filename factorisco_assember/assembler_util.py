@@ -114,19 +114,18 @@ def split_up_imm(imm):
         lower = imm - (upper << 12)
         return True, upper, lower
 
+def get_directive(code, key_word):
+    directive = [(i, line) for (i, line) in enumerate(code) if line.startswith(key_word)]
+    assert len(directive) <= 1, f"Only 1 {key_word} segment allowed in code!"
+    if len(directive) == 0:
+        return None
+    i, line = directive[0]
+    assert directive[0][1].strip() == key_word, f"Invalid line {i}: `{line}`"
+    return i
 
 def get_text_segment(code):
-    def get_directive(key_word):
-        directive = [(i, line) for (i, line) in enumerate(code) if line.startswith(key_word)]
-        assert len(directive) <= 1, f"Only 1 {key_word} segment allowed in code!"
-        if len(directive) == 0:
-            return None
-        i, line = directive[0]
-        assert directive[0][1].strip() == key_word, f"Invalid line {i}: `{line}`"
-        return i
-
-    text_directive = get_directive(".text")
-    data_directive = get_directive(".data")
+    text_directive = get_directive(code, ".text")
+    data_directive = get_directive(code, ".data")
     if data_directive is not None and text_directive < data_directive:
         text_segment = code[text_directive + 1:data_directive]
     else:
@@ -134,32 +133,61 @@ def get_text_segment(code):
         text_segment = code[text_directive + 1:]
     return text_segment
 
+def get_data_segment(code):
+    text_directive = get_directive(code, ".text")
+    data_directive = get_directive(code, ".data")
+    if data_directive is None:
+        # empty segment
+        return []
+    if text_directive < data_directive:
+        # data segment at end of file
+        data_segment = code[data_directive + 1:]
+    else:
+        # data segment is before the text segment
+        data_segment = code[data_directive + 1:text_directive]
+    return data_segment
 
-def tokenize(code):
-    output = []
-    _start_found = False
-    _start_label_found = False
-    for i, line in enumerate(code):
+def tokenize(code, is_text_segment=True):
+    def match_line(line):
         match = re.match(r"(\S+)(?:\s+(.+))?", line)  # The argument part is now optional
         if match:
             instruction = match.group(1)
             args = [arg.strip() for arg in match.group(2).split(",")] if match.group(2) else []
-            tokens = [instruction, *args]
+            return [instruction, *args]
         else:
             raise AssertionError(f"Error parsing empty line {i}: `{line}`")
+    output = []
+    _start_found = False
+    _start_label_found = False
+    for i, line in enumerate(code):
+        tokens = match_line(line)
         if tokens[0] == ".globl" and tokens[1] == "_start":
             # entry point def: jump to start
             _start_found = True
             tokens = ["j", "_start"]
         # check for basic syntax
         # labels
+        split_line = False
         if tokens[0].endswith(":"):
             if tokens[0] == "_start:":
                 _start_label_found = True
             assert ":" not in tokens[0][:-1], f"label `{line}` in line {i} contains illegal character `:`"
-            assert len(tokens) == 1, f"Label definition `{line}` in line {i} contains multiple words"
-        output.append(tokens)
-    assert _start_found and _start_label_found, "Could not find `.globl _start` in the code. Needs to present to define the entry point"
+            if is_text_segment:
+                assert len(tokens) == 1, f"Label definition `{line}` in line {i} contains multiple words"
+            else:
+                if len(tokens) > 1:
+                    # standard way of defining data in .data segment. for parsing, split label and data in 2 lines
+                    split_line = True
+        if split_line:
+            output.append([tokens[0]]) # label
+            # reparse rest of the line
+            rest_line = line[line.find(" ") + 1:]
+            rest_tokens = match_line(rest_line)
+            output.append(rest_tokens) # directive and data
+        else:
+            output.append(tokens)
+    if is_text_segment:
+        assert _start_found and _start_label_found, "Could not find `.globl _start` in the code. Needs to be present to define the entry point"
     return output
 
 
