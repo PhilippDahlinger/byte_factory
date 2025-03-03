@@ -94,6 +94,7 @@ instruction_translator = {
     "bne": (26, 1),
     "blt": (26, 2),
     "bge": (26, 3),
+    "ecall": (27, None),
     "halt": (30, None),
 }
 
@@ -147,7 +148,7 @@ def get_data_segment(code):
         data_segment = code[data_directive + 1:text_directive]
     return data_segment
 
-def tokenize(code, is_text_segment=True):
+def tokenize(code, is_text_segment=True, force_start=True):
     def match_line(line):
         match = re.match(r"(\S+)(?:\s+(.+))?", line)  # The argument part is now optional
         if match:
@@ -186,7 +187,7 @@ def tokenize(code, is_text_segment=True):
             output.append(rest_tokens) # directive and data
         else:
             output.append(tokens)
-    if is_text_segment:
+    if is_text_segment and force_start:
         assert _start_found and _start_label_found, "Could not find `.globl _start` in the code. Needs to be present to define the entry point"
     return output
 
@@ -460,6 +461,17 @@ def replace_instructions(code):
                 "rs1": get_reg_number(tokens[1]),
                 "rs2": get_reg_number(tokens[2]),
                 "imm": get_imm(tokens[3]),
+            }
+        elif opcode == 27:
+            assert len(tokens) == 1, f"Invalid number of arguments for instruction `{instr}` in line {i}"
+            # set reg and imm since it is handled internally as U instruction
+            machine_code = {
+                "opcode": opcode,
+                "rd": 0,
+                "add_opcode": add_opcode,
+                "rs1": None,
+                "rs2": None,
+                "imm": 0,
             }
         elif opcode == 30:
             assert len(tokens) == 1,  f"Invalid number of arguments for instruction `{instr}` in line {i}"

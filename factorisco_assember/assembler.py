@@ -7,7 +7,7 @@ from factorisco_assember.input_encodings.create_data_blueprint import create_dat
 from factorisco_assember.machine_language import create_machine_code
 
 
-def assemble(assembly_code, output_file, output_version="v2"):
+def assemble(assembly_code, output_file, output_version="v2", kernel_mode=False):
     assembly_code = remove_comments(assembly_code)
     assembly_code = remove_white_space(assembly_code)
     code = get_text_segment(assembly_code)
@@ -15,7 +15,7 @@ def assemble(assembly_code, output_file, output_version="v2"):
     # replace macros
     ...
     # tokenize and replace .globl _start with j _start
-    code = tokenize(code, is_text_segment=True)
+    code = tokenize(code, is_text_segment=True, force_start=not kernel_mode)
     data = tokenize(data, is_text_segment=False)
     data = compute_data_values(data)
     # replace pseudo instructions
@@ -31,9 +31,8 @@ def assemble(assembly_code, output_file, output_version="v2"):
     create_data_blueprint(machine_code, output_file=output_file, output_version=output_version)
     return True
 
-
-if __name__ == "__main__":
-    file_name = "la_test"
+def user_program():
+    file_name = "ecall_test"
     output_version = "v2"
     input_file = os.path.join("factorisco_v_assembly", f"{file_name}.s")
     output_file = os.path.join("output", "factorisco", f"{file_name}.txt")
@@ -42,4 +41,21 @@ if __name__ == "__main__":
         # split by line
         source_code = source_code.split("\n")
         print("Source code read successfully.")
-    assemble(source_code, output_file, output_version)
+    assemble(source_code, output_file, output_version, kernel_mode=False)
+
+
+def kernel_program():
+    file_name = "ecall_01"
+    output_version = "v2"
+    input_file = os.path.join("factorisco_v_assembly", "kernel", f"{file_name}.s")
+    output_file = os.path.join("output", "factorisco", "kernel", f"{file_name}.txt")
+    with open(input_file, 'r') as infile:
+        source_code = infile.read()
+        # split by line
+        source_code = source_code.split("\n")
+        print("Source code read successfully.")
+    assemble(source_code, output_file, output_version, kernel_mode=True)
+
+if __name__ == "__main__":
+    user_program()
+    # kernel_program()
