@@ -2,7 +2,7 @@ import os
 
 from bython_compiler.create_low_level_code import remove_white_space, remove_comments
 from factorisco_assember.assembler_util import get_text_segment, tokenize, replace_pseudo_instructions, collect_labels, \
-    replace_labels, replace_instructions, get_data_segment
+    replace_labels, replace_instructions, get_data_segment, compute_data_values
 from factorisco_assember.input_encodings.create_data_blueprint import create_data_blueprint
 from factorisco_assember.machine_language import create_machine_code
 
@@ -17,12 +17,13 @@ def assemble(assembly_code, output_file):
     # tokenize and replace .globl _start with j _start
     code = tokenize(code, is_text_segment=True)
     data = tokenize(data, is_text_segment=False)
+    data = compute_data_values(data)
     # replace pseudo instructions
     code = replace_pseudo_instructions(code)
-    labels, code = collect_labels(code)
+    labels, code, data = collect_labels(code, data)
     code = replace_labels(code, labels)
     code = replace_instructions(code)
-    machine_code = create_machine_code(code)
+    machine_code = create_machine_code(code, data)
     for i, line in enumerate(code):
         print(f"{i}: {line}")
     for i, line in enumerate(machine_code):

@@ -18,7 +18,7 @@ reg_key_words = [
 
 assembler_directives = [
     ".data", ".text", ".macro", ".endm", ".if", ".else", ".endif", ".globl", ".align", ".byte", ".half", ".word",
-    ".dword", ".asciz", ".space", ".double"
+    ".dword",".ascic", ".asciz", ".space", ".double"
 ]
 
 branch_instructions = [ "jal", "jalr", "beq", "bne", "blt", "bge"]
@@ -281,24 +281,34 @@ def replace_pseudo_instructions(code):
     return output
 
 
-def collect_labels(code):
+def collect_labels(code, data):
+    def add_label(label):
+        assert label not in labels, f"label `{label}` defined multiple times"
+        assert i != len(code) - 1, f"Label `{label}` set at end of file defining no address"
+        assert label not in instruction_key_words, f"Label `{label}` in line {i} is an instruction key word"
+        assert label not in assembler_directives, f"Label `{label}` in line {i} is an assembler directive"
+        assert label not in reg_key_words, f"Label `{label}` in line {i} is a register key word"
+        labels[label] = address
+        # don't output the label line
     labels = {}
     output_code = []
     address = 0
     for i, tokens in enumerate(code):
         if tokens[0].endswith(":"):
             label = tokens[0][:-1]
-            assert label not in labels, f"label `{label}` defined multiple times"
-            assert i != len(code) - 1, f"Label `{label}` set at end of file defining no address"
-            assert label not in instruction_key_words, f"Label `{label}` in line {i} is an instruction key word"
-            assert label not in assembler_directives, f"Label `{label}` in line {i} is an assembler directive"
-            assert label not in reg_key_words, f"Label `{label}` in line {i} is a register key word"
-            labels[label] = address
-            # don't output the label line
+            add_label(label)
         else:
             output_code.append(tokens)
             address += 1
-    return labels, output_code
+    output_data = []
+    for i, tokens in enumerate(data):
+        if tokens[0].endswith(":"):
+            label = tokens[0][:-1]
+            add_label(label)
+        else:
+            output_data.append(tokens)
+            address += 1
+    return labels, output_code, output_data
 
 
 def replace_labels(code, labels):
@@ -467,3 +477,40 @@ def replace_instructions(code):
         output.append(machine_code)
 
     return output
+
+
+def compute_data_values(data):
+    output_data = []
+    for i, tokens in enumerate(data):
+        if tokens[0].endswith(":"):
+            # label
+            output_data.append(tokens)
+            continue
+        directive = tokens[0]
+        values = tokens[1:]
+        # assert directive not in assembler_directives, f"Invalid directive `{directive}` in line {i} of the data segment"
+        if directive == ".word":
+            # 32 bit signed integer
+            for word in values:
+                try:
+                    word = int(word)
+                except ValueError:
+                    raise AssertionError(f"Word `{word}` in line {i} of the data segment not an integer")
+                assert -2**31 <= word < 2**31, f"Word `{word}` in line {i} of the data segment bigger than 32 bits"
+                # each word is a new line
+                output_data.append([str(word)])
+        elif directive == ".asciz" or directive == ".ascii":
+            # string with one character per word, with 0 as end
+            for string in values:
+                # remove " " from the string
+                assert string[0] == string[-1] == '"' or string[0] == string[-1] == "'", f"String `{string}` in line {i} of the data segment needs to be enclosed by quotation marks."
+                string = string[1:-1]
+                for char in string:
+                    output_data.append([str(ord(char))])
+                if directive == ".asciz":
+                    # add zero as last
+                    output_data.append(["0"])
+        elif directive == ".ascic":
+            # compressed string with 4 character per word, also with 0 as final (or multiple finals to fill the remaining word)
+            raise NotImplementedError("ascic not implemented")
+    return output_data

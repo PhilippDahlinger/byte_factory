@@ -53,12 +53,13 @@ def convert_to_word(line):
         word -= 2**32
     return word
 
-def create_machine_code(code):
+def create_machine_code(code, data):
     output_words = []
     for line in code:
         output_words.append(convert_to_word(line))
-    # for line, word in zip(code, output_words):
-    #     print(line, word, f"{word:0b}")
+    for line in data:
+        # every word is in its own list
+        output_words.append(int(line[0]))
     return output_words
 
 
