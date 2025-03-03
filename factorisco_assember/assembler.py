@@ -7,7 +7,7 @@ from factorisco_assember.input_encodings.create_data_blueprint import create_dat
 from factorisco_assember.machine_language import create_machine_code
 
 
-def assemble(assembly_code, output_file):
+def assemble(assembly_code, output_file, output_version="v2"):
     assembly_code = remove_comments(assembly_code)
     assembly_code = remove_white_space(assembly_code)
     code = get_text_segment(assembly_code)
@@ -28,12 +28,13 @@ def assemble(assembly_code, output_file):
         print(f"{i}: {line}")
     for i, line in enumerate(machine_code):
         print(f"{i}: {line}")
-    create_data_blueprint(machine_code, output_file=output_file)
+    create_data_blueprint(machine_code, output_file=output_file, output_version=output_version)
     return True
 
 
 if __name__ == "__main__":
     file_name = "la_test"
+    output_version = "v2"
     input_file = os.path.join("factorisco_v_assembly", f"{file_name}.s")
     output_file = os.path.join("output", "factorisco", f"{file_name}.txt")
     with open(input_file, 'r') as infile:
@@ -41,4 +42,4 @@ if __name__ == "__main__":
         # split by line
         source_code = source_code.split("\n")
         print("Source code read successfully.")
-    assemble(source_code, output_file)
+    assemble(source_code, output_file, output_version)

@@ -22,10 +22,18 @@ _start:
 	sw t0, 14(zero)
 	# fdr to 0 to show first line
 	sw zero, 9(zero)
-	la t0, str1
+	# refresh display
+	sw zero, 12(zero)
+	la t0, str2
 	lw t1, 0(t0)
 	sw t1, 7(zero)
 	lw t1, 1(t0)
+	sw t1, 7(zero)
+	lw t1, 2(t0)
+	sw t1, 7(zero)
+	lw t1, 3(t0)
+	sw t1, 7(zero)
+	lw t1, 4(t0)
 	sw t1, 7(zero)
 	
 	# refresh display
