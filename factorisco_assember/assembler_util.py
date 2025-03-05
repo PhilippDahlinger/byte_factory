@@ -1,4 +1,5 @@
 import re
+from collections import defaultdict
 
 instruction_key_words = ["add", "addi", "and", "andi", "auipc", "beq", "bge", "bgeu", "blt", "bltu", "bne", "div",
                          "divu", "ecall", "add", "j", "jal", "jalr", "lb", "lbu", "lh", "lhu", "lui", "lw", "mul",
@@ -283,14 +284,16 @@ def replace_pseudo_instructions(code):
 
 def collect_labels(code, data):
     def add_label(label):
-        assert label not in labels, f"label `{label}` defined multiple times"
+        if not label.isnumeric():
+            # only enforce unique labels for "real" labels, not just number labels
+            assert label not in labels, f"label `{label}` defined multiple times"
         assert i != len(code) - 1, f"Label `{label}` set at end of file defining no address"
         assert label not in instruction_key_words, f"Label `{label}` in line {i} is an instruction key word"
         assert label not in assembler_directives, f"Label `{label}` in line {i} is an assembler directive"
         assert label not in reg_key_words, f"Label `{label}` in line {i} is a register key word"
-        labels[label] = address
+        labels[label].append(address)
         # don't output the label line
-    labels = {}
+    labels = defaultdict(lambda: [])
     output_code = []
     address = 0
     for i, tokens in enumerate(code):
@@ -304,6 +307,7 @@ def collect_labels(code, data):
     for i, tokens in enumerate(data):
         if tokens[0].endswith(":"):
             label = tokens[0][:-1]
+            assert not label.isnumeric(), f"Line {i}: Label `{label}` in Data section cannot be numeric."
             add_label(label)
         else:
             output_data.append(tokens)
@@ -317,8 +321,36 @@ def replace_labels(code, labels):
         if tokens[0] in branch_instructions and tokens[0] != "jalr":
             # have to replace label as relative, jalr does not support labeling
             ref_label = tokens[-1]
+            if re.match(r"^\d+[fb]$", ref_label):
+                ref_label, indicator = ref_label[:-1], ref_label[-1]
+            else:
+                indicator = None
             assert ref_label in labels, f"Label `{ref_label}` referenced in line {i}, but not defined in code."
-            ref_abs_address = labels[ref_label]
+
+            ref_abs_addresses = labels[ref_label]
+            if indicator is None:
+                assert len(ref_abs_addresses) == 1, "Problem with Label collecting, this case should never happen."
+                ref_abs_address = ref_abs_addresses[0]
+            else:
+                if indicator == "b":
+                    ref_abs_address = None
+                    for ref_candidate in ref_abs_addresses:
+                        if ref_candidate > address:
+                            # reached addresses which are too big
+                            break
+                        ref_abs_address = ref_candidate # choose the last valid candidate as address
+                    assert ref_abs_address is not None, f"No backward label found for reference {ref_label}b in line {i}"
+                elif indicator == "f":
+                    ref_abs_address = None
+                    for ref_candidate in ref_abs_addresses[::-1]:
+                        if ref_candidate < address:
+                            # reached addresses which are too small
+                            break
+                        ref_abs_address = ref_candidate  # choose the last valid candidate as address
+                    assert ref_abs_address is not None, f"No forward label found for reference {ref_label}f in line {i}"
+                else:
+                    raise AssertionError("Problem with Label collecting, this case should never happen.")
+
             ref_rel_address = ref_abs_address - address
             if tokens[0] == "jal":
                 # maximum range for signed 20 bit immediate:
@@ -333,7 +365,9 @@ def replace_labels(code, labels):
             # addi  rd, rd, %pcrel_lo(label)  # Load lower 12 bits
             ref_label = tokens[-1]
             assert ref_label in labels, f"Label `{ref_label}` referenced in line {i}, but not defined in code."
-            ref_abs_address = labels[ref_label]
+            ref_abs_addresses = labels[ref_label]
+            assert len(ref_abs_addresses) == 1, "Problem with Label collecting, this case should never happen."
+            ref_abs_address = ref_abs_addresses[0]
             ref_rel_address = ref_abs_address - address
             _, higher, lower = split_up_imm(ref_rel_address)
             tokens[0] = "auipc"
