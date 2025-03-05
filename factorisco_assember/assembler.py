@@ -31,18 +31,6 @@ def assemble(assembly_code, output_file, output_version="v2", kernel_mode=False)
     create_data_blueprint(machine_code, output_file=output_file, output_version=output_version)
     return True
 
-def user_program():
-    file_name = "numeric_label_test"
-    output_version = "v2"
-    input_file = os.path.join("factorisco_v_assembly", f"{file_name}.s")
-    output_file = os.path.join("output", "factorisco", f"{file_name}.txt")
-    with open(input_file, 'r') as infile:
-        source_code = infile.read()
-        # split by line
-        source_code = source_code.split("\n")
-        print("Source code read successfully.")
-    assemble(source_code, output_file, output_version, kernel_mode=False)
-
 
 def kernel_program():
     file_name = "ecall_01"
@@ -55,6 +43,19 @@ def kernel_program():
         source_code = source_code.split("\n")
         print("Source code read successfully.")
     assemble(source_code, output_file, output_version, kernel_mode=True)
+
+
+def user_program():
+    file_name = "exception_test"
+    output_version = "v2"
+    input_file = os.path.join("factorisco_v_assembly", f"{file_name}.s")
+    output_file = os.path.join("output", "factorisco", f"{file_name}.txt")
+    with open(input_file, 'r') as infile:
+        source_code = infile.read()
+        # split by line
+        source_code = source_code.split("\n")
+        print("Source code read successfully.")
+    assemble(source_code, output_file, output_version, kernel_mode=False)
 
 if __name__ == "__main__":
     user_program()

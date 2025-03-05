@@ -1,7 +1,7 @@
 # ECALL implementation
 .text
 main:
-	li s10, 23
+	li s10, 24
 	sw zero, 15(zero)
 	ret
 .data
