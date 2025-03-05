@@ -32,7 +32,7 @@ def assemble(assembly_code, output_file, output_version="v2", kernel_mode=False)
     return True
 
 def user_program():
-    file_name = "ecall_test"
+    file_name = "numeric_label_test"
     output_version = "v2"
     input_file = os.path.join("factorisco_v_assembly", f"{file_name}.s")
     output_file = os.path.join("output", "factorisco", f"{file_name}.txt")
