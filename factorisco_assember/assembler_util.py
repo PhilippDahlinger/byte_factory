@@ -211,10 +211,6 @@ def replace_pseudo_instructions(code):
                 imm = int(tokens[2])
             except ValueError:
                 raise AssertionError(f"Only immediate values are supported for `li` in line {i}")
-            # if label_imm:
-            #     # right now no support with LUI -> TODO
-            #     output.append(["addi", tokens[1], "zero", tokens[2]])
-            # else:
             is_split, upper, lower = split_up_imm(imm)
             if is_split:
                 # 2 lines
