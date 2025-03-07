@@ -58,5 +58,5 @@ def user_program():
     assemble(source_code, output_file, output_version, kernel_mode=False)
 
 if __name__ == "__main__":
-    user_program()
-    # kernel_program()
+    # user_program()
+    kernel_program()

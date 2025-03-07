@@ -1,6 +1,9 @@
 # ECALL implementation
 .text
 main:
+	nop
+	nop
+	nop
 	push ra
 	la t0, jump_table  # in the final version, replace label jump_table la and add with direct immediate of correct offset to jump_table -> saves 3 cycles
 	add a7, a7, t0
