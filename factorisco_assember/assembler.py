@@ -46,7 +46,7 @@ def kernel_program():
 
 
 def user_program():
-    file_name = "exception_test"
+    file_name = "ecall_test"
     output_version = "v2"
     input_file = os.path.join("factorisco_v_assembly", f"{file_name}.s")
     output_file = os.path.join("output", "factorisco", f"{file_name}.txt")
