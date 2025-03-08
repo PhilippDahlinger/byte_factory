@@ -553,8 +553,18 @@ def compute_data_values(data):
                 # remove " " from the string
                 assert string[0] == string[-1] == '"' or string[0] == string[-1] == "'", f"String `{string}` in line {i} of the data segment needs to be enclosed by quotation marks."
                 string = string[1:-1]
-                for char in string:
+                idx = 0
+                while idx < len(string):
+                    char = string[idx]
+                    if char == "\\":
+                        if string[idx:idx +2] == "\\n":
+                            output_data.append(["10"])
+                        else:
+                            raise AssertionError(f"Invalid Escape Sequence in line {i} of the data segment.")
+                        idx += 2
+                        continue
                     output_data.append([str(ord(char))])
+                    idx += 1
                 if directive == ".asciz":
                     # add zero as last
                     output_data.append(["0"])

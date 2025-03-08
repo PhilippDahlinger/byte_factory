@@ -9,4 +9,4 @@ _start:
 	ecall # exit
 	
 .data
-	hello: .asciz "FactoRISCoV is online."
+	hello: .asciz "FactoRISCoV is \nonline."
