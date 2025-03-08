@@ -10,8 +10,10 @@ main:
 	add a7, a7, t0
 	# execute ECALL
 	jalr ra, 0(a7)
-	# remove kernel access
-	sw zero, 15(zero)
+	# remove kernel access. Since ECALL adds +1 to the kernel address in hardware, decrease it by 1. -> Same access as before the ecall instruction
+	lw t0, 15(zero)
+	dec t0
+	sw t0, 15(zero)
 	pop ra
 	ret
 	
@@ -59,7 +61,21 @@ reset:
 	ret
 	
 exit:
-	li s0, 24
+	# user program ends, go back to os
+	# need to reset stack, set ra correctly on the stack, increment kernel mode to be in kernel mode after ecall decrements it again
+	# in current single program mode: terminate cpu
+	halt
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	
+	
+	lw t0, 15(zero)
+	inc t0
+	sw t0, 15(zero)
 	ret
 
 sbrk:

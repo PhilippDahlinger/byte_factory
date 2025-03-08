@@ -33,7 +33,7 @@ def assemble(assembly_code, output_file, output_version="v2", kernel_mode=False)
 
 
 def kernel_program():
-    file_name = "ecall_01"
+    file_name = "boot"
     output_version = "v2"
     input_file = os.path.join("factorisco_v_assembly", "kernel", f"{file_name}.s")
     output_file = os.path.join("output", "factorisco", "kernel", f"{file_name}.txt")
@@ -43,6 +43,7 @@ def kernel_program():
         source_code = source_code.split("\n")
         print("Source code read successfully.")
     assemble(source_code, output_file, output_version, kernel_mode=True)
+    print(f"File Name: {file_name}")
 
 
 def user_program():
@@ -56,6 +57,7 @@ def user_program():
         source_code = source_code.split("\n")
         print("Source code read successfully.")
     assemble(source_code, output_file, output_version, kernel_mode=False)
+    print(f"File Name: {file_name}")
 
 if __name__ == "__main__":
     # user_program()
