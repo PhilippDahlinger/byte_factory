@@ -232,6 +232,12 @@ def replace_pseudo_instructions(code):
             else:
                 imm = "-" + tokens[3]
             output.append(["addi", tokens[1], tokens[2], imm])
+        elif instr == "inc":
+            assert len(tokens) == 2, f"Wrong numbers of arguments for `inc` in line {i}"
+            output.append(["addi", tokens[1], tokens[1], "1"])
+        elif instr == "dec":
+            assert len(tokens) == 2, f"Wrong numbers of arguments for `dec` in line {i}"
+            output.append(["addi", tokens[1], tokens[1], "-1"])
         elif instr == "beqz":
             assert len(tokens) == 3, f"Wrong numbers of arguments for `beqz` in line {i}"
             output.append(["beq", tokens[1], "zero", tokens[2]])
