@@ -7,7 +7,7 @@ from factorisco_assember.input_encodings.create_data_blueprint import create_dat
 from factorisco_assember.machine_language import create_machine_code
 
 
-def assemble(assembly_code, output_file, output_version="v2", kernel_mode=False):
+def assemble(assembly_code, output_file, output_version="v2", kernel_mode=False, verbose=True):
     assembly_code = remove_comments(assembly_code)
     assembly_code = remove_white_space(assembly_code)
     code = get_text_segment(assembly_code)
@@ -24,16 +24,17 @@ def assemble(assembly_code, output_file, output_version="v2", kernel_mode=False)
     code = replace_labels(code, labels)
     code = replace_instructions(code)
     machine_code = create_machine_code(code, data)
-    for i, line in enumerate(code):
-        print(f"{i}: {line}")
-    for i, line in enumerate(machine_code):
-        print(f"{i}: {line}")
+    if verbose:
+        for i, line in enumerate(code):
+            print(f"{i}: {line}")
+        for i, line in enumerate(machine_code):
+            print(f"{i}: {line}")
     create_data_blueprint(machine_code, output_file=output_file, output_version=output_version)
     return True
 
 
-def kernel_program():
-    file_name = "boot"
+def kernel_program(file_name, verbose=True):
+    print("--------------------------------------------------------")
     output_version = "v2"
     input_file = os.path.join("factorisco_v_assembly", "kernel", f"{file_name}.s")
     output_file = os.path.join("output", "factorisco", "kernel", f"{file_name}.txt")
@@ -42,12 +43,13 @@ def kernel_program():
         # split by line
         source_code = source_code.split("\n")
         print("Source code read successfully.")
-    assemble(source_code, output_file, output_version, kernel_mode=True)
+    assemble(source_code, output_file, output_version, kernel_mode=True, verbose=verbose)
     print(f"File Name: {file_name}")
+    print("--------------------------------------------------------")
 
 
-def user_program():
-    file_name = "ecall_test"
+def user_program(file_name, verbose=True):
+    print("--------------------------------------------------------")
     output_version = "v2"
     input_file = os.path.join("factorisco_v_assembly", f"{file_name}.s")
     output_file = os.path.join("output", "factorisco", f"{file_name}.txt")
@@ -56,9 +58,12 @@ def user_program():
         # split by line
         source_code = source_code.split("\n")
         print("Source code read successfully.")
-    assemble(source_code, output_file, output_version, kernel_mode=False)
+    assemble(source_code, output_file, output_version, kernel_mode=False, verbose=verbose)
     print(f"File Name: {file_name}")
+    print("--------------------------------------------------------")
 
 if __name__ == "__main__":
-    user_program()
-    # kernel_program()
+    verbose = False
+    kernel_program("ecall_01", verbose=verbose)
+    kernel_program("boot", verbose=verbose)
+    user_program("ecall_test", verbose=verbose)

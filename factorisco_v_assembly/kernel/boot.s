@@ -35,15 +35,16 @@ main:
 	li x31, 0
 
 	li sp, 33000  # init sp
+	li t0, 1000 # initial value of sbrk pointer
+	sw t0, 256(zero) # address 256 = sbrk pointer
+	
 	# reset display
 	li a7, 15 
 	ecall # cls
-	
 	li a7, 6
 	li a0, 0
 	li a1, 0
 	ecall # set cursor to 0,0
-	
 	# set font to default: no wrap, and stride is 1
 	li a7, 9
 	li a0, 0 # font
@@ -51,9 +52,14 @@ main:
 	li a2, 0 # no wrap
 	ecall
 	
+	# reset keyboard
+	# close and flush key stream
+	li a7, 23 
+	ecall # close_key_stream
 	
 	# disable kernel mode
 	sw zero, 15(zero)
+	
 	# hardcoded entry point of user program in ROM #1
 	li t0, 147968
 	jalr zero, 0(t0)
