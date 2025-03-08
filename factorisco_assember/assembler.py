@@ -47,7 +47,7 @@ def kernel_program():
 
 
 def user_program():
-    file_name = "ecall_test"
+    file_name = "print_all_chars"
     output_version = "v2"
     input_file = os.path.join("factorisco_v_assembly", f"{file_name}.s")
     output_file = os.path.join("output", "factorisco", f"{file_name}.txt")
@@ -60,5 +60,5 @@ def user_program():
     print(f"File Name: {file_name}")
 
 if __name__ == "__main__":
-    # user_program()
-    kernel_program()
+    user_program()
+    # kernel_program()

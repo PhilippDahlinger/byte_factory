@@ -44,6 +44,14 @@ main:
 	li a1, 0
 	ecall # set cursor to 0,0
 	
+	# set font to default: no wrap, and stride is 1
+	li a7, 9
+	li a0, 0 # font
+	li a1, 1 # stride
+	li a2, 0 # no wrap
+	ecall
+	
+	
 	# disable kernel mode
 	sw zero, 15(zero)
 	# hardcoded entry point of user program in ROM #1
