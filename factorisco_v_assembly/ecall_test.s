@@ -1,10 +1,27 @@
 .text
 .globl _start
 _start:
-	call input_test
+	call sleep_test
 	li a7, 1
 	ecall # exit
 
+
+sleep_test:
+	push ra
+	li a7, 4
+	ecall # get_time
+	mv s0, a0
+	li a7, 4
+	ecall # get_time
+	mv s1, a0
+	li a0, 200
+	li a7, 5
+	ecall # sleep for x cycles
+	li a7, 4
+	ecall # get_time
+	mv s2, a0
+	pop ra
+	ret
 	
 input_test:
 	push ra

@@ -99,9 +99,18 @@ raise_exception:
 	ret
 
 get_time:
+	lw a0, 16(zero)
 	ret
 
 sleep:
+	# 17 cycles to get here, 14 after ret
+	0:
+	subi a0, a0, 29  # ballpark after test
+	divi a0, a0, 5 # one loop takes 5 cycles, since jump needs 3 cycles
+	blt a0, zero, 1f
+	dec a0
+	j 0b
+	1:
 	ret
 
 set_cursor:
