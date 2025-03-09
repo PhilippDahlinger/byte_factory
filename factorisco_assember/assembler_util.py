@@ -154,7 +154,16 @@ def tokenize(code, is_text_segment=True, force_start=True):
         match = re.match(r"(\S+)(?:\s+(.+))?", line)  # The argument part is now optional
         if match:
             instruction = match.group(1)
-            args = [arg.strip() for arg in match.group(2).split(",")] if match.group(2) else []
+            combined_args = match.group(2)
+            if not combined_args:
+                return [instruction]
+            elif '"' not in combined_args:
+                args = [arg.strip() for arg in combined_args.split(",")]
+            else:
+                # extract strings
+                args = re.findall(r'"(.*?)"', combined_args)
+                # add quotation marks again
+                args = [f'"{arg}"' for arg in args]
             return [instruction, *args]
         else:
             raise AssertionError(f"Error parsing empty line {i}: `{line}`")

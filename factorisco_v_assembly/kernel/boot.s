@@ -60,8 +60,8 @@ main:
 	# disable kernel mode
 	sw zero, 15(zero)
 	
-	# hardcoded entry point of user program in ROM #1
-	li t0, 147968
+	# hardcoded entry point of OS program in kernel ROM #2
+	li t0, 139776
 	jalr zero, 0(t0)
 	nop
 	nop
