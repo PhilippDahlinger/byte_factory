@@ -57,6 +57,11 @@ main:
 	li a7, 23 
 	ecall # close_key_stream
 	
+	# print welcome string
+	la a0, welcome
+	li a7, 17
+	ecall
+	
 	# hardcoded entry point of OS program in kernel ROM #2
 	li t0, 139776
 	jalr zero, 0(t0)
@@ -64,3 +69,4 @@ main:
 	nop
 
 .data
+	welcome: .asciz "Welcome to FactOS 0.1.0!\n"

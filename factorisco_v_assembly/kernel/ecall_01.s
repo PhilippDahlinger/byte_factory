@@ -66,19 +66,17 @@ reset:
 exit:
 	# user program ends, go back to os
 	# need to reset stack, set ra correctly on the stack, increment kernel mode to be in kernel mode after ecall decrements it again
-	# in current single program mode: terminate cpu
-	halt
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	
-	
+	li sp, 33000  # reset sp
+	li t0, 1000 # reset value of sbrk pointer
+	sw t0, 256(zero) # address 256 = sbrk pointer
+	# inc kernel
 	lw t0, 15(zero)
 	inc t0
 	sw t0, 15(zero)
+	
+	# hardcoded entry point of OS program in kernel ROM #2
+	li t0, 139776
+	jalr zero, 0(t0)
 	ret
 
 sbrk:
