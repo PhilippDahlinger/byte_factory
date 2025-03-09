@@ -18,6 +18,8 @@ main:
 	ret
 	
 invalid_input:
+	# TODO
+	call raise_exception
 	
 	
 jump_table:
