@@ -20,6 +20,8 @@ sleep_test:
 	li a7, 4
 	ecall # get_time
 	mv s2, a0
+	sub s3, s2, s1
+	sub s4, s1, s0
 	pop ra
 	ret
 	

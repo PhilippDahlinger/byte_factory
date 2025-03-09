@@ -41,15 +41,19 @@ main:
 	# reset display
 	li a7, 15 
 	ecall # cls
-	li a7, 6
 	li a0, 0
 	li a1, 0
+	li a7, 6
 	ecall # set cursor to 0,0
 	# set font to default: no wrap, and stride is 1
 	li a7, 9
 	li a0, 0 # font
 	li a1, 1 # stride
 	li a2, 0 # no wrap
+	ecall
+	# set fdr to 0
+	li a0, 0
+	li a7, 11
 	ecall
 	
 	# reset keyboard

@@ -104,9 +104,9 @@ get_time:
 
 sleep:
 	# 17 cycles to get here, 14 after ret
-	0:
-	subi a0, a0, 29  # ballpark after test
+	subi a0, a0, 40  # ballpark after test
 	divi a0, a0, 5 # one loop takes 5 cycles, since jump needs 3 cycles
+	0:
 	blt a0, zero, 1f
 	dec a0
 	j 0b
