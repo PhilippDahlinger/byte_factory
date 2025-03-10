@@ -373,7 +373,47 @@ str_to_int:
 	ret
 	
 int_to_str:
+	# Todo: dynamic allocation
+	push ra
+	push s0
+	mv s0, a0  # s0: current int to parse
+	li a0, 12 # max 12 characters long, can be refined
+	call sbrk
+	# a0: current mem location to write char
+	addi a0, a0 10 # go backward
+	sw zero, 1(a0) # trailing zero for string end
+	# check negative number
+	li t0, 1
+	bge s0, zero, 1f
+	li t0, -1 # negative
+	1:
+	mul s0, s0, t0 # ensure positive number
+	2:
+	modi t1, s0, 10 # last digit
+	addi t1, 48 # ascii encoding
+	sw t1, 0(a0)
+	dec a0
+	divi s0, s0, 10
+	beqz s0, 3f
+	j 2b
+	3:
+	inc a0 # start with first char
+	bge t1, zero, 4f
+	# add "-" sign
+	li t1, 45
+	dec a0
+	sw t1 0(a0)
+	4:
+	
+	
+	
+	
+	
+	pop s0
+	pop ra
 	ret
+	 
+	
 	
 set_cursor_to_next_line:
 	lw t3, 5(zero)
