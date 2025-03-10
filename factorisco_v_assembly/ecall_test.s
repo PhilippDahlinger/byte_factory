@@ -1,9 +1,23 @@
 .text
 .globl _start
 _start:
-	call sleep_test
+	call print_int_test
 	li a7, 1
 	ecall # exit
+
+print_int_test:
+	push ra
+	li a0, -123
+	mv s7, a0
+	li a7, 19
+	ecall # print int
+	li a0, 10
+	li a7, 18 
+	ecall # print new line
+	li a0, 0
+	li a7, 2
+	pop ra
+	ret
 
 
 sleep_test:
