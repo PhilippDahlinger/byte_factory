@@ -376,13 +376,21 @@ input:
 	ret
 
 rand_int:
-	beqz a0, 1f
+	dec a0
+	blt a0, zero, 1f
 	push ra
-	push s0
+	push s0 # max value
 	mv s0, a0
 	call msb  
-	li t0, 2 # create upper bound for modulo -> TODO
-	sll t0, t0, a0
+	li t0, 2 
+	sll t0, t0, a0  # modulo max value
+	dec t0 # boolean mask of 1s for and
+	0: # rejection sampling loop
+	lw a0, 17(zero)
+	and a0, a0, t0  # ensure positive values, mod of negative number is negative 
+	ble a0, s0, 2f
+	j 0b # if not, try again
+	2:
 	pop s0
 	pop ra
 	ret

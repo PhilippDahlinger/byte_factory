@@ -1,9 +1,26 @@
 .text
 .globl _start
 _start:
-	call msb_test
+	call rand_int_test
 	li a7, 1
 	ecall # exit
+
+rand_int_test:
+	push ra
+	push s0
+	li s0, 10
+	0:
+	li a0, 10000
+	li a7, 27
+	ecall # rand_int
+	li a7, 19
+	ecall # print int
+	li a7, 25
+	ecall # wait for next key
+	beq a0, s0, 0b
+	pop s0
+	pop ra
+	ret
 
 msb_test:
 	push ra
