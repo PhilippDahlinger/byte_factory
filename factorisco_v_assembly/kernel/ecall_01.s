@@ -2,7 +2,7 @@
 .text
 main:
 	push ra
-	li t1, 32  # last valid ECALL code
+	li t1, 34  # last valid ECALL code
 	# check for valid ECALL code
 	bgt a7, t1, invalid_input
 	blt a7, zero, invalid_input
@@ -97,6 +97,15 @@ sbrk:
 	ret
 
 raise_exception:
+	li s10, -1
+	li s11, -1
+	halt
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
 	ret
 
 get_time:
@@ -367,6 +376,19 @@ input:
 	ret
 
 rand_int:
+	beqz a0, 1f
+	push ra
+	push s0
+	mv s0, a0
+	call msb  
+	li t0, 2 # create upper bound for modulo -> TODO
+	sll t0, t0, a0
+	pop s0
+	pop ra
+	ret
+	1:
+	# input error: a0 == 0
+	call raise_exception
 	ret
 	
 rand_word:
@@ -438,7 +460,7 @@ msb:
     bgt a2, a3, 1f    # while L <= R
 
     add a4, a2, a3      # mid = (L + R) / 2
-    srai a4, a4, 1      
+    divi a4, a4, 2      
 
     sll t0, t1, a4     # 1 << mid
     ble t0, a0, 2f  # if (1 << mid) <= n, go right
@@ -454,6 +476,34 @@ msb:
 	1:
     mv a0, a1          # return msb in a0
     ret
+	
+#msb2:
+	#li t0, -1
+	#beqz a0, 1f
+	#li t0, 0
+	#li t1, 2
+	#blt a0, t1, 1f
+	#li t0, 1
+	#li t1, 4
+	#blt a0, t1, 1f
+	#li t0, 2
+	#li t1, 8
+	#blt a0, t1, 1f
+	#li t0, 3
+	#li t1, 16
+	#blt a0, t1, 1f
+	#li t0, 4
+	#li t1, 32
+	#blt a0, t1, 1f
+	#li t0, 5
+	#li t1, 64
+	#blt a0, t1, 1f
+	#li t0, 1
+	#li t1, 4
+	#blt a0, t1, 1f
+	#1:
+	#mv a0, t0
+	#ret
 	
 .data
 

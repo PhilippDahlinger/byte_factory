@@ -4,54 +4,20 @@ _start:
 	call msb_test
 	li a7, 1
 	ecall # exit
-	
+
 msb_test:
 	push ra
-	li a0, 2
-	call msb
-	#li a7, 34
-	#ecall # msb
+	li a0, 5
+	li a7, 34
+	ecall # msb
+	mv s10, a0
 	li a7, 19
 	ecall # print int
+	li a0, 10
+	li a7, 18 
+	ecall # print new line
 	pop ra
 	ret
-
-msb:
-    li a1, -1           # msb = -1
-    li a2, 0            # L = 0
-    li a3, 32           # R = 32 (assuming 32-bit numbers, adjust for 64-bit)
-	li t1, 1           # t1 = 1
-    
-	0:
-    bgt a2, a3, 1f    # while L <= R
-
-    add a4, a2, a3      # mid = (L + R) / 2
-    divi a4, a4, 2      
-
-    sll t0, t1, a4     # 1 << mid
-    ble t0, a0, 2f  # if (1 << mid) <= n, go right
-
-    addi a1, a4, -1    # msb = mid - 1
-    addi a3, a4, -1    # R = mid - 1
-	push a0
-	mv a0, a1
-	li a7, 19
-	ecall
-	pop a0
-    j 0b
-
-	2:
-    addi a2, a4, 1     # L = mid + 1
-	push a0
-	mv a0, a2
-	li a7, 19
-	ecall
-	pop a0
-    j 0b
-
-	1:
-    mv a0, a1          # return msb in a0
-    ret
 
 print_int_test:
 	push ra
@@ -62,8 +28,6 @@ print_int_test:
 	li a0, 10
 	li a7, 18 
 	ecall # print new line
-	li a0, 0
-	li a7, 2
 	pop ra
 	ret
 
