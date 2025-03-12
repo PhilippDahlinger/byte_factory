@@ -8,6 +8,8 @@ main:
 	la a0, selection
 	li a7, 16
 	ecall # print without a new line
+	li a7, 22
+	ecall # open key stream
 	# input
 	3:
 	li a7, 25
@@ -51,7 +53,8 @@ main:
 	li a0, 10
 	li a7, 18
 	ecall # print new line
-	
+	li a7, 23
+	ecall # close key stream
 	la t0, jump_table
 	add t0, t0, s0
 	lw t0, 0(t0) # user program location in t0

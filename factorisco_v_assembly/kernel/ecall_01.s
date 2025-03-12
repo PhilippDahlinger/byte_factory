@@ -65,6 +65,7 @@ reset:
 	ret
 	
 exit:
+	push ra
 	# user program ends, go back to os
 	# need to reset stack, set ra correctly on the stack, increment kernel mode to be in kernel mode after ecall decrements it again
 	li sp, 33000  # reset sp
@@ -74,7 +75,17 @@ exit:
 	lw t0, 15(zero)
 	inc t0
 	sw t0, 15(zero)
+	li a0, 0 # font
+	li a1, 1 # stride
+	li a2, 0 # no wrap
+	call set_font
+	call set_cursor_to_next_line
+	call get_cursor
+	subi a0, a0, 5
+	call set_fdr # make print statement in the middle of the screen to see output from program clearly
 	
+	
+	pop ra # stack clean up
 	# hardcoded entry point of OS program in kernel ROM #2
 	li t0, 139776
 	jalr zero, 0(t0)
