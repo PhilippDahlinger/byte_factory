@@ -35,7 +35,7 @@ main:
 	li x31, 0
 
 	li sp, 33000  # init sp
-	li t0, 1000 # initial value of sbrk pointer
+	li t0, 1024 # initial value of sbrk pointer
 	sw t0, 256(zero) # address 256 = sbrk pointer
 	
 	# reset display
@@ -60,11 +60,20 @@ main:
 	# close and flush key stream
 	li a7, 23 
 	ecall # close_key_stream
+		
+	# # debug: reset RAM initial values
+	# li a0, 1024
+	# li a1, 1536
+	# 1:
+	# sw zero, 0(a0)
+	# inc a0
+	# blt a0, a1, 1b
 	
 	# print welcome string
 	la a0, welcome
 	li a7, 17
 	ecall
+
 	
 	# hardcoded entry point of OS program in kernel ROM #2
 	li t0, 139776
