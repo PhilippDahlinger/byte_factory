@@ -128,10 +128,6 @@ update_status:
 	mv a1, s2
 	li a7, 6
 	ecall
-	li a0, 72
-	li a7, 18
-	ecall
-	
 	# set border flags 0: is close to border, 1: is a binnengebiet
 	slt t2, zero, s1 # t0 = (s1 > 0), for top row
 	slt t3, zero, s2 # for left col
@@ -187,6 +183,7 @@ update_status:
 	ret
 	
 	3:
+	push s6
 	# set a " " to the status reg
 	li a0, 32
 	add s6, s3, s0 # current status index
@@ -195,14 +192,14 @@ update_status:
 	# save current status, could do it with multiple pushes, but this saves a lot of ticks
 	li s5, 136
 	addi sp, sp, -8
-	sw s0, -7(sp)
-	sw s1, -6(sp)
-	sw s2, -5(sp)
-	sw s6, -4(sp)  # all these are modified
+	sw s0, 7(sp)
+	sw s1, 6(sp)
+	sw s2, 5(sp)
+	sw s6, 4(sp)  # all these are modified
 	# put t2-t5 on the stack as local var to make it persistent between function calls 
-	sw t2, -3(sp)
-	sw t3, -2(sp)
-	sw t4, -1(sp)
+	sw t2, 3(sp)
+	sw t3, 2(sp)
+	sw t4, 1(sp)
 	sw t5, 0(sp)
 	
 
@@ -211,137 +208,175 @@ update_status:
 	ecall # print char " ". Needed for recursion reasons, since other blocks are not updated by the game loop
 	
 	lw t1, -1(s6) # center left
-	lw t3, -2(sp)
-	nop
+	lw t3, 2(sp)
 	mul t1, t1, t3 
-	nop
 	bne t1, s5, 1f
 	# recursive call, update new index
 	addi s0, s0, -1
 	addi s2, s2, -1
+	# li s11, 0
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
+	# li s11, 10
+	# li a7, 25
+	# ecall # debug break point
 	# reset to middle pos
-	lw s0, -7(sp)
-	lw s2, -5(sp)
+	lw s0, 7(sp)
+	lw s2, 5(sp)
 	
 	1:
 	lw t1, 1(s6) # center right
 	lw t5, 0(sp) # now it has to come from the stack
-	nop
 	mul t1, t1, t5
-	nop
 	bne t1, s5, 1f
 	# recursive call, correct new index
 	addi s0, s0, 1
 	addi s2, s2, 1
+	# li s11, 1
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
-	lw s0, -7(sp)
-	lw s2, -5(sp)
+	# li s11, 11
+	# li a7, 25
+	# ecall # debug break point
+	lw s0, 7(sp)
+	lw s2, 5(sp)
 	
 	1:
 	# jump over top row if top flags is 0
-	lw t2, -3(sp)
-	nop
+	lw t2, 3(sp)
+	
 	beqz t2, 2f
 	sub s6, s6, s9 # go one row up
 	sub s0, s0, s9 # array index will also shift
+	
 	lw t1, -1(s6) # top left
-	lw t3, -2(sp)
-	nop
+	lw t3, 2(sp)
 	mul t1, t1, t3
-	nop
 	bne t1, s5, 1f
 	# recursive call, correct new index
 	addi s0, s0, -1
 	addi s1, s1, -1
 	addi s2, s2, -1
+	# li s11, 2
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
+	# li s11, 12
+	# li a7, 25
+	# ecall # debug break point
 	addi s0, s0, 1 # reset s0 to the one row up status
-	lw s1, -6(sp)
-	lw s2, -5(sp)	
+	lw s1, 6(sp)
+	lw s2, 5(sp)	
 	
 	1:
 	lw t1, 0(s6) # top center
 	bne t1, s5, 1f
 	# recursive call, correct new index
 	addi s1, s1, -1
+	# li s11, 3
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
-	lw s1, -6(sp)
+	# li s11, 13
+	# li a7, 25
+	# ecall # debug break point
+	lw s1, 6(sp)
 	
 	1:
 	lw t1, 1(s6) # top right
 	lw t5, 0(sp) # now it has to come from the stack
-	nop
 	mul t1, t1, t5
-	nop
 	bne t1, s5, 1f
 	# recursive call, correct new index
 	addi s0, s0, 1
 	addi s1, s1, -1
 	addi s2, s2, 1
+	# li s11, 4
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
+	# li s11, 14
+	# li a7, 25
+	# ecall # debug break point
 	addi s0, s0, -1
-	lw s1, -6(sp)
-	lw s2, -5(sp)
+	lw s1, 6(sp)
+	lw s2, 5(sp)
 	1:
 	add s6, s6, s9
 	add s0, s0, s9
 	2:
 	# jump over bot row if bot flag is 0
-	lw t4, -1(sp)
-	nop
+	lw t4, 1(sp)
 	beqz t4, 2f
 	add s6, s6, s9 # go one row down
 	add s0, s0, s9 # array index will also shift
+	
 	lw t1, -1(s6) # bottom left
-	lw t3, -2(sp)
-	nop
+	lw t3, 2(sp)
 	mul t1, t1, t3
-	nop
 	bne t1, s5, 1f
 	# recursive call, correct new index
 	addi s0, s0, -1
 	addi s1, s1, 1
 	addi s2, s2, -1
+	# li s11, 5
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
+	# li s11, 15
+	# li a7, 25
+	# ecall # debug break point
 	addi s0, s0, 1 # reset s0 to the one row down status
-	lw s1, -6(sp)
-	lw s2, -5(sp)	
+	lw s1, 6(sp)
+	lw s2, 5(sp)	
 	
 	1:
 	lw t1, 0(s6) # bot center
 	bne t1, s5, 1f
 	# recursive call, correct new index
 	addi s1, s1, 1
+	# li s11, 6
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
-	lw s1, -6(sp)
+	# li s11, 16
+	# li a7, 25
+	# ecall # debug break point
+	lw s1, 6(sp)
 	
 	1:
 	lw t1, 1(s6) # bot right
 	lw t5, 0(sp) # now it has to come from the stack
-	nop
 	mul t1, t1, t5
-	nop
 	bne t1, s5, 1f
 	# recursive call, correct new index
 	addi s0, s0, 1
-	addi s1, s0, 1
-	addi s2, s0, 1
+	addi s1, s1, 1
+	addi s2, s2, 1
+	# li s11, 7
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
+	# li s11, 17
+	# li a7, 25
+	# ecall # debug break point
 	addi s0, s0, 1
-	lw s1, -6(sp)
-	lw s2, -5(sp)
+	lw s1, 6(sp)
+	lw s2, 5(sp)
 	1:
 	sub s6, s6, s9
 	sub s0, s0, s9
 	2:
 	# reset stack
 
-	lw s0, -7(sp)
-	lw s1, -6(sp)
-	lw s2, -5(sp)
-	lw s6, -4(sp)
+	lw s0, 7(sp)
+	lw s1, 6(sp)
+	lw s2, 5(sp)
+	# lw s6, 4(sp)
 	addi sp, sp, 8
+	pop s6
 	pop s5 # from way at the beginning
 	pop ra
 	ret
@@ -371,12 +406,13 @@ init:
 	# s5/s6: temps which are save after ecalls
 	li s7, 0 # animation state, switches between 0 and 1
 	li s8, 1 # constant 1 for stuff
-	li s9, 4 # game dim
+	li s9, 9 # game dim
 	mul s10, s9, s9 # total size of field
 	
 	# memory maps
 	# bombs
-	mv a0, s10
+	# mv a0, s10  <- Correct line
+	li a0, 256  # debug line
 	li a7, 2
 	ecall  # sbrk
 	push a0 # save ref
@@ -385,7 +421,7 @@ init:
 	# add bombs
 	# get bomb ref back from stack
 	lw s5, 0(sp)
-	li s6, 0 # bomb counter
+	li s6, 10 # bomb counter
 	# print total number of bombs
 	li a0, 0
 	addi a1, s9, 1 # 1 field right to the game
@@ -399,6 +435,7 @@ init:
 	ecall # print int (bombs)
 	
 	0:
+	# bomb placement algorithm
 	beq s6, zero, 1f
 	mv a0, s10
 	li a7, 27
@@ -410,9 +447,11 @@ init:
 	sw s8, 0(t0)
 	dec s6
 	j 0b # go back to place next bomb
+	
 	1:
 	# status 
-	mv a0, s10
+	# mv a0, s10  <- Correct line
+	li a0, 256  # debug line
 	li a7, 2
 	ecall  # sbrk
 	push a0 # save ref
@@ -437,22 +476,22 @@ init:
 	ecall # open key stream
 	
 	# DEBUG: draw bombs in status
-	#li t0, 0
-	#add t2, s3, s10 # end of status array
-	#0:
-	#add t1, s3, t0
-	#beq t1, t2, 1f
-	#add t3, s4, t0 # bomb index
-	#lw t3, 0(t3) # actual bomb bool
-	#beq t3, s8, 2f # if 1: draw bomb in status
-	#3:
-	#inc t0 
-	#j 0b
-	#2:
-	#li t3, 131 # create diamond bomb char
-	#sw t3, 0(t1) # bomb char in status reg
-	#j 3b
-	#1:
+	# li t0, 0
+	# add t2, s3, s10 # end of status array
+	# 0:
+	# add t1, s3, t0
+	# beq t1, t2, 1f
+	# add t3, s4, t0 # bomb index
+	# lw t3, 0(t3) # actual bomb bool
+	# beq t3, s8, 2f # if 1: draw bomb in status
+	# 3:
+	# inc t0 
+	# j 0b
+	# 2:
+	# li t3, 131 # create diamond bomb char
+	# sw t3, 0(t1) # bomb char in status reg
+	# j 3b
+	# 1:
 	# END DEBUG
 	
 	pop ra
@@ -474,18 +513,20 @@ init_field:
 .data
 	# have to make sure that this matches with the game dim
 	# define string like this, since the char 136 does not exist normally...
-	str_init_field: .word 136, 136, 136, 136,10
-	.word 136, 136, 136, 136, 10
-	.word 136, 136, 136, 136, 10
-	.word 136, 136, 136, 136,0
+	# str_init_field: .word 136, 136, 136, 136,10
+	# .word 136, 136, 136, 136, 10
+	# .word 136, 136, 136, 136, 10
+	# .word 136, 136, 136, 136,0
 	
-	#str_init_field: .word 136, 136, 136, 136, 136,136, 136, 136,10
-	#.word 136, 136, 136, 136, 136,136, 136, 136,10
-	#.word 136, 136, 136, 136, 136,136, 136, 136,10
-	#.word 136, 136, 136, 136, 136,136, 136, 136,10
-	#.word 136, 136, 136, 136, 136,136, 136, 136,10
-	#.word 136, 136, 136, 136, 136,136, 136, 136,10
-	#.word 136, 136, 136, 136, 136,136, 136, 136,10
-	#.word 136, 136, 136, 136, 136,136, 136, 136,0
+	str_init_field: .word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
+	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
+	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
+	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
+	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
+	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
+	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
+	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
+	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 0
+	
 	
 	str_bombs: .asciz "Bombs: "
