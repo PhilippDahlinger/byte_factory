@@ -183,6 +183,7 @@ update_status:
 	ret
 	
 	3:
+	push s6
 	# set a " " to the status reg
 	li a0, 32
 	add s6, s3, s0 # current status index
@@ -191,14 +192,14 @@ update_status:
 	# save current status, could do it with multiple pushes, but this saves a lot of ticks
 	li s5, 136
 	addi sp, sp, -8
-	sw s0, -7(sp)
-	sw s1, -6(sp)
-	sw s2, -5(sp)
-	sw s6, -4(sp)  # all these are modified
+	sw s0, 7(sp)
+	sw s1, 6(sp)
+	sw s2, 5(sp)
+	sw s6, 4(sp)  # all these are modified
 	# put t2-t5 on the stack as local var to make it persistent between function calls 
-	sw t2, -3(sp)
-	sw t3, -2(sp)
-	sw t4, -1(sp)
+	sw t2, 3(sp)
+	sw t3, 2(sp)
+	sw t4, 1(sp)
 	sw t5, 0(sp)
 	
 
@@ -207,16 +208,22 @@ update_status:
 	ecall # print char " ". Needed for recursion reasons, since other blocks are not updated by the game loop
 	
 	lw t1, -1(s6) # center left
-	lw t3, -2(sp)
+	lw t3, 2(sp)
 	mul t1, t1, t3 
 	bne t1, s5, 1f
 	# recursive call, update new index
 	addi s0, s0, -1
 	addi s2, s2, -1
+	# li s11, 0
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
+	# li s11, 10
+	# li a7, 25
+	# ecall # debug break point
 	# reset to middle pos
-	lw s0, -7(sp)
-	lw s2, -5(sp)
+	lw s0, 7(sp)
+	lw s2, 5(sp)
 	
 	1:
 	lw t1, 1(s6) # center right
@@ -226,36 +233,56 @@ update_status:
 	# recursive call, correct new index
 	addi s0, s0, 1
 	addi s2, s2, 1
+	# li s11, 1
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
-	lw s0, -7(sp)
-	lw s2, -5(sp)
+	# li s11, 11
+	# li a7, 25
+	# ecall # debug break point
+	lw s0, 7(sp)
+	lw s2, 5(sp)
 	
 	1:
 	# jump over top row if top flags is 0
-	lw t2, -3(sp)
+	lw t2, 3(sp)
+	
 	beqz t2, 2f
 	sub s6, s6, s9 # go one row up
 	sub s0, s0, s9 # array index will also shift
+	
 	lw t1, -1(s6) # top left
-	lw t3, -2(sp)
+	lw t3, 2(sp)
 	mul t1, t1, t3
 	bne t1, s5, 1f
 	# recursive call, correct new index
 	addi s0, s0, -1
 	addi s1, s1, -1
 	addi s2, s2, -1
+	# li s11, 2
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
+	# li s11, 12
+	# li a7, 25
+	# ecall # debug break point
 	addi s0, s0, 1 # reset s0 to the one row up status
-	lw s1, -6(sp)
-	lw s2, -5(sp)	
+	lw s1, 6(sp)
+	lw s2, 5(sp)	
 	
 	1:
 	lw t1, 0(s6) # top center
 	bne t1, s5, 1f
 	# recursive call, correct new index
 	addi s1, s1, -1
+	# li s11, 3
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
-	lw s1, -6(sp)
+	# li s11, 13
+	# li a7, 25
+	# ecall # debug break point
+	lw s1, 6(sp)
 	
 	1:
 	lw t1, 1(s6) # top right
@@ -266,39 +293,58 @@ update_status:
 	addi s0, s0, 1
 	addi s1, s1, -1
 	addi s2, s2, 1
+	# li s11, 4
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
+	# li s11, 14
+	# li a7, 25
+	# ecall # debug break point
 	addi s0, s0, -1
-	lw s1, -6(sp)
-	lw s2, -5(sp)
+	lw s1, 6(sp)
+	lw s2, 5(sp)
 	1:
 	add s6, s6, s9
 	add s0, s0, s9
 	2:
 	# jump over bot row if bot flag is 0
-	lw t4, -1(sp)
+	lw t4, 1(sp)
 	beqz t4, 2f
 	add s6, s6, s9 # go one row down
 	add s0, s0, s9 # array index will also shift
+	
 	lw t1, -1(s6) # bottom left
-	lw t3, -2(sp)
+	lw t3, 2(sp)
 	mul t1, t1, t3
 	bne t1, s5, 1f
 	# recursive call, correct new index
 	addi s0, s0, -1
 	addi s1, s1, 1
 	addi s2, s2, -1
+	# li s11, 5
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
+	# li s11, 15
+	# li a7, 25
+	# ecall # debug break point
 	addi s0, s0, 1 # reset s0 to the one row down status
-	lw s1, -6(sp)
-	lw s2, -5(sp)	
+	lw s1, 6(sp)
+	lw s2, 5(sp)	
 	
 	1:
 	lw t1, 0(s6) # bot center
 	bne t1, s5, 1f
 	# recursive call, correct new index
 	addi s1, s1, 1
+	# li s11, 6
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
-	lw s1, -6(sp)
+	# li s11, 16
+	# li a7, 25
+	# ecall # debug break point
+	lw s1, 6(sp)
 	
 	1:
 	lw t1, 1(s6) # bot right
@@ -309,21 +355,28 @@ update_status:
 	addi s0, s0, 1
 	addi s1, s1, 1
 	addi s2, s2, 1
+	# li s11, 7
+	# li a7, 25
+	# ecall # debug break point
 	call update_status
+	# li s11, 17
+	# li a7, 25
+	# ecall # debug break point
 	addi s0, s0, 1
-	lw s1, -6(sp)
-	lw s2, -5(sp)
+	lw s1, 6(sp)
+	lw s2, 5(sp)
 	1:
 	sub s6, s6, s9
 	sub s0, s0, s9
 	2:
 	# reset stack
 
-	lw s0, -7(sp)
-	lw s1, -6(sp)
-	lw s2, -5(sp)
-	lw s6, -4(sp)
+	lw s0, 7(sp)
+	lw s1, 6(sp)
+	lw s2, 5(sp)
+	# lw s6, 4(sp)
 	addi sp, sp, 8
+	pop s6
 	pop s5 # from way at the beginning
 	pop ra
 	ret
@@ -382,6 +435,7 @@ init:
 	ecall # print int (bombs)
 	
 	0:
+	# bomb placement algorithm
 	beq s6, zero, 1f
 	mv a0, s10
 	li a7, 27
@@ -393,6 +447,7 @@ init:
 	sw s8, 0(t0)
 	dec s6
 	j 0b # go back to place next bomb
+	
 	1:
 	# status 
 	# mv a0, s10  <- Correct line
