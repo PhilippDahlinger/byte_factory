@@ -6,21 +6,17 @@ main:
 	# check for valid ECALL code
 	bgt a7, t1, invalid_input
 	blt a7, zero, invalid_input
-	la t0, jump_table  # in the final version, replace label jump_table la and add with direct immediate of correct offset to jump_table -> saves 3 cycles
+	
+	la t0, jump_table  
 	add a7, a7, t0
 	# execute ECALL
 	jalr ra, 0(a7)
 	# remove kernel access. Since ECALL adds +1 to the kernel address in hardware, decrease it by 1. -> Same access as before the ecall instruction
 	lw t0, 15(zero)
+	pop ra  # solve mem dependency
 	dec t0
 	sw t0, 15(zero)
-	pop ra
 	ret
-	
-invalid_input:
-	# TODO
-	call raise_exception
-	
 	
 jump_table:
 	# indirect jump to correct function. the ret will bring it back to the main function
@@ -60,8 +56,12 @@ jump_table:
 	jal zero, set_cursor_to_next_line # 33
 	jal zero, msb # 34
 	
+invalid_input:
+	# TODO
+	call raise_exception
+	
 reset:
-	li s0, 23
+	# not used
 	ret
 	
 exit:
