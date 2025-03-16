@@ -348,6 +348,20 @@ input:
 	# s2: start address of string
 	# s3: persistent temp
 	# s4: animation state
+	
+	# update fdr so that current cursor is at least the second to bottom row -> cursor - fdr <= 10
+	lw t0, 5(zero) # cursor row
+	lw t1, 9(zero) # FDR
+	li t3, 10
+	sub t2, t0, t1
+	ble t2, t3, 0f
+	# set fdr to 10 rows behind cursor
+	push a0
+	subi a0, t0, 10
+	call set_fdr
+	pop a0
+	0:
+	
 	mv s1, a1
 	bnez a0, 1f
 	# a0 == 0 case: get mem from sbrk

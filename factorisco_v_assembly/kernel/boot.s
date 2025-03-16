@@ -82,4 +82,4 @@ main:
 	nop
 
 .data
-	welcome: .asciz "FactOS 0.2.0\n"
+	welcome: .asciz "FactOS 0.2.1\n"

@@ -70,6 +70,11 @@ _start:
 	j stop # end game
 	1:
 	# update status to display number
+	# only update_status if current field is unexplored
+	add t0, s3, s0 # current status index
+	lw a0, 0(t0)
+	li t0, 136
+	bne a0, t0, game_loop # go back to game loop if already explored
 	call update_status
 	# reset real cursor to current position
 	mv a0, s1
@@ -413,7 +418,7 @@ init:
 	# add bombs
 	# get bomb ref back from stack
 	lw s5, 0(sp)
-	li s6, 10 # bomb counter
+	li s6, 9 # bomb counter
 	# compute s11
 	sub s11, s10, s6  # total fields - bomb fields
 	# push s6 # save number of bombs for return

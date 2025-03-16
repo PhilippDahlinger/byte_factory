@@ -66,5 +66,5 @@ if __name__ == "__main__":
     verbose = False
     kernel_program("ecall_01", verbose=verbose)
     kernel_program("boot", verbose=verbose)
-    kernel_program("os_01", verbose=verbose)
-    user_program("ecall_test", verbose=verbose)
+    kernel_program("os_02", verbose=verbose)
+    user_program("minesweeper", verbose=verbose)
