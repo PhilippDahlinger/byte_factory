@@ -81,8 +81,8 @@ exit:
 	call set_font
 	call set_cursor_to_next_line
 	call get_cursor
-	subi a0, a0, 5
-	call set_fdr # make print statement in the middle of the screen to see output from program clearly
+	subi a0, a0, 10
+	call set_fdr # make print statement at the bottom of the screen to see the output easily
 	
 	
 	pop ra # stack clean up

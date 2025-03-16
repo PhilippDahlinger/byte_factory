@@ -10,10 +10,34 @@ main:
 	ecall # print without a new line
 	li a7, 22
 	ecall # open key stream
+	li s7, 0 # animation state var
+	li s1, 1 # constant 1
 	# input
+	
 	3:
-	li a7, 25
-	ecall # wait for next key
+	# animation
+	# update animation state
+	xori s7, s7, 1
+	# set stride to 0
+	sw zero, 13(zero)
+	beq s7, zero, 1f # j to erase animation
+    # draw animation
+	li a0, 128 # full block
+	li a7, 18
+	ecall
+	j 2f
+	1:
+	# erase animation
+	li a0, 32 # blank
+	li a7, 18
+	ecall
+	2:
+	# set stride back to 1
+	sw s1, 13(zero)
+	li a7, 24
+	ecall # read next key
+	# jump back if no key is pressed
+	beq a0, zero, 3b
 	# handle scrolling of terminal
 	li t0, 9 # up is pressed
 	beq a0, t0, 4f
@@ -67,7 +91,7 @@ main:
 
 	
 .data
-	selection: .asciz "Choose ROM slot 0, 1, 2, or 3: "
+	selection: .asciz "ROM slot: "
 	invalid_input: .asciz "Invalid input!\n"
 	jump_table: .word 147968, 152064, 156160, 160256
 	

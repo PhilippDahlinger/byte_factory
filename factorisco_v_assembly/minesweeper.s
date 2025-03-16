@@ -21,10 +21,13 @@ _start:
 	ecall
 	# process inputs
 	2:
-	li a7, 24
+	li a7, 24	
 	ecall # get next key
 	li t0, 11
-	beq a0, t0, stop
+	bne a0, t0, 4f
+	li a0, 0
+	j stop
+	4:
 	li t0, 6
 	beq a0, t0, 0f # left
 	li t0, 7
@@ -64,6 +67,7 @@ _start:
 	li a0, 131
 	li a7, 18
 	ecall # print_char
+	li a0, 0
 	j stop # end game
 	1:
 	# update status to display number
@@ -106,11 +110,39 @@ _start:
 	1: # skip everything if out of bounds
 	j game_loop
 	
-	stop:
+stop:
+	# a0 == 0: loose, else: won
+	# print end mesage
+	push a0
+	# set font and move cursor to correct printing pos
+	# move cursor to location below bomb text
+	li a0, 2
+	addi a1, s9, 1 # 1 field right to the game
+	li a7, 6
+	ecall # set cursor abs
+	# set stride to 1
+	li a0, 0 # font
+	li a1, 1 # stride
+	li a2, 0 # no wrap
+	li a7, 9
+	ecall
+	pop a0
+	beq a0, zero, 1f
+	# you won
+	la a0, str_win
+	li a7, 16
+	ecall # print
+	j 2f
+	1:
+	# you lost
+	la a0, str_loose
+	li a7, 16
+	ecall # print
+	2:
 	li a7, 23
 	ecall # close key stream
 	# move cursor to the end of the field
-	mv a0, s1
+	mv a0, s9
 	li a1, 0
 	li a7, 6
 	ecall # set cursor abs
@@ -530,3 +562,5 @@ init_field:
 	
 	
 	str_bombs: .asciz "Bombs: "
+	str_loose: .asciz "Boom!"
+	str_win: .asciz "Good job!"
