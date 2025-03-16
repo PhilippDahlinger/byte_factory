@@ -2,7 +2,6 @@
 .globl _start
 _start:
 	call init
-	
 	game_loop:
 	# animation
 	# update animation state
@@ -77,6 +76,11 @@ _start:
 	mv a1, s2
 	li a7, 6
 	ecall
+	# check win condition s11 == 0: no non-bombs to be explore
+	bne s11, zero, 5f
+	li a0, 1
+	j stop # end game with positive win message
+	5:
 	j game_loop
 	
 
@@ -152,6 +156,9 @@ stop:
 update_status:
 	# computes the number of current cursor position and saves it in the status array
 	push ra
+	# one correct field is explored -> reduce fields to explore by
+	# important: this is not added to the stack, so every iteration of update_status will reduce this by one, even the recursive ones.
+	dec s11
 	push s5 # recursive stuff: old s5 value needs to be saved
 	li s5, 0 # accumulator of the status
 	
@@ -246,13 +253,7 @@ update_status:
 	# recursive call, update new index
 	addi s0, s0, -1
 	addi s2, s2, -1
-	# li s11, 0
-	# li a7, 25
-	# ecall # debug break point
 	call update_status
-	# li s11, 10
-	# li a7, 25
-	# ecall # debug break point
 	# reset to middle pos
 	lw s0, 7(sp)
 	lw s2, 5(sp)
@@ -265,13 +266,7 @@ update_status:
 	# recursive call, correct new index
 	addi s0, s0, 1
 	addi s2, s2, 1
-	# li s11, 1
-	# li a7, 25
-	# ecall # debug break point
 	call update_status
-	# li s11, 11
-	# li a7, 25
-	# ecall # debug break point
 	lw s0, 7(sp)
 	lw s2, 5(sp)
 	
@@ -291,13 +286,7 @@ update_status:
 	addi s0, s0, -1
 	addi s1, s1, -1
 	addi s2, s2, -1
-	# li s11, 2
-	# li a7, 25
-	# ecall # debug break point
 	call update_status
-	# li s11, 12
-	# li a7, 25
-	# ecall # debug break point
 	addi s0, s0, 1 # reset s0 to the one row up status
 	lw s1, 6(sp)
 	lw s2, 5(sp)	
@@ -307,13 +296,7 @@ update_status:
 	bne t1, s5, 1f
 	# recursive call, correct new index
 	addi s1, s1, -1
-	# li s11, 3
-	# li a7, 25
-	# ecall # debug break point
 	call update_status
-	# li s11, 13
-	# li a7, 25
-	# ecall # debug break point
 	lw s1, 6(sp)
 	
 	1:
@@ -325,13 +308,7 @@ update_status:
 	addi s0, s0, 1
 	addi s1, s1, -1
 	addi s2, s2, 1
-	# li s11, 4
-	# li a7, 25
-	# ecall # debug break point
 	call update_status
-	# li s11, 14
-	# li a7, 25
-	# ecall # debug break point
 	addi s0, s0, -1
 	lw s1, 6(sp)
 	lw s2, 5(sp)
@@ -353,13 +330,7 @@ update_status:
 	addi s0, s0, -1
 	addi s1, s1, 1
 	addi s2, s2, -1
-	# li s11, 5
-	# li a7, 25
-	# ecall # debug break point
 	call update_status
-	# li s11, 15
-	# li a7, 25
-	# ecall # debug break point
 	addi s0, s0, 1 # reset s0 to the one row down status
 	lw s1, 6(sp)
 	lw s2, 5(sp)	
@@ -369,13 +340,7 @@ update_status:
 	bne t1, s5, 1f
 	# recursive call, correct new index
 	addi s1, s1, 1
-	# li s11, 6
-	# li a7, 25
-	# ecall # debug break point
 	call update_status
-	# li s11, 16
-	# li a7, 25
-	# ecall # debug break point
 	lw s1, 6(sp)
 	
 	1:
@@ -387,13 +352,7 @@ update_status:
 	addi s0, s0, 1
 	addi s1, s1, 1
 	addi s2, s2, 1
-	# li s11, 7
-	# li a7, 25
-	# ecall # debug break point
 	call update_status
-	# li s11, 17
-	# li a7, 25
-	# ecall # debug break point
 	addi s0, s0, 1
 	lw s1, 6(sp)
 	lw s2, 5(sp)
@@ -440,6 +399,7 @@ init:
 	li s8, 1 # constant 1 for stuff
 	li s9, 9 # game dim
 	mul s10, s9, s9 # total size of field
+	# s11: number of non-bombs fields still unexplored. if 0: you win
 	
 	# memory maps
 	# bombs
@@ -454,6 +414,9 @@ init:
 	# get bomb ref back from stack
 	lw s5, 0(sp)
 	li s6, 10 # bomb counter
+	# compute s11
+	sub s11, s10, s6  # total fields - bomb fields
+	# push s6 # save number of bombs for return
 	# print total number of bombs
 	li a0, 0
 	addi a1, s9, 1 # 1 field right to the game
@@ -491,6 +454,7 @@ init:
 	call init_field
 	
 	pop s3 # status field address
+	# pop s6 # number of bombs
 	pop s4 # bomb field address
 	
 	li a0, 0
@@ -525,7 +489,7 @@ init:
 	# j 3b
 	# 1:
 	# END DEBUG
-	
+	# mv a0, s6 # number of bombs as return param
 	pop ra
 	ret
 
