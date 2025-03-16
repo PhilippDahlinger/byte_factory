@@ -328,15 +328,26 @@ input:
 	lw t0, 3(zero)
 	# open the stream nethertheless
 	li t1, 1
-	sw t1, 3(zero) 
-	push ra
-	push t0
-	push s0
-	push s1
-	push s2
+	sw t1, 3(zero)
+	# save original stride
+	lw t1, 13(zero)
+	# set stride to 0
+	sw zero, 13(zero)
+	# move regs to the stack which we want to keep (ra, t0, t1), and which we want to modify (s..)
+	addi sp, sp, -8
+	sw ra, 7(sp)
+	sw t0, 6(sp)
+	sw t1, 5(sp)
+	sw s0, 4(sp)
+	sw s1, 3(sp)
+	sw s2, 2(sp)
+	sw s3, 1(sp)
+	sw s4, 0(sp)
 	# s0: current address of the string
 	# s1: end address of string. If string goes to that length: break
 	# s2: start address of string
+	# s3: persistent temp
+	# s4: animation state
 	mv s1, a1
 	bnez a0, 1f
 	# a0 == 0 case: get mem from sbrk
@@ -348,25 +359,55 @@ input:
 	# compute correct end address
 	add s1, s0, s1 
 	dec s1  # have to save a zero word at the end -> useful space is 1 less
+	li s4, 0 # init animation reg
 	
 	# main part: wait for key input, save it in string, and print it
 	# TODO: handle backspace
-	li t2, 10 # "enter" key code
 	2:
 	beq s0, s1, 4f  # max length: break
+	
+	# handle animation
+	# update animation state
+	xori s4, s4, 1
+	beq s4, zero, 5f # j to erase animation
+    # draw animation
+	li a0, 128 # full block
+	call print_char
+	j 6f
+	5:
+	# erase animation
+	li a0, 32 # blank
+	call print_char
+	6:
+	# animation done
+	
+	# process key inputs
 	call read_key_stream
-	beqz a0, 3f 
+	beqz a0, 2b # # no key entered: go back to start of loop
 	# real key in a0
 	# check for 10: break loop
-	beq a0, t2, 4f
+	li s3, 10 # "enter" key code
+	beq a0, s3, 4f
+	# check for backspace
+	li s3, 11 # "backspace" key code
+	beq a0, s3, 5f
+	# ToDo check for valid input char
 	# store in string
 	sw a0, 0(s0)
-	inc s0
 	# print char
 	call print_char
-	3:
+	# move cursor one to the right, since stride is 0, have to do it manually. -> No checking of end of line
+	lw t0, 6(zero)
+	inc s0 # solve mem dependency
+	inc t0
+	sw t0, 6(zero)
 	j 2b
+	
+	# enter is pressed
 	4:
+	# erase current animation block
+	li a0, 32 # blank
+	call print_char
 	# add zero word to end of string
 	sw zero, 0(s0)
 	# cursor to new line
@@ -374,17 +415,37 @@ input:
 	sw zero, 6(zero) # solve data dependency by adding the sw here
 	inc t3
 	sw t3, 5(zero)
-	
 	# return start address saved earlier
 	mv a0, s2
-	pop s2
-	pop s1
-	pop s0
-	pop t0
-	pop ra
+	lw ra, 7(sp)
+	lw t0, 6(sp)
+	lw t1, 5(sp)
+	lw s0, 4(sp)
+	lw s1, 3(sp)
+	lw s2, 2(sp)
+	lw s3, 1(sp)
+	lw s4, 0(sp)
+	addi sp, sp, 8
 	# reset stream state to the original state
 	sw t0, 3(zero)
+	# reset stride to original state
+	sw t1, 13(zero)
 	ret
+	
+	# backspace is pressed
+	5:
+	# erase current animation block
+	li a0, 32 # blank
+	call print_char
+	# dec s0, but not lower than s2
+	slt a0, s2, s0 # is 1 if s2 < s0, in that case decrement s0
+	# dec cursor
+	lw t0, 6(zero)
+	sub s0, s0, a0 # solve mem dependency
+	sub t0, t0, a0 # only update cursor if string is not at start
+	sw t0, 6(zero)
+	# nothing to do else, animation will update, string will end with 0,
+	j 2b
 
 rand_int:
 	dec a0
@@ -426,7 +487,10 @@ str_to_int:
 	# returns output in a0, 0 in a1 if everything worked, otherwise 0 in a0, and -1 in a1 if input error
 	# todo: negative numbers
 	li t1, 9 # max number to check input
+	# check for empty string
+	lw t0, 0(a0)
 	li t2, 0 # output reg
+	beqz t0, 3f # error 
 	0:
 	lw t0, 0(a0)
 	beq t0, zero, 1f
