@@ -14,8 +14,10 @@ str_to_int_test:
 	ecall # input
 	li a7, 31
 	ecall # str_to_int
-	# square output to prove its a number
-	mul a0, a0, a0
+	# cube output to prove its a number
+	mul t0, a0, a0
+	mul t0, t0, a0
+	mv a0, t0
 	li a7, 19
 	ecall # print int
 	pop ra

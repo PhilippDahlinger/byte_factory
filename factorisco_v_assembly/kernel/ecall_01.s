@@ -391,7 +391,15 @@ input:
 	# check for backspace
 	li s3, 11 # "backspace" key code
 	beq a0, s3, 5f
+	# handle scrolling of terminal
+	li t0, 9 # up is pressed
+	beq a0, t0, 6f
+	li t0, 8 # down is pressed
+	beq a0, t0, 7f
 	# ToDo check for valid input char
+	# check if key >= 32 to ensure printable char
+	li t0, 32
+	ble a0, t0, 8f
 	# store in string
 	sw a0, 0(s0)
 	# print char
@@ -446,6 +454,18 @@ input:
 	sw t0, 6(zero)
 	# nothing to do else, animation will update, string will end with 0,
 	j 2b
+	6:
+	li a0, -1
+	call set_fdr_rel
+	j 2b
+	7:
+	li a0, 1
+	call set_fdr_rel
+	j 2b
+	8:
+	# do nothing, just don't parse the key
+	j 2b
+	
 
 rand_int:
 	dec a0
@@ -485,11 +505,19 @@ str_to_int:
 	# does not check overflow!
 	# a0: address of string
 	# returns output in a0, 0 in a1 if everything worked, otherwise 0 in a0, and -1 in a1 if input error
-	# todo: negative numbers
 	li t1, 9 # max number to check input
-	# check for empty string
-	lw t0, 0(a0)
+	lw t0, 0(a0) # load first char
 	li t2, 0 # output reg
+	li t3, 1 # sign of output
+	# check if "-" is first char
+	li t1, 45 
+	bne t0, t1, 4f
+	# save negative sign
+	li t3, -1
+	inc a0 # first sign processed
+	lw t0, 0(a0) # load first char again to check for empty string. "-" is not valid.
+	4:
+	# check for empty string
 	beqz t0, 3f # error 
 	0:
 	lw t0, 0(a0)
@@ -504,6 +532,7 @@ str_to_int:
 	inc a0
 	j 0b
 	1:
+	mul t2, t2, t3 # correct sign
 	mv a0, t2 # output 
 	li a1, 0  # normal processing
 	ret
