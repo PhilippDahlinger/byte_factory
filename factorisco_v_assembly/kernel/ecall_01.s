@@ -519,7 +519,6 @@ str_to_int:
 	# does not check overflow!
 	# a0: address of string
 	# returns output in a0, 0 in a1 if everything worked, otherwise 0 in a0, and -1 in a1 if input error
-	li t1, 9 # max number to check input
 	lw t0, 0(a0) # load first char
 	li t2, 0 # output reg
 	li t3, 1 # sign of output
@@ -533,6 +532,7 @@ str_to_int:
 	4:
 	# check for empty string
 	beqz t0, 3f # error 
+	li t1, 9 # max digit to check input
 	0:
 	lw t0, 0(a0)
 	beq t0, zero, 1f
