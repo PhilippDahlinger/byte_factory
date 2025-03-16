@@ -1,9 +1,25 @@
 .text
 .globl _start
 _start:
-	call rand_int_test
+	call str_to_int_test
 	li a7, 1
 	ecall # exit
+
+
+str_to_int_test:
+	push ra
+	li a0, 0
+	li a1, 15 # max length
+	li a7, 26
+	ecall # input
+	li a7, 31
+	ecall # str_to_int
+	# square output to prove its a number
+	mul a0, a0, a0
+	li a7, 19
+	ecall # print int
+	pop ra
+	ret
 
 rand_int_test:
 	push ra

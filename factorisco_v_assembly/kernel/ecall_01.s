@@ -421,7 +421,34 @@ cstr_to_str:
 	ret
 	
 str_to_int:
+	# does not check overflow!
+	# a0: address of string
+	# returns output in a0, 0 in a1 if everything worked, otherwise 0 in a0, and -1 in a1 if input error
+	# todo: negative numbers
+	li t1, 9 # max number to check input
+	li t2, 0 # output reg
+	0:
+	lw t0, 0(a0)
+	beq t0, zero, 1f
+	# process digit
+	# decode
+	subi t0, t0, 48
+	blt t0, zero, 3f # assert t0 >= 0
+	bgt t0, t1, 3f # assert t0 <= 9
+	muli t2, t2, 10 # shift one digit to the right
+	add t2, t2, t0 # new digit added
+	inc a0
+	j 0b
+	1:
+	mv a0, t2 # output 
+	li a1, 0  # normal processing
 	ret
+	3:
+	# error
+	li a0, 0 # give deterministic output
+	li a1, -1 # error code
+	ret
+	
 	
 int_to_str:
 	# Todo: dynamic allocation
