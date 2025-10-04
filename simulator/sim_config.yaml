@@ -1,0 +1,13 @@
+
+boot_file: "output/factorisco/kernel/debug_boot_machine_code.txt"
+os_file: "output/factorisco/kernel/ecall_01_machine_code.txt"
+ecall_file: "output/factorisco/kernel/os_02_machine_code.txt"
+
+# pointers and addresses
+boot_address: 100000
+os_address: 101000
+ecall_address: 102000
+user_program_addresses: [103000, 104000, 105000, 106000]
+
+kernel_mode_address: 15
+clock_address: 16
