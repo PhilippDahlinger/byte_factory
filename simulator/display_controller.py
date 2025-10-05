@@ -57,8 +57,6 @@ class DisplayController:
                 line = " " * self.width
             new_display.append(line)
         self.current_display = new_display
-        # TODO: add GUI trigger
-        self.print_display()
 
     def print_display(self):
         print("-" * self.width)
