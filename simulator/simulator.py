@@ -1,6 +1,7 @@
 import yaml
 
 from simulator.display_controller import DisplayController
+from simulator.keyboard_controller import KeyboardController
 
 
 class Simulator:
@@ -17,7 +18,7 @@ class Simulator:
         self.address_room = [0] * 1000000
         self.pc = self.config["boot_address"]  # program counter starts at boot address
         self.display_controller = DisplayController(self.config["display_controller"])
-        self.keyboard_controller = None # TODO: KeyboardController
+        self.keyboard_controller = KeyboardController(self.config["keyboard_controller"], self)
 
         self.set_initial_memory()
 
@@ -125,6 +126,7 @@ class Simulator:
         elif decoded["opcode"] == 24:
             # LW	x[rd] = sext(M[x[rs1] + sext(offset)][31:0])
             address = (self.reg_stack[decoded["rs1"]] + decoded["imm"])
+            self.keyboard_controller.process(address, None, False)  # inform keyboard controller
             if address < 0 or address >= len(self.address_room):
                 raise ValueError(f"Memory access out of bounds: {address}")
             result = self.address_room[address]
@@ -135,6 +137,7 @@ class Simulator:
             if address < 0 or address >= len(self.address_room):
                 raise ValueError(f"Memory access out of bounds: {address}")
             self.address_room[address] = self.reg_stack[decoded["rs2"]]
+            self.keyboard_controller.process(address, self.reg_stack[decoded["rs2"]], True)  # inform keyboard controller
             self.display_controller.process(address, self.reg_stack[decoded["rs2"]])  # inform display controller
             result = None
             wb = False
@@ -245,7 +248,7 @@ class Simulator:
             self.address_room[i + ecall_address] = word
         # load user programs
         for program_idx, program in enumerate(self.user_codes):
-            user_address = self.config["user_addresses"][program_idx]
+            user_address = self.config["user_program_addresses"][program_idx]
             for i, word in enumerate(program):
                 self.address_room[i + user_address] = word
         # set kernel mode to 1: start in kernel mode

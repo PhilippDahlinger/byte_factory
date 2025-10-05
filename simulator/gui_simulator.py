@@ -74,6 +74,22 @@ class SimulatorGUI:
         self.display_text.pack(fill="both", expand=True)
         self.display_text.config(state="disabled")
 
+        # --- Bind keyboard focus and key presses ---
+        self.display_text.bind("<FocusIn>", self._on_display_focus)
+        self.display_text.bind("<KeyPress>", self._on_key_pressed)
+
+    def _on_display_focus(self, event):
+        # Ensure widget can actually receive key events
+        # self.display_text.focus_set()
+        pass
+
+    def _on_key_pressed(self, event):
+        """
+        Called whenever a key is pressed while the display has focus.
+        """
+        key_symbol = event.keysym  # e.g., 'a', 'Left', 'Return'
+        self.sim.keyboard_controller.add_pressed_key_to_queue(key_symbol)
+
     def _build_memory_view(self):
         frame = ttk.LabelFrame(self.root, text="Memory Viewer (32 words)")
         frame.pack(side="left", fill="y", padx=5, pady=5)

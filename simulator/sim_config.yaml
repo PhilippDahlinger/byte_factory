@@ -13,10 +13,11 @@ kernel_mode_address: 15
 clock_address: 16
 
 keyboard_controller:
-  stream_content_output: 1
-  indicator_if_stream_not_empty: 2
-  open_stream: 3  # boolean flag: 0 = closed, 1 = open
-  flush_stream: 4
+  address_map:
+    stream_content_output: 1
+    indicator_if_stream_not_empty: 2
+    open_stream: 3  # boolean flag: 0 = closed, 1 = open
+    flush_stream: 4
 
 display_controller:
   address_map:

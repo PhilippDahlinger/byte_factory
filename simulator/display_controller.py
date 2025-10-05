@@ -14,11 +14,11 @@ class DisplayController:
         self.wrap = False  # will be set by boot
         self.current_display = [" " * self.width for _ in range(self.vis_height)]  # will be set on refresh
         self.address_map = self.config["address_map"]
-        self.valid_adresses = set(self.address_map.values())
+        self.valid_addresses = set(self.address_map.values())
 
 
     def process(self, address, value):
-        if address in self.valid_adresses:
+        if address in self.valid_addresses:
             # check every address
             if address == self.address_map["cursor_row"]:
                 self.cursor_row = value
