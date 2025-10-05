@@ -40,6 +40,7 @@ class Simulator:
         :return:
         """
         decoded = self.decode(instruction)
+        print("Decoded instruction:", decoded)
         # arithmetic instructions
         if decoded["opcode"] < 20:
             a = self.reg_stack[decoded["rs1"]]
@@ -93,21 +94,19 @@ class Simulator:
                 result = (a << b) # in the end we will mask to 32 bits
             else:
                 raise ValueError(f"Unknown arithmetic opcode: {decoded['opcode']}")
-            # mask to 32 bits
-            result = result & 0xFFFFFFFF
             wb = True
         elif decoded["opcode"] == 20:
             # LUI	x[rd] = sext(immediate[31:12] << 12)
             # imm already shifted
-            result = decoded["imm"] & 0xFFFFFFFF
+            result = decoded["imm"]
             wb = True
         elif decoded["opcode"] == 21:
             # AUIPC	x[rd] = pc + (sext(immediate[31:12] << 12))
-            result = (self.pc + (decoded["imm"] & 0xFFFFFFFF)) & 0xFFFFFFFF
+            result = self.pc + decoded["imm"]
             wb = True
         elif decoded["opcode"] == 22:
             # JAL	x[rd] = pc+1; pc += sext(offset)
-            result = (self.pc + 1) & 0xFFFFFFFF
+            result = self.pc + 1
             # make imm signed
             offset = decoded["imm"]
             if offset & (1 << 31):
@@ -117,10 +116,8 @@ class Simulator:
             wb = True
         elif decoded["opcode"] == 23:
             # JALR	t =pc+1; pc=(x[rs1]+sext(offset)); x[rd]=t
-            result = (self.pc + 1) & 0xFFFFFFFF
+            result = self.pc + 1
             offset = decoded["imm"]
-            if offset & (1 << 11):
-                offset -= 1 << 12
             self.pc = (self.reg_stack[decoded["rs1"]] + offset) - 1  # -1 because we will increment pc after execution
             wb = True
         elif decoded["opcode"] == 24:
@@ -128,8 +125,53 @@ class Simulator:
             address = (self.reg_stack[decoded["rs1"]] + decoded["imm"])
             if address < 0 or address >= len(self.address_room):
                 raise ValueError(f"Memory access out of bounds: {address}")
-            result = self.address_room[address] & 0xFFFFFFFF
+            result = self.address_room[address]
             wb = True
+        elif decoded["opcode"] == 25:
+            # SW	M[x[rs1] + sext(offset)][31:0] = x[rs2]
+            address = (self.reg_stack[decoded["rs1"]] + decoded["imm"])
+            if address < 0 or address >= len(self.address_room):
+                raise ValueError(f"Memory access out of bounds: {address}")
+            self.address_room[address] = self.reg_stack[decoded["rs2"]]
+            result = None
+            wb = False
+        elif decoded["opcode"] == 26:
+            # Branch instructions
+            if decoded["add_opcode"] == 0:
+                # BEQ	if (x[rs1] == x[rs2]) pc += sext(offset)
+                condition = self.reg_stack[decoded["rs1"]] == self.reg_stack[decoded["rs2"]]
+            elif decoded["add_opcode"] == 1:
+                # BNE	if (x[rs1] != x[rs2]) pc += sext(offset)
+                condition = self.reg_stack[decoded["rs1"]] != self.reg_stack[decoded["rs2"]]
+            elif decoded["add_opcode"] == 2:
+                # BLT	if (x[rs1] < x[rs2]) pc += sext(offset)
+                condition = self.reg_stack[decoded["rs1"]] < self.reg_stack[decoded["rs2"]]
+            elif decoded["add_opcode"] == 3:
+                # BGE	if (x[rs1] >= x[rs2]) pc += sext(offset)
+                condition = self.reg_stack[decoded["rs1"]] >= self.reg_stack[decoded["rs2"]]
+            else:
+                raise ValueError(f"Unknown branch add_opcode: {decoded['add_opcode']}")
+            if condition:
+                offset = decoded["imm"]
+                self.pc = (self.pc + offset) - 1
+            result = None
+            wb = False
+        elif decoded["opcode"] == 27:
+            # ECALL: TODO
+            result = None
+            raise NotImplementedError
+        elif decoded["opcode"] == 30:
+            # NOP
+            result = None
+            wb = False
+        else:
+            raise ValueError(f"Unknown opcode: {decoded['opcode']}")
+        if wb:
+            # write back result to rd
+            if decoded["rd"] != 0:
+                # register x0 is always 0
+                print("Writing back to register:", decoded["rd"], "Value:", result)
+                self.reg_stack[decoded["rd"]] = result
 
 
 
