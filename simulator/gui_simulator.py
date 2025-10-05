@@ -29,6 +29,9 @@ class SimulatorGUI:
         self._build_memory_view()
         self._build_status()
 
+        # Bind global keyboard input (except when addr_entry is focused)
+        self.root.bind_all("<KeyPress>", self._on_global_key_pressed)
+
         self._refresh_ui(full=True)  # initial update
 
     # --------------------------
@@ -74,22 +77,6 @@ class SimulatorGUI:
         self.display_text.pack(fill="both", expand=True)
         self.display_text.config(state="disabled")
 
-        # --- Bind keyboard focus and key presses ---
-        self.display_text.bind("<FocusIn>", self._on_display_focus)
-        self.display_text.bind("<KeyPress>", self._on_key_pressed)
-
-    def _on_display_focus(self, event):
-        # Ensure widget can actually receive key events
-        # self.display_text.focus_set()
-        pass
-
-    def _on_key_pressed(self, event):
-        """
-        Called whenever a key is pressed while the display has focus.
-        """
-        key_symbol = event.keysym  # e.g., 'a', 'Left', 'Return'
-        self.sim.keyboard_controller.add_pressed_key_to_queue(key_symbol)
-
     def _build_memory_view(self):
         frame = ttk.LabelFrame(self.root, text="Memory Viewer (32 words)")
         frame.pack(side="left", fill="y", padx=5, pady=5)
@@ -103,8 +90,15 @@ class SimulatorGUI:
 
         ttk.Button(addr_frame, text="View", command=self.update_memory_view).pack(side="left")
 
-        self.mem_text = tk.Text(frame, width=25, height=35, font=("Consolas", 9),
-                                bg="#202020", fg="#cccccc", insertbackground="#00ff88")
+        self.mem_text = tk.Text(
+            frame,
+            width=25,
+            height=35,
+            font=("Consolas", 9),
+            bg="#202020",
+            fg="#cccccc",
+            insertbackground="#00ff88",
+        )
         self.mem_text.pack(fill="both", expand=True)
         self.mem_text.config(state="disabled")
 
@@ -117,6 +111,24 @@ class SimulatorGUI:
 
         self.speed_label = ttk.Label(frame, text="Speed: 0 IPS")
         self.speed_label.pack(side="left", padx=20)
+
+    # --------------------------
+    #   KEYBOARD HANDLER
+    # --------------------------
+
+    def _on_global_key_pressed(self, event):
+        """
+        Capture all key presses in the window, except when typing
+        into the start address entry field.
+        """
+        focused_widget = self.root.focus_get()
+
+        # Skip capturing when the address field is focused
+        if focused_widget == self.addr_entry:
+            return
+
+        key_symbol = event.keysym
+        self.sim.keyboard_controller.add_pressed_key_to_queue(key_symbol)
 
     # --------------------------
     #   CONTROL HANDLERS
@@ -211,5 +223,3 @@ class SimulatorGUI:
         for addr in range(start_addr, min(end_addr, len(self.sim.address_room))):
             self.mem_text.insert(tk.END, f"{addr:06}: {self.sim.address_room[addr]}\n")
         self.mem_text.config(state="disabled")
-
-
