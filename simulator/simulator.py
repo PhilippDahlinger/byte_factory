@@ -18,13 +18,12 @@ class Simulator:
 
         self.set_initial_memory()
 
-
     def run(self):
         while True:
             instruction = self.address_room[self.pc]
             print(f"PC: {self.pc}, Instruction: {instruction}")
             if instruction == 30:
-                print("Encountered halt instruction (0). Halting.")
+                print("Encountered halt instruction (30). Halting.")
                 break
             self.execute(instruction)
 
@@ -91,7 +90,7 @@ class Simulator:
                 result = a >> b
             elif decoded["opcode"] == 12:
                 # SLL (shift left logical)
-                result = (a << b) # in the end we will mask to 32 bits
+                result = (a << b)  # in the end we will mask to 32 bits
             else:
                 raise ValueError(f"Unknown arithmetic opcode: {decoded['opcode']}")
             wb = True
@@ -111,7 +110,7 @@ class Simulator:
             offset = decoded["imm"]
             if offset & (1 << 31):
                 offset -= 1 << 32
-            offset = offset >> 12 # because imm is shifted left by 12
+            offset = offset >> 12  # because imm is shifted left by 12
             self.pc = (self.pc + offset) - 1  # -1 because we will increment pc after execution
             wb = True
         elif decoded["opcode"] == 23:
@@ -157,11 +156,13 @@ class Simulator:
             result = None
             wb = False
         elif decoded["opcode"] == 27:
-            # ECALL: TODO
-            result = None
-            raise NotImplementedError
+            # ECALL x[ra] = pc+1; pc = ECALL function address
+            result = self.pc + 1
+            decoded["rd"] = 1  # ra is x1
+            self.pc = self.config["ecall_address"] - 1  # -1 because we will increment pc after execution
+            self.address_room[self.config["kernel_mode_address"]] += 1  # enter kernel mode
         elif decoded["opcode"] == 30:
-            # NOP
+            # HALT
             result = None
             wb = False
         else:
@@ -172,14 +173,6 @@ class Simulator:
                 # register x0 is always 0
                 print("Writing back to register:", decoded["rd"], "Value:", result)
                 self.reg_stack[decoded["rd"]] = result
-
-
-
-
-
-
-
-
 
     def decode(self, instruction: int) -> dict:
         # extract helper
@@ -250,6 +243,8 @@ class Simulator:
             user_address = self.config["user_addresses"][program_idx]
             for i, word in enumerate(program):
                 self.address_room[i + user_address] = word
+        # set kernel mode to 1: start in kernel mode
+        self.address_room[self.config["kernel_mode_address"]] = 1
 
     def _load_program(self, file_path: str) -> list[int]:
         with open(file_path, 'r') as f:

@@ -25,8 +25,10 @@ main:
 	# all tests passed
 	mv s0, a0
 	# call program
+	# TODO: Remove the next 2 lines, they are a bug
 	li a7, 18
 	ecall # print selection as confirmation
+
 	li a0, 10
 	li a7, 18
 	ecall # print new line
