@@ -1,5 +1,7 @@
 import yaml
 
+from simulator.display_controller import DisplayController
+
 
 class Simulator:
     def __init__(self, config: dict, user_programs: list[str]):
@@ -14,14 +16,15 @@ class Simulator:
         self.reg_stack = [0] * 32
         self.address_room = [0] * 1000000
         self.pc = self.config["boot_address"]  # program counter starts at boot address
-        self.display = None  # TODO: DisplaySimulator
+        self.display_controller = DisplayController(self.config["display_controller"])
+        self.keyboard_controller = None # TODO: KeyboardController
 
         self.set_initial_memory()
 
     def run(self):
         while True:
             instruction = self.address_room[self.pc]
-            print(f"PC: {self.pc}, Instruction: {instruction}")
+            # print(f"PC: {self.pc}, Instruction: {instruction}")
             if instruction == 30:
                 print("Encountered halt instruction (30). Halting.")
                 break
@@ -39,12 +42,12 @@ class Simulator:
         :return:
         """
         decoded = self.decode(instruction)
-        print("Decoded instruction:", decoded)
+        # print("Decoded instruction:", decoded)
         # arithmetic instructions
         if decoded["opcode"] < 20:
             a = self.reg_stack[decoded["rs1"]]
             # interpret as signed
-            if a & (1 << 31):
+            if a > 0 and a & (1 << 31):
                 a -= 1 << 32
             if decoded["add_opcode"] == 1:
                 # I instruction
@@ -52,7 +55,7 @@ class Simulator:
             else:
                 # R instruction
                 b = self.reg_stack[decoded["rs2"]]
-            if b & (1 << 31):
+            if b > 0 and b & (1 << 31):
                 b -= 1 << 32
             if decoded["opcode"] == 1:
                 # ADD
@@ -132,6 +135,7 @@ class Simulator:
             if address < 0 or address >= len(self.address_room):
                 raise ValueError(f"Memory access out of bounds: {address}")
             self.address_room[address] = self.reg_stack[decoded["rs2"]]
+            self.display_controller.process(address, self.reg_stack[decoded["rs2"]])  # inform display controller
             result = None
             wb = False
         elif decoded["opcode"] == 26:
@@ -161,6 +165,7 @@ class Simulator:
             decoded["rd"] = 1  # ra is x1
             self.pc = self.config["ecall_address"] - 1  # -1 because we will increment pc after execution
             self.address_room[self.config["kernel_mode_address"]] += 1  # enter kernel mode
+            wb = True
         elif decoded["opcode"] == 30:
             # HALT
             result = None
@@ -171,7 +176,7 @@ class Simulator:
             # write back result to rd
             if decoded["rd"] != 0:
                 # register x0 is always 0
-                print("Writing back to register:", decoded["rd"], "Value:", result)
+                # print("Writing back to register:", decoded["rd"], "Value:", result)
                 self.reg_stack[decoded["rd"]] = result
 
     def decode(self, instruction: int) -> dict:
@@ -253,7 +258,4 @@ class Simulator:
         return [int(line.strip()) for line in lines if line.strip()]
 
 
-if __name__ == "__main__":
-    config = yaml.safe_load(open("simulator/sim_config.yaml"))
-    simulator = Simulator(config, [])
-    simulator.run()
+

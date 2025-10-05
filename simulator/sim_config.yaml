@@ -1,7 +1,7 @@
 
-boot_file: "output/factorisco/kernel/debug_boot_machine_code.txt"
-os_file: "output/factorisco/kernel/ecall_01_machine_code.txt"
-ecall_file: "output/factorisco/kernel/os_02_machine_code.txt"
+boot_file: "output/factorisco/kernel/boot_machine_code.txt"
+os_file: "output/factorisco/kernel/os_02_machine_code.txt"
+ecall_file: "output/factorisco/kernel/ecall_01_machine_code.txt"
 
 # pointers and addresses
 boot_address: 135680
@@ -11,3 +11,27 @@ user_program_addresses: [147968, 152064, 156160, 160256]
 
 kernel_mode_address: 15
 clock_address: 16
+
+keyboard_controller:
+  stream_content_output: 1
+  indicator_if_stream_not_empty: 2
+  open_stream: 3  # boolean flag: 0 = closed, 1 = open
+  flush_stream: 4
+
+display_controller:
+  address_map:
+    cursor_row: 5
+    cursor_col: 6
+    write_char: 7
+    first_displayed_row: 9
+    cls: 10
+    clear_current_row: 11
+    refresh: 12
+    stride: 13
+    wrap: 14
+  # other parameters
+  width: 20
+  vis_height: 12
+  total_height: 128
+
+
