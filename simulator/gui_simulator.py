@@ -21,6 +21,8 @@ class SimulatorGUI:
         self.last_speed_time = 0.0
         self.instr_counter = 0
         self.ips_value = 0.0  # instructions per second
+        self.throttle_enabled = False  # toggle state
+        self.throttle_target_ips = 60  # x instructions per second
 
         # Build layout
         self._build_controls()
@@ -50,6 +52,10 @@ class SimulatorGUI:
 
         self.step_btn = ttk.Button(frame, text="⏭ Step", command=self.step)
         self.step_btn.pack(side="left", padx=5)
+
+        # --- Throttle toggle button ---
+        self.throttle_btn = ttk.Button(frame, text="⚡ Full Speed", command=self.toggle_throttle)
+        self.throttle_btn.pack(side="left", padx=15)
 
     def _build_register_view(self):
         frame = ttk.LabelFrame(self.root, text="Register Stack (x0–x31)")
@@ -153,6 +159,14 @@ class SimulatorGUI:
                 self.sim.display_controller.refresh()
             self._refresh_ui(full=True)
 
+    def toggle_throttle(self):
+        """Toggle between full-speed and 120 IPS throttled mode."""
+        self.throttle_enabled = not self.throttle_enabled
+        if self.throttle_enabled:
+            self.throttle_btn.config(text="🐢 60 IPS")
+        else:
+            self.throttle_btn.config(text="⚡ Full Speed")
+
     # --------------------------
     #   RUN LOOP
     # --------------------------
@@ -174,9 +188,12 @@ class SimulatorGUI:
 
             now = time.perf_counter()
 
+            # --- Throttle to 120 instructions per second if enabled ---
+            if self.throttle_enabled:
+                time.sleep(1.0 / self.throttle_target_ips)
+
             # Update display at ~10 Hz
             if now - self.last_display_update >= 1 / self.display_fps:
-                self.sim.display_controller.refresh()
                 self._refresh_display_only()
                 self.last_display_update = now
 

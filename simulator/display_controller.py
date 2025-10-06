@@ -15,6 +15,21 @@ class DisplayController:
         self.current_display = [" " * self.width for _ in range(self.vis_height)]  # will be set on refresh
         self.address_map = self.config["address_map"]
         self.valid_addresses = set(self.address_map.values())
+        self.special_chars = {
+            128: "█",  # full block
+            129: "■",  # square
+            130: "▪",  # small square
+            131: "◆",  # diamond
+            132: "⎸", # left bar
+            133: "‾", # top bar
+            134: "⎹", # right bar
+            135: "□", # empty square
+            136: "░",  # shaded block
+            137: "♣", # club
+            138: "♠",  # spade
+            139: "♥", # heart
+            140: "♦", # diamond
+        }
 
 
     def process(self, address, value):
@@ -51,8 +66,15 @@ class DisplayController:
         new_display = []
         for row in range(self.first_displayed_row, self.first_displayed_row + self.vis_height):
             if 0 <= row < self.total_height:
-                # TODO: support own ASCII extension to display more characters / own font
-                line = "".join(chr(c) if 32 <= c <= 126 else " " for c in self.data[row])
+                line_list = []
+                for c in self.data[row]:
+                    if 32 <= c <= 126:
+                        line_list.append(chr(c))
+                    elif c in self.special_chars:
+                        line_list.append(self.special_chars[c])
+                    else:
+                        line_list.append(" ")
+                line = "".join(line_list)
             else:
                 line = " " * self.width
             new_display.append(line)
