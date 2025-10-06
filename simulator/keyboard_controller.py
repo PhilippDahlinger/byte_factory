@@ -36,8 +36,9 @@ class KeyboardController:
             "Left": 6,
             "Up": 9,
             "Return": 10,
-            "Delete": 11,
+            "BackSpace": 11,
         }
+        print(key_symbol)
 
         # Check for special keys
         if key_symbol in keymap:
