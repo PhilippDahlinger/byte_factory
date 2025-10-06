@@ -17,7 +17,7 @@ class Simulator:
         self.reg_stack = [0] * 32
         self.address_room = [0] * 1000000
         self.pc = self.config["boot_address"]  # program counter starts at boot address
-        self.display_controller = DisplayController(self.config["display_controller"])
+        self.display_controller = DisplayController(self.config["display_controller"], self)
         self.keyboard_controller = KeyboardController(self.config["keyboard_controller"], self)
 
         self.set_initial_memory()

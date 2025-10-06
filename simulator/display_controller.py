@@ -1,19 +1,20 @@
 
 
 class DisplayController:
-    def __init__(self, config):
+    def __init__(self, config, simulator):
         self.config = config
+        self.simulator = simulator
         self.width = self.config["width"]
         self.vis_height = self.config["vis_height"]
         self.total_height = self.config["total_height"]
         self.data = [[0] * self.width for _ in range(self.total_height)]
         self.first_displayed_row = 0
-        self.cursor_row = 0
-        self.cursor_col = 0
+        self.address_map = self.config["address_map"]
+        self.cursor_row = self.simulator.address_room[self.address_map["cursor_row"]]
+        self.cursor_col = self.simulator.address_room[self.address_map["cursor_col"]]
         self.stride = 1  # will be set by boot
         self.wrap = False  # will be set by boot
         self.current_display = [" " * self.width for _ in range(self.vis_height)]  # will be set on refresh
-        self.address_map = self.config["address_map"]
         self.valid_addresses = set(self.address_map.values())
         self.special_chars = {
             128: "█",  # full block
@@ -54,6 +55,9 @@ class DisplayController:
                     if self.cursor_col >= self.width and self.wrap:
                         self.cursor_col = 0
                         self.cursor_row += 1
+                    # update memory-mapped cursor positions
+                    self.simulator.address_room[self.address_map["cursor_row"]] = self.cursor_row
+                    self.simulator.address_room[self.address_map["cursor_col"]] = self.cursor_col
             elif address == self.address_map["cls"]:
                 self.data = [[0] * self.width for _ in range(self.total_height)]
             elif address == self.address_map["clear_current_row"]:
