@@ -22,7 +22,7 @@ class SimulatorGUI:
         self.instr_counter = 0
         self.ips_value = 0.0  # instructions per second
         self.throttle_enabled = False  # toggle state
-        self.throttle_target_ips = 60  # x instructions per second
+        self.throttle_target_ips = 100  # x instructions per second
 
         # Build layout
         self._build_controls()
@@ -163,7 +163,7 @@ class SimulatorGUI:
         """Toggle between full-speed and 120 IPS throttled mode."""
         self.throttle_enabled = not self.throttle_enabled
         if self.throttle_enabled:
-            self.throttle_btn.config(text="🐢 60 IPS")
+            self.throttle_btn.config(text="🐢 100 IPS")
         else:
             self.throttle_btn.config(text="⚡ Full Speed")
 
@@ -222,12 +222,16 @@ class SimulatorGUI:
             self.update_memory_view(auto=True)
 
     def _refresh_display_only(self):
-        """Only update display to minimize overhead during fast runs."""
-        self.display_text.config(state="normal")
-        self.display_text.delete("1.0", tk.END)
-        for line in self.sim.display_controller.current_display:
-            self.display_text.insert(tk.END, line + "\n")
-        self.display_text.config(state="disabled")
+        """Only update display if content has changed to minimize overhead."""
+        new_text = "\n".join(self.sim.display_controller.current_display) + "\n"
+        current_text = self.display_text.get("1.0", tk.END)
+
+        # Only update if there is an actual change
+        if new_text != current_text:
+            self.display_text.config(state="normal")
+            self.display_text.delete("1.0", tk.END)
+            self.display_text.insert(tk.END, new_text)
+            self.display_text.config(state="disabled")
 
     def update_memory_view(self, auto=False):
         try:

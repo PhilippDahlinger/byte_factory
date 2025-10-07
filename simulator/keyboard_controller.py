@@ -24,7 +24,6 @@ class KeyboardController:
         code = self._translate_key(key_symbol)
         if code is not None and self.stream_open:
             self.key_queue.append(code)
-        print(self.key_queue)
 
     def _translate_key(self, key_symbol: str) -> int | None:
         """
@@ -37,8 +36,8 @@ class KeyboardController:
             "Up": 9,
             "Return": 10,
             "BackSpace": 11,
+            "space": 32,
         }
-        print(key_symbol)
 
         # Check for special keys
         if key_symbol in keymap:
