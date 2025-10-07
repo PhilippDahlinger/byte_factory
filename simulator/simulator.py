@@ -1,3 +1,5 @@
+import random
+
 import yaml
 
 from simulator.display_controller import DisplayController
@@ -19,7 +21,7 @@ class Simulator:
         self.pc = self.config["boot_address"]  # program counter starts at boot address
         self.display_controller = DisplayController(self.config["display_controller"], self)
         self.keyboard_controller = KeyboardController(self.config["keyboard_controller"], self)
-
+        self.clock = 0  # simple clock counter
         self.set_initial_memory()
 
     def run(self):
@@ -129,13 +131,24 @@ class Simulator:
             self.keyboard_controller.process(address, None, False)  # inform keyboard controller
             if address < 0 or address >= len(self.address_room):
                 raise ValueError(f"Memory access out of bounds: {address}")
-            result = self.address_room[address]
+            # check for kernel restricted addresses
+            if self.address_room[self.config["kernel_mode_address"]] == 0 and address <= self.config["kernel_restricted_addresses"]:
+                raise PermissionError(f"Accessing kernel restricted address {address} in user mode.")
+            if address == self.config["rng_address"]:
+                result = random.randint(-2 ** 31, 2 ** 31 - 1)
+            elif address == self.config["clock_address"]:
+                result = self.clock
+            else:
+                result = self.address_room[address]
             wb = True
         elif decoded["opcode"] == 25:
             # SW	M[x[rs1] + sext(offset)][31:0] = x[rs2]
             address = (self.reg_stack[decoded["rs1"]] + decoded["imm"])
             if address < 0 or address >= len(self.address_room):
                 raise ValueError(f"Memory access out of bounds: {address}")
+            # check for kernel restricted addresses
+            if self.address_room[self.config["kernel_mode_address"]] == 0 and address <= self.config["kernel_restricted_addresses"]:
+                raise PermissionError(f"Accessing kernel restricted address {address} in user mode.")
             self.address_room[address] = self.reg_stack[decoded["rs2"]]
             self.keyboard_controller.process(address, self.reg_stack[decoded["rs2"]], True)  # inform keyboard controller
             self.display_controller.process(address, self.reg_stack[decoded["rs2"]])  # inform display controller
@@ -181,6 +194,7 @@ class Simulator:
                 # register x0 is always 0
                 # print("Writing back to register:", decoded["rd"], "Value:", result)
                 self.reg_stack[decoded["rd"]] = result
+        self.clock += 1
 
     def decode(self, instruction: int) -> dict:
         # extract helper
@@ -253,6 +267,7 @@ class Simulator:
                 self.address_room[i + user_address] = word
         # set kernel mode to 1: start in kernel mode
         self.address_room[self.config["kernel_mode_address"]] = 1
+        self.clock = 0
 
     def _load_program(self, file_path: str) -> list[int]:
         with open(file_path, 'r') as f:

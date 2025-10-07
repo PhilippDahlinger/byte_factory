@@ -8,9 +8,11 @@ boot_address: 135680
 os_address: 139776
 ecall_address: 131584
 user_program_addresses: [147968, 152064, 156160, 160256]
+kernel_restricted_addresses: 1000  # first 1000 addresses are reserved for kernel
 
 kernel_mode_address: 15
 clock_address: 16
+rng_address: 17
 
 keyboard_controller:
   address_map:
