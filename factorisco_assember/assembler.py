@@ -30,6 +30,10 @@ def assemble(assembly_code, output_file, output_version="v2", kernel_mode=False,
         for i, line in enumerate(machine_code):
             print(f"{i}: {line}")
     create_data_blueprint(machine_code, output_file=output_file, output_version=output_version)
+    machine_code_output_file = output_file.replace(".txt", "_machine_code.txt")
+    with open(machine_code_output_file, 'w') as f:
+        for word in machine_code:
+            f.write(f"{word}\n")
     return True
 
 
@@ -65,6 +69,6 @@ def user_program(file_name, verbose=True):
 if __name__ == "__main__":
     verbose = False
     # kernel_program("ecall_01", verbose=verbose)
-    # kernel_program("boot", verbose=verbose)
+    # kernel_program("debug_boot", verbose=verbose)
     # kernel_program("os_02", verbose=verbose)
-    user_program("congress_boot", verbose=verbose)
+    user_program("minesweeper", verbose=verbose)
