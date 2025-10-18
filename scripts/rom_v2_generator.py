@@ -62,7 +62,7 @@ def generate_rom_v2_data_combinator():
 if __name__ == "__main__":
     # generate_rom_v2_data_combinator()
     # exit()
-    base_blueprint = "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"
+    base_blueprint = "0eNrtXG1u2zgQvQt/K4WGpL58iv4PAkOx2FRYWzYkOa0R6AA9yF5sT7IcjSh5N8UuS1XYLjDIjzxTo+Eb8ol5EDJ+E8/Hq7m0ddOL3ZuoD+emE7vHN9HVL015xLGmPBmxE5U51JVpHw7n03PdlP25FUMk6qYyX8UOhqdImKav+9rQ/eOH2765np5NawMilwdn6Mumv08Uicu5s/eeG5zQ5nvI8uxDEombhSDzD4mdqqpbc6AYHWGavj0f98/mc/la2xz2xo6ud3/FlszCchiG6B05Gf1Dkd/jlv4osynv3l6r6pnj/SfL8lPddv1+Wfj+dkFOr3XbX+3ITJIiHhSuv1tNscuhkDEOnC5lOzLfiT++/W5vu8+7b0z/5dz+Ns7fmkrs+vZqIvHSGmPpfyqPnRlcFrOfKJRNJXDdVjKUkKU/jY4V3PnaX6793/X6L6TMq2lv/ee6eUF27+Yfp5wJIJsBVWNVcCxvdgcr0x3a+kK7Lcqqak3X7VtTVvtpk8V3FKZ+VGH6V1DYx19eYR9ZYZPC9JoDNt34gE3WkMs2JpcGn/4pn/58+ns8m1mwwjJWGCvMQ2F5sL9I2V+wv/BQWBGssIwVxgrzUBjEa1yi3tglwqo3GMnW7MJfYWi2GGwxfB5PFSyxhCXGEvORmA42GZpNBpsMH4klwRJLWGIsMR+JpWucotzaKWZr2Kmt2eXBJkOyyWCT4fN4FsESUywxlpiHxGQcbDIkmww2GT4Sg2CJKZYYS8xHYnKNU4y3/p8ttYYdbM1OB5uMmE0GmwyfxzMJlhiwxFhiPhJLg01GzCaDTYaPxLJgiQFLjCXmI7F8hVOEzXsPijXsio3ZqTjUZAC3RrDJ8GqNgGCJFSwxlpiPxGSoyQBuv2GT4SWx4A6v//QUY4n9jyS2psULtm7xUmt6vGDrHi8V3OQF3OTFJsPr8Qzu8gLu8mKJeUksuM0LuM2LTYaXxIL7vID7vFhiXt9UsKbPC7bu89Jr+rxg6z4vHdznBdznxSbD6/EM7vMC7vNiiXlJLLjPC7jPi02Gl8SC+7yA+7xYYl4SW9PnBVt3Uunw11Hc5sJ/xr0egPDXUdyDwGfse4lZal+sJJDYI0QSf56iRxlBlEUwIhmpaUzZMWWRsleL8aqyY8U4pm1cOsYlFmUjSucsiEBNUEb5dNklRGQvI7R32ox4OZ9nQQTJBN2EiOwgQojtTUDMAYsAYgxymZZw4bD9pF3MPDdhSo8pMP8YoxcCI5bg8MIBsR0fMdYIVCRgQUAVQX7HAbFMHLaMYhezcEAsp/wFxgDtRLxwIJw5PHMgTMsrx22leiXWJakuqRcOI1bgsI1JXczMYcRqyo/bLGmfZXrHAbFSDi8cECtaZ4n1KqpXYl2K6lLxwoFw5rCNkS5m5kB40iTuu6J9V3LhQLhweOZAmNZZYb2K6lVYl6K6VHrHAbFWDtuY3MUsHBDrKT/uu6J9V/kdB8Q6cXjhgFjTOmusV1O9GuvSVJeWCwfCmcM2RruYmQNh4oYpMP8YoxcOhHOHFw4jzgljvZrWBH/huHyyJ0fdm5M9WZavs46EPbG68bxJUlnookiyQitZpMPwJ/DNQh8="
     base_json = blueprint_to_json(base_blueprint)
     # save json
     with open("temp.json", "w") as file:
@@ -73,12 +73,12 @@ if __name__ == "__main__":
     xs = [entity["position"]["x"] for entity in base_json["blueprint"]["entities"]]
     xs = list(set(xs))
     xs.sort()
-    xs = [57]
-    address = 160256
+    xs = [-786]
+    address = 62464
 
     for x in xs:
         for y in ys:
-            for sub_x in [0, 2, 4]:
+            for sub_x in [0, 2]:
                 base_json = change_addresses(base_json, x + sub_x, y, address)
             print(f"changed address {address}")
             address = address + 256

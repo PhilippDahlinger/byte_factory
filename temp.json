@@ -3,30 +3,9 @@
         "icons": [
             {
                 "signal": {
-                    "name": "constant-combinator"
+                    "name": "decider-combinator"
                 },
                 "index": 1
-            },
-            {
-                "signal": {
-                    "type": "virtual",
-                    "name": "signal-A"
-                },
-                "index": 2
-            },
-            {
-                "signal": {
-                    "type": "virtual",
-                    "name": "signal-L"
-                },
-                "index": 3
-            },
-            {
-                "signal": {
-                    "type": "virtual",
-                    "name": "signal-L"
-                },
-                "index": 4
             }
         ],
         "entities": [
@@ -34,1872 +13,2542 @@
                 "entity_number": 1,
                 "name": "constant-combinator",
                 "position": {
-                    "x": 207.5,
-                    "y": 201.5
+                    "x": -787.5,
+                    "y": -128.5
                 },
+                "direction": 4,
                 "control_behavior": {
                     "sections": {
                         "sections": [
                             {
-                                "index": 1,
-                                "filters": [
-                                    {
-                                        "index": 1,
-                                        "name": "wooden-chest",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 1
-                                    },
-                                    {
-                                        "index": 2,
-                                        "name": "iron-chest",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 2
-                                    },
-                                    {
-                                        "index": 3,
-                                        "name": "steel-chest",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 3
-                                    },
-                                    {
-                                        "index": 4,
-                                        "name": "storage-tank",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 4
-                                    },
-                                    {
-                                        "index": 5,
-                                        "name": "transport-belt",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 5
-                                    },
-                                    {
-                                        "index": 6,
-                                        "name": "fast-transport-belt",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 6
-                                    },
-                                    {
-                                        "index": 7,
-                                        "name": "express-transport-belt",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 7
-                                    },
-                                    {
-                                        "index": 8,
-                                        "name": "underground-belt",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 8
-                                    },
-                                    {
-                                        "index": 9,
-                                        "name": "fast-underground-belt",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 9
-                                    },
-                                    {
-                                        "index": 10,
-                                        "name": "express-underground-belt",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 10
-                                    },
-                                    {
-                                        "index": 11,
-                                        "name": "splitter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 11
-                                    },
-                                    {
-                                        "index": 12,
-                                        "name": "fast-splitter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 12
-                                    },
-                                    {
-                                        "index": 13,
-                                        "name": "express-splitter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 13
-                                    },
-                                    {
-                                        "index": 14,
-                                        "name": "burner-inserter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 14
-                                    },
-                                    {
-                                        "index": 15,
-                                        "name": "inserter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 15
-                                    },
-                                    {
-                                        "index": 16,
-                                        "name": "long-handed-inserter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 16
-                                    },
-                                    {
-                                        "index": 17,
-                                        "name": "fast-inserter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 17
-                                    },
-                                    {
-                                        "index": 18,
-                                        "name": "bulk-inserter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 18
-                                    },
-                                    {
-                                        "index": 19,
-                                        "name": "small-electric-pole",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 19
-                                    },
-                                    {
-                                        "index": 20,
-                                        "name": "medium-electric-pole",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 20
-                                    },
-                                    {
-                                        "index": 21,
-                                        "name": "big-electric-pole",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 21
-                                    },
-                                    {
-                                        "index": 22,
-                                        "name": "substation",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 22
-                                    },
-                                    {
-                                        "index": 23,
-                                        "name": "pipe",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 23
-                                    },
-                                    {
-                                        "index": 24,
-                                        "name": "pipe-to-ground",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 24
-                                    },
-                                    {
-                                        "index": 25,
-                                        "name": "pump",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 25
-                                    },
-                                    {
-                                        "index": 26,
-                                        "name": "rail",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 26
-                                    },
-                                    {
-                                        "index": 27,
-                                        "name": "train-stop",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 27
-                                    },
-                                    {
-                                        "index": 28,
-                                        "name": "rail-signal",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 28
-                                    },
-                                    {
-                                        "index": 29,
-                                        "name": "rail-chain-signal",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 29
-                                    },
-                                    {
-                                        "index": 30,
-                                        "name": "locomotive",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 30
-                                    },
-                                    {
-                                        "index": 31,
-                                        "name": "cargo-wagon",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 31
-                                    },
-                                    {
-                                        "index": 32,
-                                        "name": "fluid-wagon",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 32
-                                    },
-                                    {
-                                        "index": 33,
-                                        "name": "artillery-wagon",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 33
-                                    },
-                                    {
-                                        "index": 34,
-                                        "name": "car",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 34
-                                    },
-                                    {
-                                        "index": 35,
-                                        "name": "tank",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 35
-                                    },
-                                    {
-                                        "index": 36,
-                                        "name": "spidertron",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 36
-                                    },
-                                    {
-                                        "index": 37,
-                                        "name": "logistic-robot",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 37
-                                    },
-                                    {
-                                        "index": 38,
-                                        "name": "construction-robot",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 38
-                                    },
-                                    {
-                                        "index": 39,
-                                        "name": "active-provider-chest",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 39
-                                    },
-                                    {
-                                        "index": 40,
-                                        "name": "passive-provider-chest",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 40
-                                    },
-                                    {
-                                        "index": 41,
-                                        "name": "storage-chest",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 41
-                                    },
-                                    {
-                                        "index": 42,
-                                        "name": "buffer-chest",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 42
-                                    },
-                                    {
-                                        "index": 43,
-                                        "name": "requester-chest",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 43
-                                    },
-                                    {
-                                        "index": 44,
-                                        "name": "roboport",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 44
-                                    },
-                                    {
-                                        "index": 45,
-                                        "name": "small-lamp",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 45
-                                    },
-                                    {
-                                        "index": 46,
-                                        "name": "arithmetic-combinator",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 46
-                                    },
-                                    {
-                                        "index": 47,
-                                        "name": "decider-combinator",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 47
-                                    },
-                                    {
-                                        "index": 48,
-                                        "name": "selector-combinator",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 48
-                                    },
-                                    {
-                                        "index": 49,
-                                        "name": "constant-combinator",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 49
-                                    },
-                                    {
-                                        "index": 50,
-                                        "name": "power-switch",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 50
-                                    },
-                                    {
-                                        "index": 51,
-                                        "name": "programmable-speaker",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 51
-                                    },
-                                    {
-                                        "index": 52,
-                                        "name": "display-panel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 52
-                                    },
-                                    {
-                                        "index": 53,
-                                        "name": "stone-brick",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 53
-                                    },
-                                    {
-                                        "index": 54,
-                                        "name": "concrete",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 54
-                                    },
-                                    {
-                                        "index": 55,
-                                        "name": "hazard-concrete",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 55
-                                    },
-                                    {
-                                        "index": 56,
-                                        "name": "refined-concrete",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 56
-                                    },
-                                    {
-                                        "index": 57,
-                                        "name": "refined-hazard-concrete",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 57
-                                    },
-                                    {
-                                        "index": 58,
-                                        "name": "landfill",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 58
-                                    },
-                                    {
-                                        "index": 59,
-                                        "name": "cliff-explosives",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 59
-                                    },
-                                    {
-                                        "index": 60,
-                                        "name": "repair-pack",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 60
-                                    },
-                                    {
-                                        "index": 61,
-                                        "name": "blueprint",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 61
-                                    },
-                                    {
-                                        "index": 62,
-                                        "name": "deconstruction-planner",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 62
-                                    },
-                                    {
-                                        "index": 63,
-                                        "name": "upgrade-planner",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 63
-                                    },
-                                    {
-                                        "index": 64,
-                                        "name": "blueprint-book",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 64
-                                    },
-                                    {
-                                        "index": 65,
-                                        "name": "boiler",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 65
-                                    },
-                                    {
-                                        "index": 66,
-                                        "name": "steam-engine",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 66
-                                    },
-                                    {
-                                        "index": 67,
-                                        "name": "solar-panel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 67
-                                    },
-                                    {
-                                        "index": 68,
-                                        "name": "accumulator",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 68
-                                    },
-                                    {
-                                        "index": 69,
-                                        "name": "nuclear-reactor",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 69
-                                    },
-                                    {
-                                        "index": 70,
-                                        "name": "heat-pipe",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 70
-                                    },
-                                    {
-                                        "index": 71,
-                                        "name": "heat-exchanger",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 71
-                                    },
-                                    {
-                                        "index": 72,
-                                        "name": "steam-turbine",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 72
-                                    },
-                                    {
-                                        "index": 73,
-                                        "name": "burner-mining-drill",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 73
-                                    },
-                                    {
-                                        "index": 74,
-                                        "name": "electric-mining-drill",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 74
-                                    },
-                                    {
-                                        "index": 75,
-                                        "name": "offshore-pump",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 75
-                                    },
-                                    {
-                                        "index": 76,
-                                        "name": "pumpjack",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 76
-                                    },
-                                    {
-                                        "index": 77,
-                                        "name": "stone-furnace",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 77
-                                    },
-                                    {
-                                        "index": 78,
-                                        "name": "steel-furnace",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 78
-                                    },
-                                    {
-                                        "index": 79,
-                                        "name": "electric-furnace",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 79
-                                    },
-                                    {
-                                        "index": 80,
-                                        "name": "assembling-machine-1",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 80
-                                    },
-                                    {
-                                        "index": 81,
-                                        "name": "assembling-machine-2",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 81
-                                    },
-                                    {
-                                        "index": 82,
-                                        "name": "assembling-machine-3",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 82
-                                    },
-                                    {
-                                        "index": 83,
-                                        "name": "oil-refinery",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 83
-                                    },
-                                    {
-                                        "index": 84,
-                                        "name": "chemical-plant",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 84
-                                    },
-                                    {
-                                        "index": 85,
-                                        "name": "centrifuge",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 85
-                                    },
-                                    {
-                                        "index": 86,
-                                        "name": "lab",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 86
-                                    },
-                                    {
-                                        "index": 87,
-                                        "name": "beacon",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 87
-                                    },
-                                    {
-                                        "index": 88,
-                                        "name": "speed-module",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 88
-                                    },
-                                    {
-                                        "index": 89,
-                                        "name": "speed-module-2",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 89
-                                    },
-                                    {
-                                        "index": 90,
-                                        "name": "speed-module-3",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 90
-                                    },
-                                    {
-                                        "index": 91,
-                                        "name": "efficiency-module",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 91
-                                    },
-                                    {
-                                        "index": 92,
-                                        "name": "efficiency-module-2",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 92
-                                    },
-                                    {
-                                        "index": 93,
-                                        "name": "efficiency-module-3",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 93
-                                    },
-                                    {
-                                        "index": 94,
-                                        "name": "productivity-module",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 94
-                                    },
-                                    {
-                                        "index": 95,
-                                        "name": "productivity-module-2",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 95
-                                    },
-                                    {
-                                        "index": 96,
-                                        "name": "productivity-module-3",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 96
-                                    },
-                                    {
-                                        "index": 97,
-                                        "name": "rocket-silo",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 97
-                                    },
-                                    {
-                                        "index": 98,
-                                        "name": "cargo-landing-pad",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 98
-                                    },
-                                    {
-                                        "index": 99,
-                                        "name": "satellite",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 99
-                                    },
-                                    {
-                                        "index": 100,
-                                        "type": "recipe",
-                                        "name": "basic-oil-processing",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 100
-                                    },
-                                    {
-                                        "index": 101,
-                                        "type": "recipe",
-                                        "name": "advanced-oil-processing",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 101
-                                    },
-                                    {
-                                        "index": 102,
-                                        "type": "recipe",
-                                        "name": "coal-liquefaction",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 102
-                                    },
-                                    {
-                                        "index": 103,
-                                        "type": "recipe",
-                                        "name": "heavy-oil-cracking",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 103
-                                    },
-                                    {
-                                        "index": 104,
-                                        "type": "recipe",
-                                        "name": "light-oil-cracking",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 104
-                                    },
-                                    {
-                                        "index": 105,
-                                        "type": "recipe",
-                                        "name": "solid-fuel-from-petroleum-gas",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 105
-                                    },
-                                    {
-                                        "index": 106,
-                                        "type": "recipe",
-                                        "name": "solid-fuel-from-light-oil",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 106
-                                    },
-                                    {
-                                        "index": 107,
-                                        "type": "recipe",
-                                        "name": "solid-fuel-from-heavy-oil",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 107
-                                    },
-                                    {
-                                        "index": 108,
-                                        "name": "wood",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 108
-                                    },
-                                    {
-                                        "index": 109,
-                                        "name": "coal",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 109
-                                    },
-                                    {
-                                        "index": 110,
-                                        "name": "stone",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 110
-                                    },
-                                    {
-                                        "index": 111,
-                                        "name": "iron-ore",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 111
-                                    },
-                                    {
-                                        "index": 112,
-                                        "name": "copper-ore",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 112
-                                    },
-                                    {
-                                        "index": 113,
-                                        "name": "uranium-ore",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 113
-                                    },
-                                    {
-                                        "index": 114,
-                                        "name": "raw-fish",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 114
-                                    },
-                                    {
-                                        "index": 115,
-                                        "name": "iron-plate",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 115
-                                    },
-                                    {
-                                        "index": 116,
-                                        "name": "copper-plate",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 116
-                                    },
-                                    {
-                                        "index": 117,
-                                        "name": "steel-plate",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 117
-                                    },
-                                    {
-                                        "index": 118,
-                                        "name": "solid-fuel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 118
-                                    },
-                                    {
-                                        "index": 119,
-                                        "name": "plastic-bar",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 119
-                                    },
-                                    {
-                                        "index": 120,
-                                        "name": "sulfur",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 120
-                                    },
-                                    {
-                                        "index": 121,
-                                        "name": "battery",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 121
-                                    },
-                                    {
-                                        "index": 122,
-                                        "name": "explosives",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 122
-                                    },
-                                    {
-                                        "index": 123,
-                                        "name": "water-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 123
-                                    },
-                                    {
-                                        "index": 124,
-                                        "name": "crude-oil-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 124
-                                    },
-                                    {
-                                        "index": 125,
-                                        "name": "petroleum-gas-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 125
-                                    },
-                                    {
-                                        "index": 126,
-                                        "name": "light-oil-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 126
-                                    },
-                                    {
-                                        "index": 127,
-                                        "name": "heavy-oil-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 127
-                                    },
-                                    {
-                                        "index": 128,
-                                        "name": "lubricant-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 128
-                                    },
-                                    {
-                                        "index": 129,
-                                        "name": "sulfuric-acid-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 129
-                                    },
-                                    {
-                                        "index": 130,
-                                        "type": "recipe",
-                                        "name": "water-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 130
-                                    },
-                                    {
-                                        "index": 131,
-                                        "type": "recipe",
-                                        "name": "crude-oil-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 131
-                                    },
-                                    {
-                                        "index": 132,
-                                        "type": "recipe",
-                                        "name": "petroleum-gas-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 132
-                                    },
-                                    {
-                                        "index": 133,
-                                        "type": "recipe",
-                                        "name": "light-oil-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 133
-                                    },
-                                    {
-                                        "index": 134,
-                                        "type": "recipe",
-                                        "name": "heavy-oil-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 134
-                                    },
-                                    {
-                                        "index": 135,
-                                        "type": "recipe",
-                                        "name": "lubricant-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 135
-                                    },
-                                    {
-                                        "index": 136,
-                                        "type": "recipe",
-                                        "name": "sulfuric-acid-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 136
-                                    },
-                                    {
-                                        "index": 137,
-                                        "type": "recipe",
-                                        "name": "empty-water-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 137
-                                    },
-                                    {
-                                        "index": 138,
-                                        "type": "recipe",
-                                        "name": "empty-crude-oil-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 138
-                                    },
-                                    {
-                                        "index": 139,
-                                        "type": "recipe",
-                                        "name": "empty-petroleum-gas-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 139
-                                    },
-                                    {
-                                        "index": 140,
-                                        "type": "recipe",
-                                        "name": "empty-light-oil-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 140
-                                    },
-                                    {
-                                        "index": 141,
-                                        "type": "recipe",
-                                        "name": "empty-heavy-oil-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 141
-                                    },
-                                    {
-                                        "index": 142,
-                                        "type": "recipe",
-                                        "name": "empty-lubricant-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 142
-                                    },
-                                    {
-                                        "index": 143,
-                                        "type": "recipe",
-                                        "name": "empty-sulfuric-acid-barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 143
-                                    },
-                                    {
-                                        "index": 144,
-                                        "name": "iron-gear-wheel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 144
-                                    },
-                                    {
-                                        "index": 145,
-                                        "name": "iron-stick",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 145
-                                    },
-                                    {
-                                        "index": 146,
-                                        "name": "copper-cable",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 146
-                                    },
-                                    {
-                                        "index": 147,
-                                        "name": "barrel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 147
-                                    },
-                                    {
-                                        "index": 148,
-                                        "name": "electronic-circuit",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 148
-                                    },
-                                    {
-                                        "index": 149,
-                                        "name": "advanced-circuit",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 149
-                                    },
-                                    {
-                                        "index": 150,
-                                        "name": "processing-unit",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 150
-                                    },
-                                    {
-                                        "index": 151,
-                                        "name": "engine-unit",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 151
-                                    },
-                                    {
-                                        "index": 152,
-                                        "name": "electric-engine-unit",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 152
-                                    },
-                                    {
-                                        "index": 153,
-                                        "name": "flying-robot-frame",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 153
-                                    },
-                                    {
-                                        "index": 154,
-                                        "name": "low-density-structure",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 154
-                                    },
-                                    {
-                                        "index": 155,
-                                        "name": "rocket-fuel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 155
-                                    },
-                                    {
-                                        "index": 156,
-                                        "type": "recipe",
-                                        "name": "rocket-part",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 156
-                                    },
-                                    {
-                                        "index": 157,
-                                        "type": "recipe",
-                                        "name": "uranium-processing",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 157
-                                    },
-                                    {
-                                        "index": 158,
-                                        "name": "uranium-235",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 158
-                                    },
-                                    {
-                                        "index": 159,
-                                        "name": "uranium-238",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 159
-                                    },
-                                    {
-                                        "index": 160,
-                                        "name": "uranium-fuel-cell",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 160
-                                    },
-                                    {
-                                        "index": 161,
-                                        "name": "depleted-uranium-fuel-cell",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 161
-                                    },
-                                    {
-                                        "index": 162,
-                                        "type": "recipe",
-                                        "name": "nuclear-fuel-reprocessing",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 162
-                                    },
-                                    {
-                                        "index": 163,
-                                        "type": "recipe",
-                                        "name": "kovarex-enrichment-process",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 163
-                                    },
-                                    {
-                                        "index": 164,
-                                        "name": "nuclear-fuel",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 164
-                                    },
-                                    {
-                                        "index": 165,
-                                        "name": "automation-science-pack",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 165
-                                    },
-                                    {
-                                        "index": 166,
-                                        "name": "logistic-science-pack",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 166
-                                    },
-                                    {
-                                        "index": 167,
-                                        "name": "military-science-pack",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 167
-                                    },
-                                    {
-                                        "index": 168,
-                                        "name": "chemical-science-pack",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 168
-                                    },
-                                    {
-                                        "index": 169,
-                                        "name": "production-science-pack",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 169
-                                    },
-                                    {
-                                        "index": 170,
-                                        "name": "utility-science-pack",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 170
-                                    },
-                                    {
-                                        "index": 171,
-                                        "name": "space-science-pack",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 171
-                                    },
-                                    {
-                                        "index": 172,
-                                        "name": "pistol",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 172
-                                    },
-                                    {
-                                        "index": 173,
-                                        "name": "submachine-gun",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 173
-                                    },
-                                    {
-                                        "index": 174,
-                                        "name": "shotgun",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 174
-                                    },
-                                    {
-                                        "index": 175,
-                                        "name": "combat-shotgun",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 175
-                                    },
-                                    {
-                                        "index": 176,
-                                        "name": "rocket-launcher",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 176
-                                    },
-                                    {
-                                        "index": 177,
-                                        "name": "flamethrower",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 177
-                                    },
-                                    {
-                                        "index": 178,
-                                        "name": "firearm-magazine",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 178
-                                    },
-                                    {
-                                        "index": 179,
-                                        "name": "piercing-rounds-magazine",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 179
-                                    },
-                                    {
-                                        "index": 180,
-                                        "name": "uranium-rounds-magazine",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 180
-                                    },
-                                    {
-                                        "index": 181,
-                                        "name": "shotgun-shell",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 181
-                                    },
-                                    {
-                                        "index": 182,
-                                        "name": "piercing-shotgun-shell",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 182
-                                    },
-                                    {
-                                        "index": 183,
-                                        "name": "cannon-shell",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 183
-                                    },
-                                    {
-                                        "index": 184,
-                                        "name": "explosive-cannon-shell",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 184
-                                    },
-                                    {
-                                        "index": 185,
-                                        "name": "uranium-cannon-shell",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 185
-                                    },
-                                    {
-                                        "index": 186,
-                                        "name": "explosive-uranium-cannon-shell",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 186
-                                    },
-                                    {
-                                        "index": 187,
-                                        "name": "artillery-shell",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 187
-                                    },
-                                    {
-                                        "index": 188,
-                                        "name": "rocket",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 188
-                                    },
-                                    {
-                                        "index": 189,
-                                        "name": "explosive-rocket",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 189
-                                    },
-                                    {
-                                        "index": 190,
-                                        "name": "atomic-bomb",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 190
-                                    },
-                                    {
-                                        "index": 191,
-                                        "name": "flamethrower-ammo",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 191
-                                    },
-                                    {
-                                        "index": 192,
-                                        "name": "grenade",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 192
-                                    },
-                                    {
-                                        "index": 193,
-                                        "name": "cluster-grenade",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 193
-                                    },
-                                    {
-                                        "index": 194,
-                                        "name": "poison-capsule",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 194
-                                    },
-                                    {
-                                        "index": 195,
-                                        "name": "slowdown-capsule",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 195
-                                    },
-                                    {
-                                        "index": 196,
-                                        "name": "defender-capsule",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 196
-                                    },
-                                    {
-                                        "index": 197,
-                                        "type": "entity",
-                                        "name": "defender",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 197
-                                    },
-                                    {
-                                        "index": 198,
-                                        "type": "entity",
-                                        "name": "distractor",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 198
-                                    },
-                                    {
-                                        "index": 199,
-                                        "type": "entity",
-                                        "name": "destroyer",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 199
-                                    },
-                                    {
-                                        "index": 200,
-                                        "name": "distractor-capsule",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 200
-                                    },
-                                    {
-                                        "index": 201,
-                                        "name": "destroyer-capsule",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 201
-                                    },
-                                    {
-                                        "index": 202,
-                                        "name": "light-armor",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 202
-                                    },
-                                    {
-                                        "index": 203,
-                                        "name": "heavy-armor",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 203
-                                    },
-                                    {
-                                        "index": 204,
-                                        "name": "modular-armor",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 204
-                                    },
-                                    {
-                                        "index": 205,
-                                        "name": "power-armor",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 205
-                                    },
-                                    {
-                                        "index": 206,
-                                        "name": "power-armor-mk2",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 206
-                                    },
-                                    {
-                                        "index": 207,
-                                        "name": "solar-panel-equipment",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 207
-                                    },
-                                    {
-                                        "index": 208,
-                                        "name": "fission-reactor-equipment",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 208
-                                    },
-                                    {
-                                        "index": 209,
-                                        "name": "battery-equipment",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 209
-                                    },
-                                    {
-                                        "index": 210,
-                                        "name": "battery-mk2-equipment",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 210
-                                    },
-                                    {
-                                        "index": 211,
-                                        "name": "belt-immunity-equipment",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 211
-                                    },
-                                    {
-                                        "index": 212,
-                                        "name": "exoskeleton-equipment",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 212
-                                    },
-                                    {
-                                        "index": 213,
-                                        "name": "personal-roboport-equipment",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 213
-                                    },
-                                    {
-                                        "index": 214,
-                                        "name": "personal-roboport-mk2-equipment",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 214
-                                    },
-                                    {
-                                        "index": 215,
-                                        "name": "night-vision-equipment",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 215
-                                    },
-                                    {
-                                        "index": 216,
-                                        "name": "energy-shield-equipment",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 216
-                                    },
-                                    {
-                                        "index": 217,
-                                        "name": "energy-shield-mk2-equipment",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 217
-                                    },
-                                    {
-                                        "index": 218,
-                                        "name": "personal-laser-defense-equipment",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 218
-                                    },
-                                    {
-                                        "index": 219,
-                                        "name": "discharge-defense-equipment",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 219
-                                    },
-                                    {
-                                        "index": 220,
-                                        "name": "stone-wall",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 220
-                                    },
-                                    {
-                                        "index": 221,
-                                        "name": "gate",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 221
-                                    },
-                                    {
-                                        "index": 222,
-                                        "name": "radar",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 222
-                                    },
-                                    {
-                                        "index": 223,
-                                        "name": "land-mine",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 223
-                                    },
-                                    {
-                                        "index": 224,
-                                        "name": "gun-turret",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 224
-                                    },
-                                    {
-                                        "index": 225,
-                                        "name": "laser-turret",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 225
-                                    },
-                                    {
-                                        "index": 226,
-                                        "name": "flamethrower-turret",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 226
-                                    },
-                                    {
-                                        "index": 227,
-                                        "name": "artillery-turret",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 227
-                                    },
-                                    {
-                                        "index": 228,
-                                        "type": "fluid",
-                                        "name": "water",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 228
-                                    },
-                                    {
-                                        "index": 229,
-                                        "type": "fluid",
-                                        "name": "steam",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 229
-                                    },
-                                    {
-                                        "index": 230,
-                                        "type": "fluid",
-                                        "name": "crude-oil",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 230
-                                    },
-                                    {
-                                        "index": 231,
-                                        "type": "fluid",
-                                        "name": "petroleum-gas",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 231
-                                    },
-                                    {
-                                        "index": 232,
-                                        "type": "fluid",
-                                        "name": "light-oil",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 232
-                                    },
-                                    {
-                                        "index": 233,
-                                        "type": "fluid",
-                                        "name": "heavy-oil",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 233
-                                    },
-                                    {
-                                        "index": 234,
-                                        "type": "fluid",
-                                        "name": "lubricant",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 234
-                                    },
-                                    {
-                                        "index": 235,
-                                        "type": "fluid",
-                                        "name": "sulfuric-acid",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 235
-                                    },
-                                    {
-                                        "index": 236,
-                                        "type": "entity",
-                                        "name": "small-biter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 236
-                                    },
-                                    {
-                                        "index": 237,
-                                        "type": "entity",
-                                        "name": "medium-biter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 237
-                                    },
-                                    {
-                                        "index": 238,
-                                        "type": "entity",
-                                        "name": "big-biter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 238
-                                    },
-                                    {
-                                        "index": 239,
-                                        "type": "entity",
-                                        "name": "behemoth-biter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 239
-                                    },
-                                    {
-                                        "index": 240,
-                                        "type": "entity",
-                                        "name": "small-spitter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 240
-                                    },
-                                    {
-                                        "index": 241,
-                                        "type": "entity",
-                                        "name": "medium-spitter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 241
-                                    },
-                                    {
-                                        "index": 242,
-                                        "type": "entity",
-                                        "name": "big-spitter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 242
-                                    },
-                                    {
-                                        "index": 243,
-                                        "type": "entity",
-                                        "name": "behemoth-spitter",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 243
-                                    },
-                                    {
-                                        "index": 244,
-                                        "type": "entity",
-                                        "name": "small-worm-turret",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 244
-                                    },
-                                    {
-                                        "index": 245,
-                                        "type": "entity",
-                                        "name": "medium-worm-turret",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 245
-                                    },
-                                    {
-                                        "index": 246,
-                                        "type": "entity",
-                                        "name": "big-worm-turret",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 246
-                                    },
-                                    {
-                                        "index": 247,
-                                        "type": "entity",
-                                        "name": "behemoth-worm-turret",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 247
-                                    },
-                                    {
-                                        "index": 248,
-                                        "type": "entity",
-                                        "name": "biter-spawner",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 248
-                                    },
-                                    {
-                                        "index": 249,
-                                        "type": "entity",
-                                        "name": "spitter-spawner",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 249
-                                    },
-                                    {
-                                        "index": 250,
-                                        "type": "entity",
-                                        "name": "cliff",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 250
-                                    },
-                                    {
-                                        "index": 251,
-                                        "type": "entity",
-                                        "name": "character",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 251
-                                    },
-                                    {
-                                        "index": 252,
-                                        "type": "entity",
-                                        "name": "big-sand-rock",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 252
-                                    },
-                                    {
-                                        "index": 253,
-                                        "type": "entity",
-                                        "name": "huge-rock",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 253
-                                    },
-                                    {
-                                        "index": 254,
-                                        "type": "entity",
-                                        "name": "crude-oil",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 254
-                                    },
-                                    {
-                                        "index": 255,
-                                        "name": "spidertron-remote",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 255
-                                    },
-                                    {
-                                        "index": 256,
-                                        "name": "discharge-defense-remote",
-                                        "quality": "normal",
-                                        "comparator": "=",
-                                        "count": 256
-                                    }
-                                ],
-                                "group": "All 256 items"
+                                "index": 1
                             }
                         ]
                     }
                 }
+            },
+            {
+                "entity_number": 2,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -128.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 3,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -128.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 4,
+                "name": "constant-combinator",
+                "position": {
+                    "x": -787.5,
+                    "y": -126.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "sections": {
+                        "sections": [
+                            {
+                                "index": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "entity_number": 5,
+                "name": "constant-combinator",
+                "position": {
+                    "x": -787.5,
+                    "y": -127.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "sections": {
+                        "sections": [
+                            {
+                                "index": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "entity_number": 6,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -126.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 7,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -127.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 8,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -126.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 9,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -127.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 10,
+                "name": "constant-combinator",
+                "position": {
+                    "x": -787.5,
+                    "y": -124.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "sections": {
+                        "sections": [
+                            {
+                                "index": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "entity_number": 11,
+                "name": "constant-combinator",
+                "position": {
+                    "x": -787.5,
+                    "y": -125.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "sections": {
+                        "sections": [
+                            {
+                                "index": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "entity_number": 12,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -124.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 13,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -125.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 14,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -124.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 15,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -125.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 16,
+                "name": "constant-combinator",
+                "position": {
+                    "x": -787.5,
+                    "y": -122.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "sections": {
+                        "sections": [
+                            {
+                                "index": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "entity_number": 17,
+                "name": "constant-combinator",
+                "position": {
+                    "x": -787.5,
+                    "y": -123.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "sections": {
+                        "sections": [
+                            {
+                                "index": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "entity_number": 18,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -122.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 19,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -123.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 20,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -122.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 21,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -123.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 22,
+                "name": "constant-combinator",
+                "position": {
+                    "x": -787.5,
+                    "y": -120.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "sections": {
+                        "sections": [
+                            {
+                                "index": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "entity_number": 23,
+                "name": "constant-combinator",
+                "position": {
+                    "x": -787.5,
+                    "y": -121.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "sections": {
+                        "sections": [
+                            {
+                                "index": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "entity_number": 24,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -120.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 25,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -121.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 26,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -120.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 27,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -121.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 28,
+                "name": "constant-combinator",
+                "position": {
+                    "x": -787.5,
+                    "y": -118.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "sections": {
+                        "sections": [
+                            {
+                                "index": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "entity_number": 29,
+                "name": "constant-combinator",
+                "position": {
+                    "x": -787.5,
+                    "y": -119.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "sections": {
+                        "sections": [
+                            {
+                                "index": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "entity_number": 30,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -118.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 31,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -119.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 32,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -118.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 33,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -119.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 34,
+                "name": "constant-combinator",
+                "position": {
+                    "x": -787.5,
+                    "y": -116.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "sections": {
+                        "sections": [
+                            {
+                                "index": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "entity_number": 35,
+                "name": "constant-combinator",
+                "position": {
+                    "x": -787.5,
+                    "y": -117.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "sections": {
+                        "sections": [
+                            {
+                                "index": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "entity_number": 36,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -116.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 37,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -117.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 38,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -116.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 39,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -117.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 40,
+                "name": "constant-combinator",
+                "position": {
+                    "x": -787.5,
+                    "y": -114.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "sections": {
+                        "sections": [
+                            {
+                                "index": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "entity_number": 41,
+                "name": "constant-combinator",
+                "position": {
+                    "x": -787.5,
+                    "y": -115.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "sections": {
+                        "sections": [
+                            {
+                                "index": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "entity_number": 42,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -114.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 43,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -115.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 44,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -114.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 45,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -115.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 46,
+                "name": "constant-combinator",
+                "position": {
+                    "x": -787.5,
+                    "y": -113.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "sections": {
+                        "sections": [
+                            {
+                                "index": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "entity_number": 47,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -786,
+                    "y": -113.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-3"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
+            },
+            {
+                "entity_number": 48,
+                "name": "decider-combinator",
+                "position": {
+                    "x": -784,
+                    "y": -113.5
+                },
+                "direction": 4,
+                "control_behavior": {
+                    "decider_conditions": {
+                        "conditions": [
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 81920,
+                                "comparator": "\u2265",
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            },
+                            {
+                                "first_signal": {
+                                    "type": "virtual",
+                                    "name": "signal-P"
+                                },
+                                "constant": 82176,
+                                "first_signal_networks": {
+                                    "red": true,
+                                    "green": false
+                                },
+                                "compare_type": "and"
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "signal": {
+                                    "type": "virtual",
+                                    "name": "signal-everything"
+                                },
+                                "networks": {
+                                    "red": false,
+                                    "green": true
+                                }
+                            }
+                        ]
+                    }
+                },
+                "player_description": "address_read_decider"
             }
         ],
+        "wires": [
+            [
+                1,
+                2,
+                2,
+                2
+            ],
+            [
+                2,
+                1,
+                7,
+                1
+            ],
+            [
+                2,
+                2,
+                3,
+                2
+            ],
+            [
+                2,
+                3,
+                7,
+                3
+            ],
+            [
+                3,
+                1,
+                9,
+                1
+            ],
+            [
+                3,
+                3,
+                9,
+                3
+            ],
+            [
+                4,
+                2,
+                6,
+                2
+            ],
+            [
+                5,
+                2,
+                7,
+                2
+            ],
+            [
+                6,
+                1,
+                7,
+                1
+            ],
+            [
+                6,
+                1,
+                13,
+                1
+            ],
+            [
+                6,
+                2,
+                8,
+                2
+            ],
+            [
+                6,
+                3,
+                7,
+                3
+            ],
+            [
+                6,
+                3,
+                13,
+                3
+            ],
+            [
+                7,
+                2,
+                9,
+                2
+            ],
+            [
+                8,
+                1,
+                9,
+                1
+            ],
+            [
+                8,
+                1,
+                15,
+                1
+            ],
+            [
+                8,
+                3,
+                9,
+                3
+            ],
+            [
+                8,
+                3,
+                15,
+                3
+            ],
+            [
+                10,
+                2,
+                12,
+                2
+            ],
+            [
+                11,
+                2,
+                13,
+                2
+            ],
+            [
+                12,
+                1,
+                13,
+                1
+            ],
+            [
+                12,
+                1,
+                19,
+                1
+            ],
+            [
+                12,
+                2,
+                14,
+                2
+            ],
+            [
+                12,
+                3,
+                13,
+                3
+            ],
+            [
+                12,
+                3,
+                19,
+                3
+            ],
+            [
+                13,
+                2,
+                15,
+                2
+            ],
+            [
+                14,
+                1,
+                15,
+                1
+            ],
+            [
+                14,
+                1,
+                21,
+                1
+            ],
+            [
+                14,
+                3,
+                15,
+                3
+            ],
+            [
+                14,
+                3,
+                21,
+                3
+            ],
+            [
+                16,
+                2,
+                18,
+                2
+            ],
+            [
+                17,
+                2,
+                19,
+                2
+            ],
+            [
+                18,
+                1,
+                19,
+                1
+            ],
+            [
+                18,
+                1,
+                25,
+                1
+            ],
+            [
+                18,
+                2,
+                20,
+                2
+            ],
+            [
+                18,
+                3,
+                19,
+                3
+            ],
+            [
+                18,
+                3,
+                25,
+                3
+            ],
+            [
+                19,
+                2,
+                21,
+                2
+            ],
+            [
+                20,
+                1,
+                21,
+                1
+            ],
+            [
+                20,
+                1,
+                27,
+                1
+            ],
+            [
+                20,
+                3,
+                21,
+                3
+            ],
+            [
+                20,
+                3,
+                27,
+                3
+            ],
+            [
+                22,
+                2,
+                24,
+                2
+            ],
+            [
+                23,
+                2,
+                25,
+                2
+            ],
+            [
+                24,
+                1,
+                25,
+                1
+            ],
+            [
+                24,
+                1,
+                31,
+                1
+            ],
+            [
+                24,
+                2,
+                26,
+                2
+            ],
+            [
+                24,
+                3,
+                25,
+                3
+            ],
+            [
+                24,
+                3,
+                31,
+                3
+            ],
+            [
+                25,
+                2,
+                27,
+                2
+            ],
+            [
+                26,
+                1,
+                27,
+                1
+            ],
+            [
+                26,
+                1,
+                33,
+                1
+            ],
+            [
+                26,
+                3,
+                27,
+                3
+            ],
+            [
+                26,
+                3,
+                33,
+                3
+            ],
+            [
+                28,
+                2,
+                30,
+                2
+            ],
+            [
+                29,
+                2,
+                31,
+                2
+            ],
+            [
+                30,
+                1,
+                31,
+                1
+            ],
+            [
+                30,
+                1,
+                37,
+                1
+            ],
+            [
+                30,
+                2,
+                32,
+                2
+            ],
+            [
+                30,
+                3,
+                31,
+                3
+            ],
+            [
+                30,
+                3,
+                37,
+                3
+            ],
+            [
+                31,
+                2,
+                33,
+                2
+            ],
+            [
+                32,
+                1,
+                33,
+                1
+            ],
+            [
+                32,
+                1,
+                39,
+                1
+            ],
+            [
+                32,
+                3,
+                33,
+                3
+            ],
+            [
+                32,
+                3,
+                39,
+                3
+            ],
+            [
+                34,
+                2,
+                36,
+                2
+            ],
+            [
+                35,
+                2,
+                37,
+                2
+            ],
+            [
+                36,
+                1,
+                37,
+                1
+            ],
+            [
+                36,
+                1,
+                43,
+                1
+            ],
+            [
+                36,
+                2,
+                38,
+                2
+            ],
+            [
+                36,
+                3,
+                37,
+                3
+            ],
+            [
+                36,
+                3,
+                43,
+                3
+            ],
+            [
+                37,
+                2,
+                39,
+                2
+            ],
+            [
+                38,
+                1,
+                39,
+                1
+            ],
+            [
+                38,
+                1,
+                45,
+                1
+            ],
+            [
+                38,
+                3,
+                39,
+                3
+            ],
+            [
+                38,
+                3,
+                45,
+                3
+            ],
+            [
+                40,
+                2,
+                42,
+                2
+            ],
+            [
+                41,
+                2,
+                43,
+                2
+            ],
+            [
+                42,
+                1,
+                43,
+                1
+            ],
+            [
+                42,
+                1,
+                47,
+                1
+            ],
+            [
+                42,
+                2,
+                44,
+                2
+            ],
+            [
+                42,
+                3,
+                43,
+                3
+            ],
+            [
+                42,
+                3,
+                47,
+                3
+            ],
+            [
+                43,
+                2,
+                45,
+                2
+            ],
+            [
+                44,
+                1,
+                45,
+                1
+            ],
+            [
+                44,
+                1,
+                48,
+                1
+            ],
+            [
+                44,
+                3,
+                45,
+                3
+            ],
+            [
+                44,
+                3,
+                48,
+                3
+            ],
+            [
+                46,
+                2,
+                47,
+                2
+            ],
+            [
+                47,
+                2,
+                48,
+                2
+            ]
+        ],
         "item": "blueprint",
-        "version": 562949955518464
+        "version": 562949957943296
     }
 }
