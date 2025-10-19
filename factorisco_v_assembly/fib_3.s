@@ -3,7 +3,7 @@
 
 _start:
 	li sp, 17407
-	li a0, 10
+	li a0, 100
 	call fib_dp
 	nop
 	nop
@@ -29,11 +29,6 @@ _loop:
 	addi t0, t0, 1
 	j _loop
 _end_loop:
-    li t5, 26
-    sw t5, 1025(zero)
-    0:
-    j 0b
-
 	# first 2 values are known: 1 and 1
 	li t0, 1
 	sw t0, 1024(zero)

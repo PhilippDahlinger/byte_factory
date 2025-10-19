@@ -71,4 +71,4 @@ if __name__ == "__main__":
     # kernel_program("ecall_01", verbose=verbose)
     # kernel_program("debug_boot", verbose=verbose)
     # kernel_program("os_02", verbose=verbose)
-    user_program("fib_3", verbose=verbose)
+    user_program("forward_test_2", verbose=verbose)

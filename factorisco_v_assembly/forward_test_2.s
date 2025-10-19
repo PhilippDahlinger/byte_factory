@@ -2,7 +2,7 @@
 .globl _start
 
 _start:
-	li sp, 100  # init stack
+	li sp, 17407  # init stack
 
     # --- TEST 1: Forwarding from EX Stage ---
     li t0, 5           # t0 = 5
@@ -45,6 +45,10 @@ _start:
     # Expected: a3 = 4, a4 = 6, a5 = 24, a6 = 28
 
     # --- END: Halt execution ---
+    nop
+	nop
+	nop
+	nop
     halt
 	nop
 	nop
