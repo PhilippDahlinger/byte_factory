@@ -2,9 +2,13 @@
 .globl _start
 
 _start:
-	li sp, 1596
-	li a0, 10
+	li sp, 17407
+	li a0, 12
 	call fib_rec
+	nop
+	nop
+	nop
+	nop
 	halt
 	nop
 	nop

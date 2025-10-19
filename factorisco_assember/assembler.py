@@ -7,7 +7,7 @@ from factorisco_assember.input_encodings.create_data_blueprint import create_dat
 from factorisco_assember.machine_language import create_machine_code
 
 
-def assemble(assembly_code, output_file, output_version="v2", kernel_mode=False, verbose=True):
+def assemble(assembly_code, output_file, output_version="v3", kernel_mode=False, verbose=True):
     assembly_code = remove_comments(assembly_code)
     assembly_code = remove_white_space(assembly_code)
     code = get_text_segment(assembly_code)
@@ -39,7 +39,7 @@ def assemble(assembly_code, output_file, output_version="v2", kernel_mode=False,
 
 def kernel_program(file_name, verbose=True):
     print("--------------------------------------------------------")
-    output_version = "v2"
+    output_version = "v3"
     input_file = os.path.join("factorisco_v_assembly", "kernel", f"{file_name}.s")
     output_file = os.path.join("output", "factorisco", "kernel", f"{file_name}.txt")
     with open(input_file, 'r') as infile:
@@ -54,7 +54,7 @@ def kernel_program(file_name, verbose=True):
 
 def user_program(file_name, verbose=True):
     print("--------------------------------------------------------")
-    output_version = "v2"
+    output_version = "v3"
     input_file = os.path.join("factorisco_v_assembly", f"{file_name}.s")
     output_file = os.path.join("output", "factorisco", f"{file_name}.txt")
     with open(input_file, 'r') as infile:
@@ -71,4 +71,4 @@ if __name__ == "__main__":
     # kernel_program("ecall_01", verbose=verbose)
     # kernel_program("debug_boot", verbose=verbose)
     # kernel_program("os_02", verbose=verbose)
-    user_program("minesweeper", verbose=verbose)
+    user_program("fib_3", verbose=verbose)

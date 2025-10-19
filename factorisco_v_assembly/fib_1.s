@@ -19,6 +19,3 @@ end_loop:
 	nop
 	nop
 .data
-	Here
-	Random stuff
-	is there

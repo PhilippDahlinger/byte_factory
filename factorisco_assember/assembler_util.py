@@ -96,6 +96,7 @@ instruction_translator = {
     "blt": (26, 2),
     "bge": (26, 3),
     "ecall": (27, None),
+    "mret": (28, None),
     "halt": (30, None),
 }
 
@@ -509,6 +510,17 @@ def replace_instructions(code):
             }
         elif opcode == 27:
             assert len(tokens) == 1, f"Invalid number of arguments for instruction `{instr}` in line {i}"
+            # set reg and imm since it is handled internally as U instruction
+            machine_code = {
+                "opcode": opcode,
+                "rd": 0,
+                "add_opcode": add_opcode,
+                "rs1": None,
+                "rs2": None,
+                "imm": 0,
+            }
+        elif opcode == 28:
+            assert len(tokens) == 1,  f"Invalid number of arguments for instruction `{instr}` in line {i}"
             # set reg and imm since it is handled internally as U instruction
             machine_code = {
                 "opcode": opcode,

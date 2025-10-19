@@ -2,9 +2,13 @@
 .globl _start
 
 _start:
-	li sp, 1596
+	li sp, 17407
 	li a0, 10
 	call fib_dp
+	nop
+	nop
+	nop
+	nop
 	halt
 	nop
 	nop
@@ -17,17 +21,23 @@ _start:
 
 fib_dp:
 	# create array of length (a0)
-	li t0, 0
+	li t0, 1024
+	add t1, t0, a0
 _loop:
-	beq t0, a0, _end_loop
-	sw zero, 300(t0)
+	beq t0, t1, _end_loop
+	sw zero, 0(t0)
 	addi t0, t0, 1
 	j _loop
 _end_loop:
+    li t5, 26
+    sw t5, 1025(zero)
+    0:
+    j 0b
+
 	# first 2 values are known: 1 and 1
 	li t0, 1
-	sw t0, 300(zero)
-	sw t0, 301(zero)
+	sw t0, 1024(zero)
+	sw t0, 1025(zero)
 	# _fib_dp works with a0 - 1
 	subi a0, a0, 1
 	push ra
@@ -38,7 +48,7 @@ _end_loop:
 	
 _fib_dp:
 	# check if already computed
-	lw t0, 300(a0)
+	lw t0, 1024(a0)
 	# if not 0 -> already computed, return that directly
 	bnez t0, _base_case
 	# else: compute number and store it before returning
@@ -57,7 +67,7 @@ _fib_dp:
 	call _fib_dp
 	add a0, a0, s0  # a0 = result
 	# store result, index is s1
-	sw a0, 300(s1)
+	sw a0, 1024(s1)
 	pop ra
 	pop s1
 	pop s0
