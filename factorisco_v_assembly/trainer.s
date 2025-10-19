@@ -91,7 +91,7 @@ init:
 	ecall # set fdr to current cursor row
 	la a0, str_init
 	li a7, 17
-	ecall # println
+	ecall # printlnf
 	li s0, 100 # max value of operand 1
 	li s1, 100 # max value of operand 2
 	# s2, s3: actual numbers of the operands

@@ -117,10 +117,14 @@ main:
 	la t0, jump_table
 	add t0, t0, s0
 	lw t0, 0(t0) # user program location in t0
-	
+
+	# store return to main loop address in ram
+	la t1, main
+	sw t1, 1050(zero)
+
 	# disable kernel mode
 	sw zero, 15(zero)
-	
+
 	# call user program
 	jr t0
 	

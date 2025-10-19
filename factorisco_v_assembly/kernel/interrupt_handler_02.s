@@ -184,13 +184,10 @@ exit:
 	push ra
 	# user program ends, go back to os
 	# need to reset stack, set ra correctly on the stack, increment kernel mode to be in kernel mode after ecall decrements it again
-	li sp, 33000  # reset sp
-	li t0, 1000 # reset value of sbrk pointer
+	# TODO: set correct values
+	# li sp, 33000  # reset sp
+	# li t0, 1000 # reset value of sbrk pointer
 	sw t0, 256(zero) # address 256 = sbrk pointer
-	# inc kernel
-	lw t0, 15(zero)
-	inc t0
-	sw t0, 15(zero)
 	li a0, 0 # font
 	li a1, 1 # stride
 	li a2, 0 # no wrap
@@ -202,8 +199,10 @@ exit:
 	
 	
 	pop ra # stack clean up
-	# hardcoded entry point of OS program in kernel ROM #2
-	li t0, 139776
+	# load entry point of OS
+	lw t0, 1050(zero) # OS entry point stored at address 1050
+	0:
+	j 0b
 	jalr zero, 0(t0)
 	ret
 
