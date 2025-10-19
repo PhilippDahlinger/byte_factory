@@ -68,7 +68,7 @@ def user_program(file_name, verbose=True):
 
 if __name__ == "__main__":
     verbose = False
-    # kernel_program("ecall_01", verbose=verbose)
+    kernel_program("interrupt_handler_02", verbose=verbose)
     # kernel_program("debug_boot", verbose=verbose)
-    # kernel_program("os_02", verbose=verbose)
-    user_program("forward_test_2", verbose=verbose)
+    kernel_program("os_03", verbose=verbose)
+    # user_program("forward_test_2", verbose=verbose)

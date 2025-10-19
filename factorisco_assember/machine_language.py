@@ -23,7 +23,7 @@ def convert_to_word(line):
         word = ((word << 5) + line["rd"]) & 0xFFFFFFFF
         # opcode
         word = ((word << 7) + line["opcode"]) & 0xFFFFFFFF
-    elif 20 <= opcode <= 22 or opcode == 27 or opcode == 30:
+    elif 20 <= opcode <= 22 or opcode == 27 or opcode == 28 or opcode == 30:
         # U Instruction
         # view input as shifted 12 bits to the left
         word = line["imm"] & 0xFFFFF
