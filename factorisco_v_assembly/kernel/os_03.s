@@ -66,13 +66,13 @@ boot:
 	li a7, 23
 	ecall # close_key_stream
 
-	# # debug: reset RAM initial values
-	# li a0, 1024
-	# li a1, 1536
-	# 1:
-	# sw zero, 0(a0)
-	# inc a0
-	# blt a0, a1, 1b
+	# debug: reset RAM initial values
+	li a0, 1024
+	li a1, 1536
+	1:
+	sw zero, 0(a0)
+	inc a0
+	blt a0, a1, 1b
 
 	# print welcome string
 	la a0, welcome
@@ -92,7 +92,7 @@ main:
 	la a0, selection
 	li a7, 16
 	ecall # print without a new line
-	li a0, 512 # string address of input
+	li a0, 1100 # string address of input
 	li a1, 10 # max length 10
 	li a7, 26
 	ecall # input
@@ -102,17 +102,13 @@ main:
 	# check if a1 is -1
 	li t0, -1
 	beq a1, t0, invalid_input
-	# check that range is in 0-3
-	li t0, 3
+	# check that range is in 0-2
+	li t0, 2
 	bgt a0, t0, invalid_input
 	blt a0, zero, invalid_input
 	# all tests passed
 	mv s0, a0
 	# call program
-	# TODO: Remove the next 2 lines, they are a bug
-	li a7, 18
-	ecall # print selection as confirmation
-
 	li a0, 10
 	li a7, 18
 	ecall # print new line
@@ -142,5 +138,5 @@ invalid_input:
 	welcome: .asciz "FactOS 0.3.1\n"
 	selection: .asciz "ROM slot: "
 	str_invalid_input: .asciz "Invalid input!\n"
-	jump_table: .word 147968, 152064, 156160, 160256
+	jump_table: .word 50176, 58368, 62464
 	
