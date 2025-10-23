@@ -21,13 +21,17 @@ class SimulatorGUI:
         self.last_speed_time = 0.0
         self.instr_counter = 0
         self.ips_value = 0.0  # instructions per second
-        self.throttle_enabled = False  # toggle state
-        self.throttle_target_ips = 100  # x instructions per second
+        self.throttle_enabled = False
+        self.throttle_target_ips = 100  # target instructions per second when throttled
+
+        # Color display settings
+        self.color_cell_size = 12  # each "pixel" size (px)
+        self.color_rects = None    # 2D list of rectangle ids; built lazily
 
         # Build layout
         self._build_controls()
         self._build_register_view()
-        self._build_display()
+        self._build_display()       # includes text + color display (stacked)
         self._build_memory_view()
         self._build_status()
 
@@ -53,7 +57,6 @@ class SimulatorGUI:
         self.step_btn = ttk.Button(frame, text="⏭ Step", command=self.step)
         self.step_btn.pack(side="left", padx=5)
 
-        # --- Throttle toggle button ---
         self.throttle_btn = ttk.Button(frame, text="⚡ Full Speed", command=self.toggle_throttle)
         self.throttle_btn.pack(side="left", padx=15)
 
@@ -68,9 +71,11 @@ class SimulatorGUI:
             self.reg_labels.append(lbl)
 
     def _build_display(self):
+        # Parent frame for both displays, stacked vertically
         frame = ttk.LabelFrame(self.root, text="Display")
         frame.pack(side="left", fill="both", expand=True, padx=5, pady=5)
 
+        # --- Text display (existing) ---
         self.display_text = tk.Text(
             frame,
             width=self.sim.display_controller.width,
@@ -82,6 +87,50 @@ class SimulatorGUI:
         )
         self.display_text.pack(fill="both", expand=True)
         self.display_text.config(state="disabled")
+
+        # --- Color display (new) ---
+        # Placed below the text display inside the same group.
+        # Uses a Canvas with pre-created rectangles for each pixel.
+        color_container = ttk.Frame(frame)
+        color_container.pack(fill="x", pady=(8, 0))
+
+        ttk.Label(color_container, text="Color Display (32×32)").pack(anchor="w")
+
+        # Create the canvas sized to the 32×32 grid
+        w = 32 * self.color_cell_size
+        h = 32 * self.color_cell_size
+        self.color_canvas = tk.Canvas(
+            color_container,
+            width=w,
+            height=h,
+            bg="#101010",
+            highlightthickness=0,
+            bd=0,
+        )
+        self.color_canvas.pack()
+
+        # Build the rectangle grid lazily; we may not have the controller yet at init time.
+        self._ensure_color_grid()
+
+    def _ensure_color_grid(self):
+        """Create the 32×32 grid of rectangles once."""
+        if self.color_rects is not None:
+            return
+
+        cols = 32
+        rows = 32
+        cs = self.color_cell_size
+
+        self.color_rects = [[None for _ in range(cols)] for _ in range(rows)]
+        for y in range(rows):
+            y0 = y * cs
+            for x in range(cols):
+                x0 = x * cs
+                rid = self.color_canvas.create_rectangle(
+                    x0, y0, x0 + cs - 2, y0 + cs - 2, # small padding to distinguish pixels
+                    outline="", fill="#000000"
+                )
+                self.color_rects[y][x] = rid
 
     def _build_memory_view(self):
         frame = ttk.LabelFrame(self.root, text="Memory Viewer (32 words)")
@@ -123,16 +172,9 @@ class SimulatorGUI:
     # --------------------------
 
     def _on_global_key_pressed(self, event):
-        """
-        Capture all key presses in the window, except when typing
-        into the start address entry field.
-        """
         focused_widget = self.root.focus_get()
-
-        # Skip capturing when the address field is focused
         if focused_widget == self.addr_entry:
             return
-
         key_symbol = event.keysym
         self.sim.keyboard_controller.add_pressed_key_to_queue(key_symbol)
 
@@ -148,7 +190,7 @@ class SimulatorGUI:
 
     def pause(self):
         self.running = False
-        self._refresh_ui(full=True)  # full refresh when paused
+        self._refresh_ui(full=True)
 
     def step(self):
         if not self.running:
@@ -156,11 +198,13 @@ class SimulatorGUI:
             if instruction != 30:
                 self.sim.execute(instruction)
                 self.sim.pc += 1
+                # If your controllers require manual refresh(), call them here as needed.
                 self.sim.display_controller.refresh()
+                # If your color controller also needs it, uncomment:
+                # self.sim.color_display_controller.refresh()
             self._refresh_ui(full=True)
 
     def toggle_throttle(self):
-        """Toggle between full-speed and 120 IPS throttled mode."""
         self.throttle_enabled = not self.throttle_enabled
         if self.throttle_enabled:
             self.throttle_btn.config(text="🐢 100 IPS")
@@ -181,18 +225,16 @@ class SimulatorGUI:
                 self.running = False
                 break
 
-            # Execute one instruction
             self.sim.execute(instruction)
             self.sim.pc += 1
             self.instr_counter += 1
 
             now = time.perf_counter()
 
-            # --- Throttle to 120 instructions per second if enabled ---
             if self.throttle_enabled:
                 time.sleep(1.0 / self.throttle_target_ips)
 
-            # Update display at ~10 Hz
+            # Update both displays at ~10 Hz
             if now - self.last_display_update >= 1 / self.display_fps:
                 self._refresh_display_only()
                 self.last_display_update = now
@@ -204,7 +246,6 @@ class SimulatorGUI:
                 self.instr_counter = 0
                 self.last_speed_time = now
 
-        # final refresh after run stops
         self._refresh_ui(full=True)
 
     # --------------------------
@@ -222,16 +263,67 @@ class SimulatorGUI:
             self.update_memory_view(auto=True)
 
     def _refresh_display_only(self):
-        """Only update display if content has changed to minimize overhead."""
+        # Text display redraw (only when changed)
         new_text = "\n".join(self.sim.display_controller.current_display) + "\n"
         current_text = self.display_text.get("1.0", tk.END)
-
-        # Only update if there is an actual change
         if new_text != current_text:
             self.display_text.config(state="normal")
             self.display_text.delete("1.0", tk.END)
             self.display_text.insert(tk.END, new_text)
             self.display_text.config(state="disabled")
+
+        # Color display redraw
+        self._refresh_color_display()
+
+    # --------------------------
+    #   COLOR DISPLAY HELPERS
+    # --------------------------
+
+    def _refresh_color_display(self):
+        """
+        Redraw the 32×32 color grid from the color display controller,
+        accepting either 24-bit ints (0xRRGGBB) or (r, g, b) tuples.
+        """
+        controller = getattr(self.sim, "color_display_controller", None)
+        if controller is None:
+            return
+
+        # Ensure grid exists (in case this gets called before build)
+        self._ensure_color_grid()
+
+        # Try to obtain frame data from likely attribute names
+        frame = getattr(controller, "current_frame", None)
+        if frame is None:
+            frame = getattr(controller, "pixels", None)
+        if frame is None:
+            return  # nothing to draw yet
+
+        rows = min(32, len(frame))
+        cols = min(32, len(frame[0]) if rows > 0 else 0)
+
+        for y in range(rows):
+            row = frame[y]
+            for x in range(cols):
+                val = row[x]
+                fill = self._to_hex_color(val)
+                self.color_canvas.itemconfig(self.color_rects[y][x], fill=fill)
+
+    @staticmethod
+    def _to_hex_color(val):
+        """
+        Convert either (r, g, b) with 0-255 each or a 24-bit int 0xRRGGBB
+        into a Tk color string like '#RRGGBB'.
+        """
+        if isinstance(val, tuple) and len(val) == 3:
+            r, g, b = val
+        elif isinstance(val, int):
+            r = (val >> 16) & 0xFF
+            g = (val >> 8) & 0xFF
+            b = val & 0xFF
+        else:
+            # Fallback to black if unexpected value
+            r = g = b = 0
+        return f"#{r:02x}{g:02x}{b:02x}"
 
     def update_memory_view(self, auto=False):
         try:

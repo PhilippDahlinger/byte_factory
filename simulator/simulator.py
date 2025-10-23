@@ -10,15 +10,14 @@ class Simulator:
     def __init__(self, config: dict, user_programs: list[str]):
         self.config = config
         # load all programs
-        self.boot_code = self._load_program(config["boot_file"])
         self.os_code = self._load_program(config["os_file"])
-        self.ecall_code = self._load_program(config["ecall_file"])
+        self.interrupt_handler_code = self._load_program(config["interrupt_handler_file"])
         self.user_codes = [self._load_program(f) for f in user_programs]
-        assert len(self.user_codes) <= 4, "Maximum 4 user programs supported."
+        assert len(self.user_codes) <= 2, "Maximum 2 user programs supported."
 
         self.reg_stack = [0] * 32
-        self.address_room = [0] * 1000000
-        self.pc = self.config["boot_address"]  # program counter starts at boot address
+        self.address_room = [0] * 99328
+        self.pc = self.config["os_address"]  # program counter starts at boot address
         self.display_controller = DisplayController(self.config["display_controller"], self)
         self.keyboard_controller = KeyboardController(self.config["keyboard_controller"], self)
         self.clock = 0  # simple clock counter
@@ -28,12 +27,13 @@ class Simulator:
         while True:
             instruction = self.address_room[self.pc]
             # print(f"PC: {self.pc}, Instruction: {instruction}")
-            if instruction == 30:
+            if instruction == 30 and self.address_room[self.config["mode"]] == 1:
                 print("Encountered halt instruction (30). Halting.")
                 break
             self.execute(instruction)
 
             self.pc += 1
+            # TODO define bounds based on mode
             if self.pc >= len(self.address_room):
                 print("Program counter out of bounds. Halting.")
                 break
@@ -132,7 +132,8 @@ class Simulator:
             if address < 0 or address >= len(self.address_room):
                 raise ValueError(f"Memory access out of bounds: {address}")
             # check for kernel restricted addresses
-            if self.address_room[self.config["kernel_mode_address"]] == 0 and address <= self.config["kernel_restricted_addresses"]:
+            # TODO: add user bounds
+            if self.address_room[self.config["mode"]] == 0 and address <= self.config["kernel_restricted_addresses"]:
                 raise PermissionError(f"Accessing kernel restricted address {address} in user mode.")
             if address == self.config["rng_address"]:
                 result = random.randint(-2 ** 31, 2 ** 31 - 1)
@@ -147,6 +148,7 @@ class Simulator:
             if address < 0 or address >= len(self.address_room):
                 raise ValueError(f"Memory access out of bounds: {address}")
             # check for kernel restricted addresses
+            # TODO: add user bounds
             if self.address_room[self.config["kernel_mode_address"]] == 0 and address <= self.config["kernel_restricted_addresses"]:
                 raise PermissionError(f"Accessing kernel restricted address {address} in user mode.")
             self.address_room[address] = self.reg_stack[decoded["rs2"]]
@@ -176,12 +178,15 @@ class Simulator:
             result = None
             wb = False
         elif decoded["opcode"] == 27:
-            # ECALL x[ra] = pc+1; pc = ECALL function address
-            result = self.pc + 1
-            decoded["rd"] = 1  # ra is x1
-            self.pc = self.config["ecall_address"] - 1  # -1 because we will increment pc after execution
-            self.address_room[self.config["kernel_mode_address"]] += 1  # enter kernel mode
-            wb = True
+            # ECALL
+            if self.address_room[self.config["mie"]] == 1:
+                # Do the standard entering of interrupt process
+                self._start_interrupt_process(decoded, interrupt_type=3) # ecall
+            wb = False
+        elif decoded["opcode"] == 28:
+            # mret
+            self.pc = self.address_room[self.config["mepc"]]
+            self.address_room[self.config["mode"]] = self.address_room[self.config["mpp"]]
         elif decoded["opcode"] == 30:
             # HALT
             result = None
@@ -227,7 +232,7 @@ class Simulator:
             # sign extend
             imm = sign_extend(imm, 12)
         # U instruction
-        elif opcode == 20 or opcode == 21 or opcode == 22 or opcode == 27 or opcode == 30:
+        elif opcode == 20 or opcode == 21 or opcode == 22 or opcode == 27 or opcode == 28 or opcode == 30:
             imm = extract(instruction, 31, 12)
             # shift left by 12
             imm = imm << 12
@@ -243,33 +248,56 @@ class Simulator:
             "imm": imm
         }
 
+    def _start_interrupt_process(self, decoded_instruction: dict, interrupt_type: int):
+        """
+        Handle the standard process of entering an interrupt:
+        1. Set MIE := 0
+        2. Set MEPC := PC
+        3. set MPP := Mode
+        4. Set Mode := 1
+        5. Set PC to the vectorized interrupt handler address (defined by base + interrupt_type)
+        :param decoded_instruction: The decoded instruction dictionary.
+        :param interrupt_type: The type of interrupt (e.g. 3 for ecall).
+        :return:
+        """
+        # 1. Set MIE := 0
+        self.address_room[self.config["mie"]] = 0
+        # 2. Set MEPC := PC
+        self.address_room[self.config["mepc"]] = self.pc
+        # 3. Set MPP := MODE
+        self.address_room[self.config["mpp"]] = self.address_room[self.config["mode"]]
+        # 4. Set Mode := 1
+        self.address_room[self.config["mode"]] = 1
+        # 5. Set PC to the vectorized interrupt handler address (defined by base + interrupt_type)
+        base_address = self.config["interrupt_start_address"]
+        self.pc = base_address + interrupt_type - 1 # -1 because we will increment pc after execution
+
+
+
     def set_initial_memory(self):
         """
         Set the initial memory state with boot code, OS code, ecall code, and user programs.
         :return:
         """
-        # load boot code
-        boot_address = self.config["boot_address"]
-        for i, word in enumerate(self.boot_code):
-            self.address_room[i + boot_address] = word
         # load OS code
         os_address = self.config["os_address"]
         for i, word in enumerate(self.os_code):
             self.address_room[i + os_address] = word
-        # load ecall code
-        ecall_address = self.config["ecall_address"]
-        for i, word in enumerate(self.ecall_code):
-            self.address_room[i + ecall_address] = word
+        # load interrupt handler code
+        interrupt_handler_address = self.config["interrupt_start_address"]
+        for i, word in enumerate(self.interrupt_handler_code):
+            self.address_room[i + interrupt_handler_address] = word
         # load user programs
         for program_idx, program in enumerate(self.user_codes):
             user_address = self.config["user_program_addresses"][program_idx]
             for i, word in enumerate(program):
                 self.address_room[i + user_address] = word
         # set kernel mode to 1: start in kernel mode
-        self.address_room[self.config["kernel_mode_address"]] = 1
+        self.address_room[self.config["mode"]] = 1
         self.clock = 0
 
-    def _load_program(self, file_path: str) -> list[int]:
+    @staticmethod
+    def _load_program(file_path: str) -> list[int]:
         with open(file_path, 'r') as f:
             lines = f.readlines()
         # convert to int

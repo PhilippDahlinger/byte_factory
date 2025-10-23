@@ -1,0 +1,53 @@
+
+#os_file: "output/factorisco/kernel/os_02_machine_code.txt"
+os_file: "output/factorisco/congress_boot_machine_code.txt"
+interrupt_handler_file: "output/factorisco/kernel/interrupt_handler_02_machine_code.txt"
+
+# pointers and addresses
+os_address: 33792
+interrupt_start_address: 41000 # todo: correct address
+user_program_addresses: [50176, 58368]  # todo: correct address
+kernel_restricted_addresses: 8000  # first addresses are reserved for kernel
+
+mode: 18
+mie: 19
+mepc: 20
+mpp: 21
+
+clock_address: 16
+rng_address: 15
+
+keyboard_controller:
+  address_map:
+    stream_content_output: 1
+    indicator_if_stream_not_empty: 2
+    open_stream: 3  # boolean flag: 0 = closed, 1 = open
+    flush_stream: 4
+
+display_controller:
+  address_map:
+    cursor_row: 5
+    cursor_col: 6
+    write_char: 7
+    first_displayed_row: 9
+    cls: 10
+    clear_current_row: 11
+    refresh: 12
+    stride: 13
+    wrap: 14
+  # other parameters
+  width: 20
+  vis_height: 6
+  total_height: 128
+
+color_display_controller:
+  address_map:
+    cursor_x: 22
+    cursor_y: 23
+    red: 24
+    green: 25
+    blue: 26
+    hex_color: 27
+    write_rgb: 28
+    write_hex: 29
+    cls_color: 30
