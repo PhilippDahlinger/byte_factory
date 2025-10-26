@@ -1,6 +1,11 @@
 .text
 .globl _start
 _start:
+    # enable interrupts
+	li t0, 1
+	sw t0, 18(zero)
+
+    li sp, 17400  # init sp
     # cls
     li a7, 15
     ecall

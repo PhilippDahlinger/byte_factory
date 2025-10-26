@@ -9,10 +9,10 @@ interrupt_start_address: 41000 # todo: correct address
 user_program_addresses: [50176, 58368]  # todo: correct address
 kernel_restricted_addresses: 8000  # first addresses are reserved for kernel
 
-mode: 18
-mie: 19
-mepc: 20
-mpp: 21
+mode: 17
+mie: 18
+mepc: 19
+mpp: 20
 
 clock_address: 16
 rng_address: 15

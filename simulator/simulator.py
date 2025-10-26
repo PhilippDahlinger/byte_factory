@@ -149,8 +149,8 @@ class Simulator:
                 raise ValueError(f"Memory access out of bounds: {address}")
             # check for kernel restricted addresses
             # TODO: add user bounds
-            if self.address_room[self.config["kernel_mode_address"]] == 0 and address <= self.config["kernel_restricted_addresses"]:
-                raise PermissionError(f"Accessing kernel restricted address {address} in user mode.")
+            # if self.address_room[self.config["mode"]] == 0 and address <= self.config["kernel_restricted_addresses"]:
+            #     raise PermissionError(f"Accessing kernel restricted address {address} in user mode.")
             self.address_room[address] = self.reg_stack[decoded["rs2"]]
             self.keyboard_controller.process(address, self.reg_stack[decoded["rs2"]], True)  # inform keyboard controller
             self.display_controller.process(address, self.reg_stack[decoded["rs2"]])  # inform display controller
@@ -187,6 +187,7 @@ class Simulator:
             # mret
             self.pc = self.address_room[self.config["mepc"]]
             self.address_room[self.config["mode"]] = self.address_room[self.config["mpp"]]
+            wb = False
         elif decoded["opcode"] == 30:
             # HALT
             result = None
