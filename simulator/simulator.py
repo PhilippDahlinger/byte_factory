@@ -185,7 +185,7 @@ class Simulator:
             wb = False
         elif decoded["opcode"] == 28:
             # mret
-            self.pc = self.address_room[self.config["mepc"]]
+            self.pc = self.address_room[self.config["mepc"]] - 1  # -1 because we will increment pc after execution
             self.address_room[self.config["mode"]] = self.address_room[self.config["mpp"]]
             wb = False
         elif decoded["opcode"] == 30:

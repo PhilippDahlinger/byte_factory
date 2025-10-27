@@ -16,7 +16,7 @@ main:
 
     # Handle ECALL: no need to jump since we are at the end of the table
 	# Save all registers which we modify here
-	# Use space 1024 -> 1024 + 31 for that (# todo: maybe find a better space / do a shadow swap in hardware)
+	# Use space 1026 -> 1056 for that (# todo: maybe find a better space / do a shadow swap in hardware)
 	sw x1, 1024(zero)
 	sw x2, 1025(zero)
 	sw x3, 1026(zero)
@@ -49,7 +49,12 @@ main:
     sw x30, 1053(zero)
     sw x31, 1054(zero)
 
-    # TODO: load OS stack pointer
+    # check if MPP is user mode (00), if so: load OS sp, else: use existing sp, since we are already in OS mode
+    lw t0, 21(zero) # load MPP
+    bne t0, zero, 1f
+    # do not need to save user sp, since it is already done in the register shadow swap
+    lw sp, 1025(zero) # load OS sp
+    1:
 
 	li t1, 34  # last valid ECALL code
 	# check for valid ECALL code
@@ -207,13 +212,32 @@ exit:
 	ret
 
 sbrk:
-	lw t0, 256(zero) # load old sbrk pointer
+    # a0: number of bytes to increase sbrk pointer
+    # load correct sbrk pointer depending on MPP
+    lw t3, 21(zero) # load MPP
+    bne t3, zero, 1f
+    # sbrk was called from user mode
+	lw t0, 1057(zero) # load old user sbrk pointer
+	j 2f
+	1:
+	# sbrk was called from OS mode
+	lw t0, 1024(zero) # load old OS sbrk pointer
+	2:
 	add t1, t0, a0 # update
 	# check for invalid state
-	li t2, 1000
-	blt t1, t2, 1f # if < 1000: memory regime of kernel -> throw exception
-	bge t1, sp, 1f # check if sbrk is in stack regime. sp can grow into sbrk though currently
-	sw t1, 256(zero)
+	# TODO: update this depending on memory map
+	# li t2, 1000
+	# blt t1, t2, 1f # if < 1000: memory regime of kernel -> throw exception
+	# bge t1, sp, 1f # check if sbrk is in stack regime. sp can grow into sbrk though currently
+	# write back updated sbrk pointer, MPP should be still in regs
+    bne t3, zero, 2f
+    # user mode
+	sw t1, 1057(zero)
+	j 3f
+	2:
+	# OS mode
+	sw t1, 1024(zero)
+	3:
 	# return old sbrk pointer
 	mv a0, t0 # old sbrk pointer
 	ret

@@ -1,7 +1,5 @@
 # 🧩 FactoRISCo V — ECALL Reference Manual
 
-### Version 1.0 • Based on `interrupt_handler_02.s`
-
 This document describes every **ECALL (Environment Call)** implemented in the **FactoRISCo V Runtime**.
 ECALLs provide a system-level interface between **user programs** and the **FactoRISCo V kernel** — similar to system calls in traditional operating systems.
 
