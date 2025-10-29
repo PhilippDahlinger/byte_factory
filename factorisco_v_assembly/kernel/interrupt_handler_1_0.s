@@ -825,9 +825,9 @@ str_to_file_name:
 	andi t4, t4, 255
 	andi t5, t5, 255
 	# push into t0
-	sll t0, t0, 8
+	slli t0, t0, 8
 	or t0, t0, t4
-	sll t0, t0, 8
+	slli t0, t0, 8
 	or t0, t0, t5
 	# do the same again
 	lw t4, 2(a0)
@@ -836,9 +836,9 @@ str_to_file_name:
 	andi t4, t4, 255
 	andi t5, t5, 255
 	# push into t0
-	sll t0, t0, 8
+	slli t0, t0, 8
 	or t0, t0, t4
-	sll t0, t0, 8
+	slli t0, t0, 8
 	or t0, t0, t5
 
     # fill the remaining ones
@@ -850,7 +850,7 @@ str_to_file_name:
       # increment counter here to solve mem dependency
       inc t2
       andi t4, t4, 255
-      sll t1, t1, 8
+      slli t1, t1, 8
       or t1, t1, t4
       j 3b
     2:
@@ -872,7 +872,7 @@ str_to_file_name:
       # increment counter here to solve mem dependency
       inc t2
       andi t4, t4, 255
-      sll t0, t0, 8
+      slli t0, t0, 8
       or t0, t0, t4
       j 3b
     2:

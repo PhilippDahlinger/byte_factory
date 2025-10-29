@@ -1,4 +1,4 @@
-def convert_to_word(line):
+def convert_to_word(line, line_label):
     opcode = line["opcode"]
     if (opcode < 20 and line["add_opcode"] == 1) or opcode == 23 or opcode == 24:
         # I Instruction
@@ -47,17 +47,17 @@ def convert_to_word(line):
         # opcode
         word = ((word << 7) + line["opcode"]) & 0xFFFFFFFF
     else:
-        raise ValueError(f"Wrong combination of opcode and add_opcode: {line}")
+        raise ValueError(f"Wrong combination of opcode and add_opcode: {line} in line {line_label}")
     if word >= 2**31:
         # interpret as negative number
         word -= 2**32
     return word
 
-def create_machine_code(code, data):
+def create_machine_code(code, data, code_line_labels):
     output_words = []
-    for line in code:
-        output_words.append(convert_to_word(line))
-    for line in data:
+    for i, line in enumerate(code):
+        output_words.append(convert_to_word(line, code_line_labels[i]))
+    for i, line in enumerate(data):
         # every word is in its own list
         output_words.append(int(line[0]))
     return output_words

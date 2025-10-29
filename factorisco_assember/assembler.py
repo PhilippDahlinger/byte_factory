@@ -8,22 +8,31 @@ from factorisco_assember.machine_language import create_machine_code
 
 
 def assemble(assembly_code, output_file, output_version="v3", kernel_mode=False, verbose=True):
-    assembly_code = remove_comments(assembly_code)
-    assembly_code = remove_white_space(assembly_code)
-    code = get_text_segment(assembly_code)
-    data = get_data_segment(assembly_code)
+    assembly_code, line_labels = remove_comments(assembly_code)
+    assembly_code, line_labels = remove_white_space(assembly_code, line_labels)
+    code, code_line_labels = get_text_segment(assembly_code, line_labels)
+    assert len(code_line_labels) == len(code)
+    data, data_line_labels = get_data_segment(assembly_code, line_labels)
+    assert len(data_line_labels) == len(data)
     # replace macros
     ...
-    # tokenize and replace .globl _start with j _start
-    code = tokenize(code, is_text_segment=True, force_start=not kernel_mode)
-    data = tokenize(data, is_text_segment=False)
-    data = compute_data_values(data)
+    # tokenize
+    code, code_line_labels = tokenize(code, code_line_labels, is_text_segment=True)
+    assert len(code_line_labels) == len(code)
+    data, data_line_labels = tokenize(data, data_line_labels, is_text_segment=False)
+    assert len(data_line_labels) == len(data)
+    data, data_line_labels = compute_data_values(data, data_line_labels)
+    assert len(data_line_labels) == len(data)
     # replace pseudo instructions
-    code = replace_pseudo_instructions(code)
-    labels, code, data = collect_labels(code, data)
-    code = replace_labels(code, labels)
-    code = replace_instructions(code)
-    machine_code = create_machine_code(code, data)
+    code, code_line_labels = replace_pseudo_instructions(code, code_line_labels)
+    assert len(code_line_labels) == len(code)
+    labels, code, data, code_line_labels, data_line_labels = collect_labels(code, data, code_line_labels, data_line_labels)
+    assert len(code_line_labels) == len(code)
+    code = replace_labels(code, labels, code_line_labels)
+    assert len(code_line_labels) == len(code)
+    code, code_line_labels = replace_instructions(code, code_line_labels)
+    assert len(code_line_labels) == len(code)
+    machine_code = create_machine_code(code, data, code_line_labels)
     if verbose:
         for i, line in enumerate(code):
             print(f"{i}: {line}")

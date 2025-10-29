@@ -126,31 +126,35 @@ def get_directive(code, key_word):
     assert directive[0][1].strip() == key_word, f"Invalid line {i}: `{line}`"
     return i
 
-def get_text_segment(code):
+def get_text_segment(code, line_labels):
     text_directive = get_directive(code, ".text")
     data_directive = get_directive(code, ".data")
     if data_directive is not None and text_directive < data_directive:
         text_segment = code[text_directive + 1:data_directive]
+        line_labels = line_labels[text_directive + 1:data_directive]
     else:
         # either no data segment or data segment was before the text segment
         text_segment = code[text_directive + 1:]
-    return text_segment
+        line_labels = line_labels[text_directive + 1:]
+    return text_segment, line_labels
 
-def get_data_segment(code):
+def get_data_segment(code, line_labels):
     text_directive = get_directive(code, ".text")
     data_directive = get_directive(code, ".data")
     if data_directive is None:
         # empty segment
-        return []
+        return [], []
     if text_directive < data_directive:
         # data segment at end of file
         data_segment = code[data_directive + 1:]
+        line_labels = line_labels[data_directive + 1:]
     else:
         # data segment is before the text segment
         data_segment = code[data_directive + 1:text_directive]
-    return data_segment
+        line_labels = line_labels[data_directive + 1:text_directive]
+    return data_segment, line_labels
 
-def tokenize(code, is_text_segment=True, force_start=True):
+def tokenize(code_or_data, line_labels, is_text_segment=True):
     def match_line(line):
         match = re.match(r"(\S+)(?:\s+(.+))?", line)  # The argument part is now optional
         if match:
@@ -167,168 +171,194 @@ def tokenize(code, is_text_segment=True, force_start=True):
                 args = [f'"{arg}"' for arg in args]
             return [instruction, *args]
         else:
-            raise AssertionError(f"Error parsing empty line {i}: `{line}`")
+            raise AssertionError(f"Error parsing empty line {line_labels[i]}: `{line}`")
     output = []
-    _start_found = False
-    _start_label_found = False
-    for i, line in enumerate(code):
+    output_line_labels = []
+    for i, line in enumerate(code_or_data):
         tokens = match_line(line)
-        if tokens[0] == ".globl" and tokens[1] == "_start":
-            # entry point def: jump to start
-            _start_found = True
-            tokens = ["j", "_start"]
         # check for basic syntax
         # labels
         split_line = False
         if tokens[0].endswith(":"):
-            if tokens[0] == "_start:":
-                _start_label_found = True
-            assert ":" not in tokens[0][:-1], f"label `{line}` in line {i} contains illegal character `:`"
+            assert ":" not in tokens[0][:-1], f"label `{line}` in line {line_labels[i]} contains illegal character `:`"
             if is_text_segment:
-                assert len(tokens) == 1, f"Label definition `{line}` in line {i} contains multiple words"
+                assert len(tokens) == 1, f"Label definition `{line}` in line {line_labels[i]} contains multiple words"
             else:
                 if len(tokens) > 1:
                     # standard way of defining data in .data segment. for parsing, split label and data in 2 lines
                     split_line = True
         if split_line:
             output.append([tokens[0]]) # label
+            output_line_labels.append(line_labels[i])
             # reparse rest of the line
             rest_line = line[line.find(" ") + 1:]
             rest_tokens = match_line(rest_line)
             output.append(rest_tokens) # directive and data
+            # add another line label for the data line
+            output_line_labels.append(line_labels[i])
         else:
             output.append(tokens)
-    if is_text_segment and force_start:
-        assert _start_found and _start_label_found, "Could not find `.globl _start` in the code. Needs to be present to define the entry point"
-    return output
+            output_line_labels.append(line_labels[i])
+    return output, output_line_labels
 
 
-def replace_pseudo_instructions(code):
+def replace_pseudo_instructions(code, line_labels):
     output = []
+    output_line_labels = []
     for i, tokens in enumerate(code):
         if tokens[0].endswith(":"):
             # found label
             output.append(tokens)
+            output_line_labels.append(line_labels[i])
             continue
         instr = tokens[0]
         # check all possible pseudo instructions
         if instr == "mv":
-            assert len(tokens) == 3, f"Wrong numbers of arguments for `mv` in line {i}"
+            assert len(tokens) == 3, f"Wrong numbers of arguments for `mv` in line {line_labels[i]}"
             output.append(["addi", tokens[1], tokens[2], "0"])
+            output_line_labels.append(line_labels[i])
         elif instr == "li":
-            assert len(tokens) == 3, f"Wrong numbers of arguments for `li` in line {i}"
+            assert len(tokens) == 3, f"Wrong numbers of arguments for `li` in line {line_labels[i]}"
             try:
                 imm = int(tokens[2])
             except ValueError:
-                raise AssertionError(f"Only immediate values are supported for `li` in line {i}")
+                raise AssertionError(f"Only immediate values are supported for `li` in line {line_labels[i]}")
             is_split, upper, lower = split_up_imm(imm)
             if is_split:
                 # 2 lines
                 output.append(["lui", tokens[1], str(upper)])
                 output.append(["addi", tokens[1], tokens[1], str(lower)])
+                output_line_labels.append(line_labels[i])
+                output_line_labels.append(line_labels[i])
             else:
                 # directly addi
                 output.append(["addi", tokens[1], "zero", str(lower)])
+                output_line_labels.append(line_labels[i])
         elif instr == "neg":
-            assert len(tokens) == 3, f"Wrong numbers of arguments for `neg` in line {i}"
+            assert len(tokens) == 3, f"Wrong numbers of arguments for `neg` in line {line_labels[i]}"
             output.append(["sub", tokens[1], "zero", tokens[2]])
+            output_line_labels.append(line_labels[i])
         elif instr == "not":
-            assert len(tokens) == 3, f"Wrong numbers of arguments for `not` in line {i}"
+            assert len(tokens) == 3, f"Wrong numbers of arguments for `not` in line {line_labels[i]}"
             output.append(["xori", tokens[1], tokens[2], "-1"])
+            output_line_labels.append(line_labels[i])
         elif instr == "subi":
-            assert len(tokens) == 4, f"Wrong numbers of arguments for `subi` in line {i}"
+            assert len(tokens) == 4, f"Wrong numbers of arguments for `subi` in line {line_labels[i]}"
             if tokens[3].startswith("-"):
                 imm = tokens[3][1:]
             else:
                 imm = "-" + tokens[3]
             output.append(["addi", tokens[1], tokens[2], imm])
+            output_line_labels.append(line_labels[i])
         elif instr == "inc":
-            assert len(tokens) == 2, f"Wrong numbers of arguments for `inc` in line {i}"
+            assert len(tokens) == 2, f"Wrong numbers of arguments for `inc` in line {line_labels[i]}"
             output.append(["addi", tokens[1], tokens[1], "1"])
+            output_line_labels.append(line_labels[i])
         elif instr == "dec":
-            assert len(tokens) == 2, f"Wrong numbers of arguments for `dec` in line {i}"
+            assert len(tokens) == 2, f"Wrong numbers of arguments for `dec` in line {line_labels[i]}"
             output.append(["addi", tokens[1], tokens[1], "-1"])
+            output_line_labels.append(line_labels[i])
         elif instr == "beqz":
-            assert len(tokens) == 3, f"Wrong numbers of arguments for `beqz` in line {i}"
+            assert len(tokens) == 3, f"Wrong numbers of arguments for `beqz` in line {line_labels[i]}"
             output.append(["beq", tokens[1], "zero", tokens[2]])
+            output_line_labels.append(line_labels[i])
         elif instr == "bnez":
-            assert len(tokens) == 3, f"Wrong numbers of arguments for `bnez` in line {i}"
+            assert len(tokens) == 3, f"Wrong numbers of arguments for `bnez` in line {line_labels[i]}"
             output.append(["bne", tokens[1], "zero", tokens[2]])
+            output_line_labels.append(line_labels[i])
         elif instr == "bgt":
-            assert len(tokens) == 4, f"Wrong numbers of arguments for `bgt` in line {i}"
+            assert len(tokens) == 4, f"Wrong numbers of arguments for `bgt` in line {line_labels[i]}"
             output.append(["blt", tokens[2], tokens[1], tokens[3]])
+            output_line_labels.append(line_labels[i])
         elif instr == "ble":
-            assert len(tokens) == 4, f"Wrong numbers of arguments for `ble` in line {i}"
+            assert len(tokens) == 4, f"Wrong numbers of arguments for `ble` in line {line_labels[i]}"
             output.append(["bge", tokens[2], tokens[1], tokens[3]])
+            output_line_labels.append(line_labels[i])
         elif instr == "j":
-            assert len(tokens) == 2, f"Wrong numbers of arguments for `j` in line {i}"
+            assert len(tokens) == 2, f"Wrong numbers of arguments for `j` in line {line_labels[i]}"
             output.append(["jal", "zero", tokens[1]])
+            output_line_labels.append(line_labels[i])
         elif instr == "jr":
-            assert len(tokens) == 2, f"Wrong numbers of arguments for `jr` in line {i}"
+            assert len(tokens) == 2, f"Wrong numbers of arguments for `jr` in line {line_labels[i]}"
             output.append(["jalr", "zero", f"0({tokens[1]})"])
+            output_line_labels.append(line_labels[i])
         elif instr == "nop":
-            assert len(tokens) == 1, f"Wrong numbers of arguments for `nop` in line {i}"
+            assert len(tokens) == 1, f"Wrong numbers of arguments for `nop` in line {line_labels[i]}"
             output.append(["addi", "zero", "zero", "0"])
+            output_line_labels.append(line_labels[i])
         elif instr == "la":
-            assert len(tokens) == 3, f"Wrong numbers of arguments for `la` in line {i}"
+            assert len(tokens) == 3, f"Wrong numbers of arguments for `la` in line {line_labels[i]}"
             # always split up in 2 instructions, but don't replace it yet, since the label has to be defined later
             output.append(["la", tokens[1], tokens[2]])
             output.append(["nop"])
+            output_line_labels.append(line_labels[i])
+            output_line_labels.append(line_labels[i])
         elif instr == "call":
-            assert len(tokens) == 2, f"Wrong numbers of arguments for `call` in line {i}"
+            assert len(tokens) == 2, f"Wrong numbers of arguments for `call` in line {line_labels[i]}"
             output.append(["jal", "ra", tokens[1]])
+            output_line_labels.append(line_labels[i])
         elif instr == "ret":
-            assert len(tokens) == 1, f"Wrong numbers of arguments for `ret` in line {i}"
+            assert len(tokens) == 1, f"Wrong numbers of arguments for `ret` in line {line_labels[i]}"
             output.append(["jalr", "zero", "0(ra)"])
+            output_line_labels.append(line_labels[i])
         elif instr == "push":
-            assert len(tokens) == 2, f"Wrong numbers of arguments for `push` in line {i}"
+            assert len(tokens) == 2, f"Wrong numbers of arguments for `push` in line {line_labels[i]}"
             output.append(["addi", "sp", "sp", "-1"])
             output.append(["sw", tokens[1], "0(sp)"])
+            output_line_labels.append(line_labels[i])
+            output_line_labels.append(line_labels[i])
         elif instr == "pop":
-            assert len(tokens) == 2, f"Wrong numbers of arguments for `pop` in line {i}"
+            assert len(tokens) == 2, f"Wrong numbers of arguments for `pop` in line {line_labels[i]}"
             output.append(["lw", tokens[1], "0(sp)"])
             output.append(["addi", "sp", "sp", "1"])
+            output_line_labels.append(line_labels[i])
+            output_line_labels.append(line_labels[i])
         # implement more if needed
         else:
             # no pseudo instruction
             output.append(tokens)
-    return output
+            output_line_labels.append(line_labels[i])
+    return output, output_line_labels
 
 
-def collect_labels(code, data):
-    def add_label(label):
+def collect_labels(code, data, code_line_labels, data_line_labels):
+    def add_label(label, line_labels):
         if not label.isnumeric():
             # only enforce unique labels for "real" labels, not just number labels
-            assert label not in labels, f"label `{label}` defined multiple times"
-        assert i != len(code) - 1, f"Label `{label}` set at end of file defining no address"
-        assert label not in instruction_key_words, f"Label `{label}` in line {i} is an instruction key word"
-        assert label not in assembler_directives, f"Label `{label}` in line {i} is an assembler directive"
-        assert label not in reg_key_words, f"Label `{label}` in line {i} is a register key word"
+            assert label not in labels, f"label `{label}` in line {line_labels[i]} defined multiple times"
+        assert i != len(code) - 1, f"Label `{label}` in line {line_labels[i]} set at end of file defining no address"
+        assert label not in instruction_key_words, f"Label `{label}` in line {line_labels[i]} is an instruction key word"
+        assert label not in assembler_directives, f"Label `{label}` in line {line_labels[i]} is an assembler directive"
+        assert label not in reg_key_words, f"Label `{label}` in line {line_labels[i]} is a register key word"
         labels[label].append(address)
         # don't output the label line
     labels = defaultdict(lambda: [])
     output_code = []
+    output_code_line_labels = []
     address = 0
     for i, tokens in enumerate(code):
         if tokens[0].endswith(":"):
             label = tokens[0][:-1]
-            add_label(label)
+            add_label(label, code_line_labels)
         else:
             output_code.append(tokens)
+            output_code_line_labels.append(code_line_labels[i])
             address += 1
     output_data = []
+    output_data_line_labels = []
     for i, tokens in enumerate(data):
         if tokens[0].endswith(":"):
             label = tokens[0][:-1]
             assert not label.isnumeric(), f"Line {i}: Label `{label}` in Data section cannot be numeric."
-            add_label(label)
+            add_label(label, data_line_labels)
         else:
             output_data.append(tokens)
+            output_data_line_labels.append(data_line_labels[i])
             address += 1
-    return labels, output_code, output_data
+    return labels, output_code, output_data, output_code_line_labels, output_data_line_labels
 
 
-def replace_labels(code, labels):
+def replace_labels(code, labels, code_line_labels):
     address = 0
     for i, tokens in enumerate(code):
         if tokens[0] in branch_instructions and tokens[0] != "jalr":
@@ -338,11 +368,11 @@ def replace_labels(code, labels):
                 ref_label, indicator = ref_label[:-1], ref_label[-1]
             else:
                 indicator = None
-            assert ref_label in labels, f"Label `{ref_label}` referenced in line {i}, but not defined in code."
+            assert ref_label in labels, f"Label `{ref_label}` referenced in line {code_line_labels[i]}, but not defined in code."
 
             ref_abs_addresses = labels[ref_label]
             if indicator is None:
-                assert len(ref_abs_addresses) == 1, "Problem with Label collecting, this case should never happen."
+                assert len(ref_abs_addresses) == 1, f"Problem with Label collecting in line {code_line_labels[i]}, this case should never happen."
                 ref_abs_address = ref_abs_addresses[0]
             else:
                 if indicator == "b":
@@ -352,7 +382,7 @@ def replace_labels(code, labels):
                             # reached addresses which are too big
                             break
                         ref_abs_address = ref_candidate # choose the last valid candidate as address
-                    assert ref_abs_address is not None, f"No backward label found for reference {ref_label}b in line {i}"
+                    assert ref_abs_address is not None, f"No backward label found for reference {ref_label}b in line {code_line_labels[i]}"
                 elif indicator == "f":
                     ref_abs_address = None
                     for ref_candidate in ref_abs_addresses[::-1]:
@@ -360,24 +390,24 @@ def replace_labels(code, labels):
                             # reached addresses which are too small
                             break
                         ref_abs_address = ref_candidate  # choose the last valid candidate as address
-                    assert ref_abs_address is not None, f"No forward label found for reference {ref_label}f in line {i}"
+                    assert ref_abs_address is not None, f"No forward label found for reference {ref_label}f in line {code_line_labels[i]}"
                 else:
                     raise AssertionError("Problem with Label collecting, this case should never happen.")
 
             ref_rel_address = ref_abs_address - address
             if tokens[0] == "jal":
                 # maximum range for signed 20 bit immediate:
-                assert -2**19 <= ref_rel_address < 2**19
+                assert -2**19 <= ref_rel_address < 2**19, f"Relative address {ref_rel_address} for label `{ref_label}` in line {code_line_labels[i]} out of range for `jal` instruction."
             else:
                 # maximum range for signed 12 bit immediate:
-                assert -2**11 <= ref_rel_address < 2**11
+                assert -2**11 <= ref_rel_address < 2**11, f"Relative address {ref_rel_address} for label `{ref_label}` in line {code_line_labels[i]} out of range for `{tokens[0]}` instruction."
             tokens[-1] = str(ref_rel_address)
         elif tokens[0] == "la":
             # Replace with
             # auipc rd, %pcrel_hi(label)  # Load upper 20 bits (relative to PC)
             # addi  rd, rd, %pcrel_lo(label)  # Load lower 12 bits
             ref_label = tokens[-1]
-            assert ref_label in labels, f"Label `{ref_label}` referenced in line {i}, but not defined in code."
+            assert ref_label in labels, f"Label `{ref_label}` referenced in line {code_line_labels[i]}, but not defined in code."
             ref_abs_addresses = labels[ref_label]
             assert len(ref_abs_addresses) == 1, "Problem with Label collecting, this case should never happen."
             ref_abs_address = ref_abs_addresses[0]
@@ -385,12 +415,12 @@ def replace_labels(code, labels):
             _, higher, lower = split_up_imm(ref_rel_address)
             tokens[0] = "auipc"
             tokens[-1] = str(higher)
-            assert code[i+1] == ["nop"], f"Problems decoding `la` instruction in line {i}"
+            assert code[i+1] == ["nop"], f"Problems decoding `la` instruction in line {code_line_labels[i]}"
             code[i+1] = ["addi", tokens[1], tokens[1], str(lower)]
         address += 1
     return code
 
-def replace_instructions(code):
+def replace_instructions(code, code_line_labels):
     def get_reg_number(reg_name):
         if reg_name in riscv_reg_translator:
             reg_name = riscv_reg_translator[reg_name]
@@ -398,17 +428,17 @@ def replace_instructions(code):
         try:
             reg_number = int(reg_name[1:])
         except ValueError:
-            raise AssertionError(f"Invalid reg name `{reg_name}` in line {i}")
-        assert 0 <= reg_number <= 31, f"Invalid reg name `{reg_name}` in line {i}"
+            raise AssertionError(f"Invalid reg name `{reg_name}` in line {code_line_labels[i]}")
+        assert 0 <= reg_number <= 31, f"Invalid reg name `{reg_name}` in line {code_line_labels[i]}"
         return reg_number
 
     def get_reg_imm_from_combined_token(combined_token):
-        assert "(" in combined_token, f"sw/lw requires combined `<offset>(<rs2>)` as last argument, but got `{combined_token}` in line {i}"
+        assert "(" in combined_token, f"sw/lw requires combined `<offset>(<rs2>)` as last argument, but got `{combined_token}` in line {code_line_labels[i]}"
         assert ")" == combined_token[
-            -1], f"sw/lw requires combined `<offset>(<rs2>)` as last argument, but got `{combined_token}` in line {i}"
+            -1], f"sw/lw requires combined `<offset>(<rs2>)` as last argument, but got `{combined_token}` in line {code_line_labels[i]}"
         split_token = combined_token[:-1].split("(")
         assert len(
-            split_token) == 2, f"sw requires combined `<offset>(<rs2>)` as last argument, but got `{combined_token}` in line {i}"
+            split_token) == 2, f"sw requires combined `<offset>(<rs2>)` as last argument, but got `{combined_token}` in line {code_line_labels[i]}"
         imm = get_imm(split_token[0])
         reg = get_reg_number(split_token[1])
         return imm, reg
@@ -417,18 +447,19 @@ def replace_instructions(code):
         try:
             imm = int(token)
         except ValueError:
-            raise AssertionError(f"Invalid immediate value `{token}` in line {i}")
+            raise AssertionError(f"Invalid immediate value `{token}` in line {code_line_labels[i]}")
         if check_small_range:
-            assert -2048 <= imm <= 2047, f"Immediate value {imm} in line {i} must be between -2048 and 2047"
+            assert -2048 <= imm <= 2047, f"Immediate value {imm} in line {code_line_labels[i]} must be between -2048 and 2047"
         return imm
 
     output = []
+    output_code_line_labels = []
     for i, tokens in enumerate(code):
         instr = tokens[0]
-        assert instr in instruction_translator, f"Invalid instruction `{instr}` in line {i}"
+        assert instr in instruction_translator, f"Invalid instruction `{instr}` in line {code_line_labels[i]}"
         opcode, add_opcode = instruction_translator[instr]
         if opcode < 20 and add_opcode == 1:
-            assert len(tokens) == 4, f"Invalid number of arguments for instruction `{instr}` in line {i}"
+            assert len(tokens) == 4, f"Invalid number of arguments for instruction `{instr}` in line {code_line_labels[i]}"
             # reg-imm alu op
             machine_code = {
                 "opcode": opcode,
@@ -439,7 +470,7 @@ def replace_instructions(code):
                 "imm": get_imm(tokens[3]),
             }
         elif opcode < 20 and add_opcode == 2:
-            assert len(tokens) == 4, f"Invalid number of arguments for instruction `{instr}` in line {i}"
+            assert len(tokens) == 4, f"Invalid number of arguments for instruction `{instr}` in line {code_line_labels[i]}"
             # reg-reg alu op
             machine_code = {
                 "opcode": opcode,
@@ -450,7 +481,7 @@ def replace_instructions(code):
                 "imm": None,
             }
         elif 20 <= opcode <= 22:
-            assert len(tokens) == 3, f"Invalid number of arguments for instruction `{instr}` in line {i}"
+            assert len(tokens) == 3, f"Invalid number of arguments for instruction `{instr}` in line {code_line_labels[i]}"
             machine_code = {
                 "opcode": opcode,
                 "rd": get_reg_number(tokens[1]),
@@ -461,7 +492,7 @@ def replace_instructions(code):
             }
         elif  opcode == 23:
             # jalr rd, imm(rs1)
-            assert len(tokens) == 3, f"Invalid number of arguments for instruction `{instr}` in line {i}"
+            assert len(tokens) == 3, f"Invalid number of arguments for instruction `{instr}` in line {code_line_labels[i]}"
             imm, reg = get_reg_imm_from_combined_token(tokens[2])
             machine_code = {
                 "opcode": opcode,
@@ -473,7 +504,7 @@ def replace_instructions(code):
             }
         elif opcode == 24:
             # lw rd, imm(rs1)
-            assert len(tokens) == 3, f"Invalid number of arguments for instruction `{instr}` in line {i}"
+            assert len(tokens) == 3, f"Invalid number of arguments for instruction `{instr}` in line {code_line_labels[i]}"
             combined_token = tokens[2]
             imm, reg = get_reg_imm_from_combined_token(combined_token)
             machine_code = {
@@ -486,7 +517,7 @@ def replace_instructions(code):
             }
         elif opcode == 25:
             # sw rs2, imm(rs1)
-            assert len(tokens) == 3, f"Invalid number of arguments for instruction `{instr}` in line {i}"
+            assert len(tokens) == 3, f"Invalid number of arguments for instruction `{instr}` in line {code_line_labels[i]}"
             combined_token = tokens[2]
             imm, reg = get_reg_imm_from_combined_token(combined_token)
             machine_code = {
@@ -499,7 +530,7 @@ def replace_instructions(code):
             }
         elif opcode == 26:
             # all branches
-            assert len(tokens) == 4, f"Invalid number of arguments for instruction `{instr}` in line {i}"
+            assert len(tokens) == 4, f"Invalid number of arguments for instruction `{instr}` in line {code_line_labels[i]}"
             machine_code = {
                 "opcode": opcode,
                 "rd": None,
@@ -509,7 +540,7 @@ def replace_instructions(code):
                 "imm": get_imm(tokens[3]),
             }
         elif opcode == 27:
-            assert len(tokens) == 1, f"Invalid number of arguments for instruction `{instr}` in line {i}"
+            assert len(tokens) == 1, f"Invalid number of arguments for instruction `{instr}` in line {code_line_labels[i]}"
             # set reg and imm since it is handled internally as U instruction
             machine_code = {
                 "opcode": opcode,
@@ -520,7 +551,7 @@ def replace_instructions(code):
                 "imm": 0,
             }
         elif opcode == 28:
-            assert len(tokens) == 1,  f"Invalid number of arguments for instruction `{instr}` in line {i}"
+            assert len(tokens) == 1,  f"Invalid number of arguments for instruction `{instr}` in line {code_line_labels[i]}"
             # set reg and imm since it is handled internally as U instruction
             machine_code = {
                 "opcode": opcode,
@@ -531,7 +562,7 @@ def replace_instructions(code):
                 "imm": 0,
             }
         elif opcode == 30:
-            assert len(tokens) == 1,  f"Invalid number of arguments for instruction `{instr}` in line {i}"
+            assert len(tokens) == 1,  f"Invalid number of arguments for instruction `{instr}` in line {code_line_labels[i]}"
             # set reg and imm since it is handled internally as U instruction
             machine_code = {
                 "opcode": opcode,
@@ -542,18 +573,21 @@ def replace_instructions(code):
                 "imm": 0,
             }
         else:
-            raise AssertionError(f"Instruction {instr} invalid in line {i}")
+            raise AssertionError(f"Instruction {instr} invalid in line {code_line_labels[i]}")
         output.append(machine_code)
+        output_code_line_labels.append(code_line_labels[i])
 
-    return output
+    return output, output_code_line_labels
 
 
-def compute_data_values(data):
+def compute_data_values(data, line_labels):
     output_data = []
+    output_line_labels = []
     for i, tokens in enumerate(data):
         if tokens[0].endswith(":"):
             # label
             output_data.append(tokens)
+            output_line_labels.append(line_labels[i])
             continue
         directive = tokens[0]
         values = tokens[1:]
@@ -564,15 +598,16 @@ def compute_data_values(data):
                 try:
                     word = int(word)
                 except ValueError:
-                    raise AssertionError(f"Word `{word}` in line {i} of the data segment not an integer")
-                assert -2**31 <= word < 2**31, f"Word `{word}` in line {i} of the data segment bigger than 32 bits"
+                    raise AssertionError(f"Word `{word}` in line {line_labels[i]} of the data segment not an integer")
+                assert -2**31 <= word < 2**31, f"Word `{word}` in line {line_labels[i]} of the data segment bigger than 32 bits"
                 # each word is a new line
                 output_data.append([str(word)])
+                output_line_labels.append(line_labels[i])
         elif directive == ".asciz" or directive == ".ascii":
             # string with one character per word, with 0 as end
             for string in values:
                 # remove " " from the string
-                assert string[0] == string[-1] == '"' or string[0] == string[-1] == "'", f"String `{string}` in line {i} of the data segment needs to be enclosed by quotation marks."
+                assert string[0] == string[-1] == '"' or string[0] == string[-1] == "'", f"String `{string}` in line {line_labels[i]} of the data segment needs to be enclosed by quotation marks."
                 string = string[1:-1]
                 idx = 0
                 while idx < len(string):
@@ -580,16 +615,19 @@ def compute_data_values(data):
                     if char == "\\":
                         if string[idx:idx +2] == "\\n":
                             output_data.append(["10"])
+                            output_line_labels.append(line_labels[i])
                         else:
-                            raise AssertionError(f"Invalid Escape Sequence in line {i} of the data segment.")
+                            raise AssertionError(f"Invalid Escape Sequence in line {line_labels[i]} of the data segment.")
                         idx += 2
                         continue
                     output_data.append([str(ord(char))])
+                    output_line_labels.append(line_labels[i])
                     idx += 1
                 if directive == ".asciz":
                     # add zero as last
                     output_data.append(["0"])
+                    output_line_labels.append(line_labels[i])
         elif directive == ".ascic":
             # compressed string with 4 character per word, also with 0 as final (or multiple finals to fill the remaining word)
             raise NotImplementedError("ascic not implemented")
-    return output_data
+    return output_data, output_line_labels
