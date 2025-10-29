@@ -56,7 +56,8 @@ main:
     lw sp, 1025(zero) # load OS sp
     1:
 
-	li t1, 34  # last valid ECALL code
+    # TODO: adapt to the final ecall limit
+	li t1, 50  # last valid ECALL code
 	# check for valid ECALL code
 	bgt a7, t1, invalid_input
 	blt a7, zero, invalid_input
@@ -176,6 +177,7 @@ jump_table:
 	jal zero, int_to_str #32
 	jal zero, set_cursor_to_next_line # 33
 	jal zero, msb # 34
+	jal zero, fs_abs_seek  # 35
 	
 invalid_input:
 	# TODO
@@ -768,35 +770,124 @@ msb:
 	1:
     mv a0, a1          # return msb in a0
     ret
-	
-#msb2:
-	#li t0, -1
-	#beqz a0, 1f
-	#li t0, 0
-	#li t1, 2
-	#blt a0, t1, 1f
-	#li t0, 1
-	#li t1, 4
-	#blt a0, t1, 1f
-	#li t0, 2
-	#li t1, 8
-	#blt a0, t1, 1f
-	#li t0, 3
-	#li t1, 16
-	#blt a0, t1, 1f
-	#li t0, 4
-	#li t1, 32
-	#blt a0, t1, 1f
-	#li t0, 5
-	#li t1, 64
-	#blt a0, t1, 1f
-	#li t0, 1
-	#li t1, 4
-	#blt a0, t1, 1f
-	#1:
-	#mv a0, t0
-	#ret
-	
+
+# file system absolute seek (a0: absolute file path)
+# returns a0: block index of file start, -1 if not found
+#         a1: block index of parent directory of target file
+fs_abs_seek:
+    push ra
+    # debug test:
+    li a1, 7
+    call str_to_file_name
+    halt
+
+    pop ra
+    ret
+
+
+# Helper functions for file system operations
+
+# next_chunk (a0: start pointer address of string)
+next_chunk:
+    # Find the next "/" or end of string (0x00), store the length on the way
+	# if length is 0 (e.g. start_pointer points at 0x00):
+	# 	return a0 = 0
+	# Ensure that length <= 8, else return a0 = -1
+	# call str_to_file_name with the length, results in a0, a1 be the content of the string
+	# return a0, a1
+
+	ret
+
+# str_to_file_name (a0: start pointer address of string, a1: length of string)
+str_to_file_name:
+    # it is already checked that a1 <= 8
+	# t0 = t1 = 0x00000000
+	# counter = 0
+	# if length >= 4:
+	# 	push 4x data value into t0 (that means: shl by a byte, or the current byte)
+	#	push length - 4 x data value into t1, push 8 - length x 0x00 into t1
+	# else:
+	#	push length x data value into t0, push 4 - length x 0x00 into t0
+	# mv a0, t0; mv a1, t1
+	# return a0, a1
+
+	li t0, 0
+	li t1, 0
+	li t3, 4
+
+	blt a1, t3, 1f
+	# length >= 4
+
+	# fill in the first 4 bytes
+	lw t4, 0(a0)
+	lw t5, 1(a0)
+	# byte mask
+	andi t4, t4, 255
+	andi t5, t5, 255
+	# push into t0
+	sll t0, t0, 8
+	or t0, t0, t4
+	sll t0, t0, 8
+	or t0, t0, t5
+	# do the same again
+	lw t4, 2(a0)
+	lw t5, 3(a0)
+	# byte mask
+	andi t4, t4, 255
+	andi t5, t5, 255
+	# push into t0
+	sll t0, t0, 8
+	or t0, t0, t4
+	sll t0, t0, 8
+	or t0, t0, t5
+
+    # fill the remaining ones
+    li t2, 4  # counter
+    3:
+    beq a1, t2, 2f
+      add t5, a0, t2 # address of next byte
+      lw t4, 0(t5)
+      # increment counter here to solve mem dependency
+      inc t2
+      andi t4, t4, 255
+      sll t1, t1, 8
+      or t1, t1, t4
+      j 3b
+    2:
+    # shift bytes to the left to fill up to 8 bytes
+    # num remaining bytes is 8 - length
+    li t2, 8
+    sub t2, t2, a1
+    muli t2, t2, 8
+    sll t1, t1, t2
+    j 4f
+
+	1:
+    # length < 4
+    li t2, 0  # counter
+    3:
+    beq a1, t2, 2f
+      add t5, a0, t2 # address of next byte
+      lw t4, 0(t5)
+      # increment counter here to solve mem dependency
+      inc t2
+      andi t4, t4, 255
+      sll t0, t0, 8
+      or t0, t0, t4
+      j 3b
+    2:
+    # shift bytes to the left to fill up to 4 bytes
+    # num remaining bytes is 4 - length
+    li t2, 4
+    sub t2, t2, a1
+    muli t2, t2, 8
+    sll t0, t0, t2
+    4:
+    mv a0, t0
+    mv a1, t1
+    ret
+
+
 .data
 
 

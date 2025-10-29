@@ -65,6 +65,10 @@ boot:
 	li a1, 256      # block size
 	li a2, 64       # number of blocks
 	call fs_init
+	# load a debug string
+	la a0, debug_path
+	li a7, 35 # fs_abs_seek
+	ecall
 	nop
 	nop
 	nop
@@ -149,5 +153,6 @@ fs_init:
 	
 .data
 	welcome: .asciz "FactOS 1.0.0\n"
+	debug_path: .asciz "ABC.TXT"
 
 	
