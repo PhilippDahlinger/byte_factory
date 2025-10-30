@@ -776,11 +776,50 @@ msb:
 #         a1: block index of parent directory of target file
 fs_abs_seek:
     push ra
-    # debug test:
-    li a1, 7
-    call str_to_file_name
-    halt
+    push s0  # block index of file
+    push s1  # block index of parent directory of target file
+    push s2  # last chunk is a dir flag
+    push s3  # super block address
+    push s4  # block size
 
+    # load super block address
+    lw s3, 1058(zero) # super block address
+    li s0, 1
+    li s1, 1
+    li s2, 1 # last chunk is dir flag
+    # load block size
+    lw s4, 2(s3) # block size
+    # root dir is at block 1
+
+    # parsing loop
+    1:
+    call next_chunk
+    # a0: end of current chunk, or -1 if error, or 0 if end of string
+    # a1/a2: file name
+    beqz a0, 4f  # end of string: done
+    # check if -1: if so return -1 as error
+    li t0, -1
+    beq a0, t0, 5f # error case
+    # if the code reaches this point: the last chunk has to be a dir, otherwise error
+    bnez s2, 1f
+    # error case
+    li a0, -1
+    j 5f
+    1:
+    # search for file in current dir (s0)
+
+
+
+
+    4:
+    # prepare outputs: todo
+    5:
+    # return
+    pop s4
+    pop s3
+    pop s2
+    pop s1
+    pop s0
     pop ra
     ret
 
@@ -789,14 +828,52 @@ fs_abs_seek:
 
 # next_chunk (a0: start pointer address of string)
 next_chunk:
-    # Find the next "/" or end of string (0x00), store the length on the way
-	# if length is 0 (e.g. start_pointer points at 0x00):
-	# 	return a0 = 0
-	# Ensure that length <= 8, else return a0 = -1
-	# call str_to_file_name with the length, results in a0, a1 be the content of the string
-	# return a0, a1
 
-	ret
+    # check valid first char
+    lw t0, 0(a0)
+    li t2, 47 # "/"
+    # check if t0 is 0x0
+    bnez t0, 1f
+    li a0, 0
+    ret
+    1:
+    # check if first char is "/"
+    beq t0, t2, 1f
+    li a0, -1
+    ret
+
+    # Find out length of name
+    1:
+    addi t0, a0, 1
+    li a1, a0  # length counter
+    1:
+    lw t1, 0(t0)
+    inc t0
+    beqz t1, 2f # end of string
+    beq t1, t2, 2f # found "/"
+    # add length 1
+    inc a1
+    j 1b
+    2:
+    # check if length == 0 or length > 8: error
+    li t3, 8
+    bne a1, zero, 3f
+    ble a1, t3, 3f
+    li a0, -1
+    ret
+    3:
+    # save current pos of cursor
+    subi t0, t0, 1
+    push t0
+
+    # call str_to_file_name
+    inc a0  # move to first char of name
+    push ra
+    call str_to_file_name
+    pop ra
+    pop a0 # return end of current chunk
+    ret
+
 
 # str_to_file_name (a0: start pointer address of string, a1: length of string)
 str_to_file_name:
@@ -808,8 +885,8 @@ str_to_file_name:
 	#	push length - 4 x data value into t1, push 8 - length x 0x00 into t1
 	# else:
 	#	push length x data value into t0, push 4 - length x 0x00 into t0
-	# mv a0, t0; mv a1, t1
-	# return a0, a1
+	# mv a1, t0; mv a2, t1
+	# return a1, a2
 
 	li t0, 0
 	li t1, 0
@@ -883,8 +960,8 @@ str_to_file_name:
     muli t2, t2, 8
     sll t0, t0, t2
     4:
-    mv a0, t0
-    mv a1, t1
+    mv a1, t0
+    mv a2, t1
     ret
 
 

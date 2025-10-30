@@ -144,6 +144,10 @@ fs_init:
     li t3, 1
     sw t3, 250(t0)   # parent dir index
 
+    # save start of superblock address in OS RAM
+    sw a0, 1058(zero) # fs base address save
+
+
     # done, first 2 blocks are initialized, return
     pop ra
     ret
@@ -153,6 +157,6 @@ fs_init:
 	
 .data
 	welcome: .asciz "FactOS 1.0.0\n"
-	debug_path: .asciz "ABC.TXT"
+	debug_path: .asciz "/HOME/DEBUG.T"
 
 	
