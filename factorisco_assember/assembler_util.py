@@ -424,7 +424,7 @@ def replace_instructions(code, code_line_labels):
     def get_reg_number(reg_name):
         if reg_name in riscv_reg_translator:
             reg_name = riscv_reg_translator[reg_name]
-        assert reg_name.startswith("x")
+        assert reg_name.startswith("x"), f"Invalid reg name `{reg_name}` in line {code_line_labels[i]}"
         try:
             reg_number = int(reg_name[1:])
         except ValueError:

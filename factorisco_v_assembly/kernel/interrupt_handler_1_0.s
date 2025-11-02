@@ -773,11 +773,11 @@ msb:
 
 # file system absolute seek (a0: absolute file path)
 # returns a0: block index of file start, -1 if not found
-#         a1: block index of parent directory of target file
+#         a1: address for directory entry of file. undefined if not found
 fs_abs_seek:
     push ra
     push s0  # block index of file
-    push s1  # block index of parent directory of target file
+    push s1  # address for directory entry of file. undefined if not found
     push s2  # last chunk is a dir flag
     push s3  # super block address / fs mount point
     push s4  # block size
@@ -785,7 +785,10 @@ fs_abs_seek:
     # load super block address
     lw s3, 1058(zero) # super block address
     li s0, 1
-    li s1, 1
+    # the root directory is a special dir. It is self referenced in its first directory entry. This allows to seek for "/" and get the same output as any other dir
+    # since we have a directory entry.
+    # it is the first directory entry -> mount address + 256
+    addi s1, s3, 256
     li s2, 1 # last chunk is dir flag
     # load block size
     lw s4, 2(s3) # block size
@@ -796,16 +799,16 @@ fs_abs_seek:
     call next_chunk
     # a0: end of current chunk, or -1 if error, or 0 if end of string
     # a1/a2: file name
-    beqz a0, 4f  # end of string: done
+    beqz a0, 4f  # end of string: Done seeking. prepare outputs and return
     # check if -1: if so return -1 as error
     li t0, -1
     beq a0, t0, 5f # error case
     # if the code reaches this point: the last chunk has to be a dir, otherwise error
-    bnez s2, 1f
+    bnez s2, 2f
     # error case
     li a0, -1
     j 5f
-    1:
+    2:
     # save current end of current chunk
     push a0
     # search for file in current dir
@@ -813,15 +816,34 @@ fs_abs_seek:
     mv a3, s3 # fs mount point
     mv a4, s4 # block size
     call find_file_in_dir
-
+    # a0: address of file directory entry, or -1 if not found
     # have to get the end of current chunk back
-    pop a0
+    pop t7  # store it somewhere for later reference
+    # check if not found
+    li t0, -1
+    beq a0, t0, 5f # error case
 
-
-
+    # Success: file found. do the update for the next loop
+    # update block indices
+    lw s0, 3(a0) # load block index of found file
+    mv s1, a0  # save address of found file directory entry
+    # check if new file is a directory (type == 2)
+    lw t0, 0(a0)
+    li t1, 2
+    beq t0, t1, 2f
+    # not a dir
+    li s2, 0
+    # don't need an else case, since s2 is always set to 1 if code reaches this point
+    2:
+    # restore end of current chunk
+    mv a0, t7
+    # next iteration
+    j 1b
 
     4:
-    # prepare outputs: todo
+    # success case:
+    mv a0, s0 # block index
+    mv a1, s1 # address of directory entry
     5:
     # return
     pop s4
@@ -870,6 +892,8 @@ find_file_in_dir:
     ret
 
 # next_chunk (a0: start pointer address of string)
+# returns: a0: end pointer address of current chunk, or 0 if end of string, or -1 if error
+#          a1/a2: file name in current chunk, already converted to file name format
 next_chunk:
 
     # check valid first char

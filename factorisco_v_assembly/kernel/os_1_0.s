@@ -140,8 +140,19 @@ fs_init:
     sw zero, 4(t1)
     bne t1, t0, 1b
 
-    # set parent directory index to self (1)
+    # the root directory is a special dir. It is self referenced in its first directory entry. This allows to seek for "/" and get the same output as any other dir
+    # -> Define the first directory entry as the root dir itself
+    li t3, 2
+    sw t3, 0(t0)    # type: directory (2)
+    # empty name ( TODO: revisit that)
+    sw zero, 1(t0) # name part 1
+    sw zero, 2(t0) # name part 2
+    # start block index: root dir is at block 1
     li t3, 1
+    sw t3, 3(t0)   # start block index
+    # size: undefined for directories, already initialized as 0
+
+    # set parent directory index to self (1)
     sw t3, 250(t0)   # parent dir index
 
     # save start of superblock address in OS RAM
