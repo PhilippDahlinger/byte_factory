@@ -92,24 +92,24 @@ fs_init:
     li t0, 1
     sw t0, 4(a0)      # fs_base + 4: root directory block index
 
-    # create free map. each bit represents a block (0=free, 1=used)
+    # create free map. each word represents a block (0=free, 1=used)
     # initially, block 0 is used for super block, block 1 contains the root directory
-    # hence, first two bits are set to 1, rest are 0.
-    li t1, 3 # first 32 bit word: 00000011
+    # hence, first two words are set to 1, rest are 0.
+    li t1, 1 # first block (super block) used
     sw t1, 5(a0)      # fs_base + 5: free map start
-    # find out how many words are needed for free map
-    addi t2, a2, -1  # num_blocks - 1, we use that to divide by 32 and add 1 to ensure that 1-32 -> 1 free map word, 33-64 -> 2 free map words, etc.
-    divi t2, t2, 32 # num_blocks // 32
-    # first block of free map already written, need t2 more words (1 extra since we round up)
-    addi t3, a0, 6  # pointer to free map area, one word after start
+    sw t1, 6(a0)      # fs_base + 6: second block (root dir) used
+    # remaining blocks are zero
+    # start address: 7(a0)
+    addi t0, a0, 7
+    # end address: t0 + (num_blocks - 2)
+    add t1, t0, a2
+    subi t1, t1, 2
+    0:
+    beq t0, t1, 1f
+    sw zero, 0(t0)
+    inc t0
+    j 0b
     1:
-    beqz t2, 2f
-    sw zero, 0(t3) # write 0 to free map word
-    dec t2
-    inc t3
-    j 1b
-    2:
-
     # super block initialized. Now initialize root directory block
 
     # structure of directory block: first 250 words are the directory entries. It consists of entries of 5 words each:
