@@ -888,7 +888,7 @@ next_chunk:
     # Find out length of name
     1:
     addi t0, a0, 1
-    li a1, a0  # length counter
+    li a1, 0  # length counter
     1:
     lw t1, 0(t0)
     inc t0
