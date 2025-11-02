@@ -779,7 +779,7 @@ fs_abs_seek:
     push s0  # block index of file
     push s1  # block index of parent directory of target file
     push s2  # last chunk is a dir flag
-    push s3  # super block address
+    push s3  # super block address / fs mount point
     push s4  # block size
 
     # load super block address
@@ -806,7 +806,16 @@ fs_abs_seek:
     li a0, -1
     j 5f
     1:
-    # search for file in current dir (s0)
+    # save current end of current chunk
+    push a0
+    # search for file in current dir
+    mv a0, s0 # current block index
+    mv a3, s3 # fs mount point
+    mv a4, s4 # block size
+    call find_file_in_dir
+
+    # have to get the end of current chunk back
+    pop a0
 
 
 
@@ -825,6 +834,40 @@ fs_abs_seek:
 
 
 # Helper functions for file system operations
+
+# find file in current dir (a0: current block index, a1/a2: file name, a3: fs mount point, a4: block size)
+# returns: address of file directory entry, or -1 if not found
+# Assumes that block a0 is actually a dir, and not a raw file!
+find_file_in_dir:
+    # get address of current dir block
+    # mount point + block size * block index
+    mul t0, a4, a0
+    add t0, t0, a3
+    li t2, 250 # max 50 * 5 = 250 entries per dir (one entry is 5 words)
+    add t2, t0, t2 # end address of dir block
+    1:
+    beq t0, t2, 3f # end of loop: file not found
+    # check if entry is empty, if so: continue
+    lw t3, 0(t0)
+    addi t0, t0, 5 # solve mem dependency
+    beqz t3, 1b
+    # load entry name
+    lw t3, 1(t0)
+    lw t4, 2(t0)
+    # compare with a1/a2, mismatch: continue
+    bne a1, t3, 1b
+    bne a2, t4, 1b
+
+
+    # if code reaches this, there was a match
+    # return address of entry: t0 - 5 since we added 5 earlier in the last loop execution
+    subi a0, t0, 5
+    ret
+
+    3:
+    # ERROR Case
+    li a0, -1
+    ret
 
 # next_chunk (a0: start pointer address of string)
 next_chunk:
