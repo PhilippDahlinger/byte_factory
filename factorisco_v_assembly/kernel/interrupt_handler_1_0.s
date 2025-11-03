@@ -179,6 +179,8 @@ jump_table:
 	jal zero, msb # 34
 	jal zero, len_str # 35
 	jal zero, fs_abs_seek  # 36
+	jal zero, fs_touch # 37
+	jal zero, fs_mkdir # 38
 	
 invalid_input:
 	# TODO
