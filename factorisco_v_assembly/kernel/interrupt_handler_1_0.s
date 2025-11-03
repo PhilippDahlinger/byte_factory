@@ -61,7 +61,7 @@ main:
 	# check for valid ECALL code
 	bgt a7, t1, invalid_input
 	blt a7, zero, invalid_input
-	
+
 	la t0, jump_table  
 	add a7, a7, t0
 	# execute ECALL
@@ -177,7 +177,8 @@ jump_table:
 	jal zero, int_to_str #32
 	jal zero, set_cursor_to_next_line # 33
 	jal zero, msb # 34
-	jal zero, fs_abs_seek  # 35
+	jal zero, len_str # 35
+	jal zero, fs_abs_seek  # 36
 	
 invalid_input:
 	# TODO
@@ -874,6 +875,7 @@ fs_abs_seek:
 # fs_touch: create an empty non-directory file at absolute path
 # a0: absolute file path of parent directory
 # a1: uncompressed str of new file name
+# returns: a0: -1 if error, else address of file entry in parent dir
 fs_touch:
     # seek to parent directory
     push ra
@@ -886,6 +888,20 @@ fs_touch:
     ret
 
 
+# fs_mkdir: create an empty directory at absolute path
+# a0: absolute file path of parent directory
+# a1: uncompressed str of new directory name
+# returns: a0: -1 if error, else address of file entry in parent dir
+fs_mkdir:
+    # seek to parent directory
+    push ra
+    push a1  # save new file name
+    call fs_abs_seek
+    li a2, 2 # new file type = directory
+    pop a3  # new file name
+    call fs_create_file
+    pop ra
+    ret
 
 # Helper functions for file system operations
 
@@ -1094,7 +1110,6 @@ find_file_in_dir:
 # returns: a0: end pointer address of current chunk, or 0 if end of string, or -1 if error
 #          a1/a2: file name in current chunk, already converted to file name format
 next_chunk:
-
     # check valid first char
     lw t0, 0(a0)
     li t2, 47 # "/"
@@ -1142,6 +1157,7 @@ next_chunk:
 
 
 # str_to_file_name (a0: start pointer address of string, a1: length of string)
+# returns: a1/a2: compressed file name
 str_to_file_name:
     # it is already checked that a1 <= 8
 	# t0 = t1 = 0x00000000

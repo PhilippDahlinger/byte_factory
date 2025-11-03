@@ -1,8 +1,6 @@
 import json
 
-from bython_compiler.create_blueprint import blueprint_to_json, find_combinator, json_to_blueprint
-from scripts.display_generator import base_json
-from scripts.get_signal_dict import signal_dict
+from bython_compiler.create_blueprint import blueprint_to_json, json_to_blueprint
 
 
 def change_pmem_v1(base_json, x, y, code):

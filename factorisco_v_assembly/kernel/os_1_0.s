@@ -65,18 +65,15 @@ boot:
 	li a1, 256      # block size
 	li a2, 64       # number of blocks
 	call fs_init
+
+	# Debugging the file System: TODO: delete this block later
 	# load a debug string
 	la a0, debug_path
-	li a7, 35 # fs_abs_seek
+	li a7, 36 # fs_abs_seek
 	ecall
-	nop
-	nop
-	nop
-	nop
+
+	li s10, 8743
 	halt
-	nop
-	nop
-	nop
 
 
 # fs_init(a0=fs_base, a1=block_size, a2=num_blocks)
@@ -168,6 +165,7 @@ fs_init:
 	
 .data
 	welcome: .asciz "FactOS 1.0.0\n"
-	debug_path: .asciz "/HOME/DEBUG.T"
+	debug_path: .asciz "/"
+	debug_name: "BIN"
 
 	

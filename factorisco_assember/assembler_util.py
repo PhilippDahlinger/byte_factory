@@ -386,7 +386,7 @@ def replace_labels(code, labels, code_line_labels):
                 elif indicator == "f":
                     ref_abs_address = None
                     for ref_candidate in ref_abs_addresses[::-1]:
-                        if ref_candidate < address:
+                        if ref_candidate <= address:
                             # reached addresses which are too small
                             break
                         ref_abs_address = ref_candidate  # choose the last valid candidate as address

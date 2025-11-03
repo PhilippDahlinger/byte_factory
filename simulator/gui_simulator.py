@@ -225,7 +225,14 @@ class SimulatorGUI:
                 self.running = False
                 break
 
-            self.sim.execute(instruction)
+            try:
+                self.sim.execute(instruction)
+            except Exception as e:
+                # if anything goes wrong, update the display at least to see the last state correctly
+                self._refresh_display_only()
+                print(f"Error during execution at PC={self.sim.pc}: {e}")
+                raise e
+
             self.sim.pc += 1
             self.instr_counter += 1
 

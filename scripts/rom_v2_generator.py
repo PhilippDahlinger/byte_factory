@@ -31,7 +31,6 @@ def generate_output_filter_combinator():
     with open("output/items.txt", "r") as file:
         items = file.readlines()
         items = [x.strip() for x in items]
-    print("stop")
 
 
 def generate_item_list():
@@ -40,7 +39,6 @@ def generate_item_list():
     # save json
     with open("temp.json", "w") as file:
         json.dump(base_json, file, indent=4)
-    print("stop")
     output_list = base_json["blueprint"]["entities"][0]["control_behavior"]["decider_conditions"]["outputs"]
     output_list = [output["signal"]["name"] for output in output_list]
     print(output_list)
