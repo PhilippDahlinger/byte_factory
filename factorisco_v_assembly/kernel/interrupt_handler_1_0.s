@@ -771,6 +771,23 @@ msb:
     mv a0, a1          # return msb in a0
     ret
 
+
+# len_str(a0: start of str)
+# returns a0: start of str (same as input), a1: length of string
+len_str:
+    mv t7, a0 # save start of str
+    li a1, 0  # length counter
+    1:
+    lw t1, 0(a0)
+    inc a0
+    beqz t1, 2f # end of string
+    # add length 1
+    inc a1
+    j 1b
+    2:
+    mv a0, t7 # get original start of str back
+    ret
+
 # file system absolute seek (a0: absolute file path)
 # returns a0: block index of file start, -1 if not found
 #         a1: address for directory entry of file. undefined if not found
@@ -854,8 +871,190 @@ fs_abs_seek:
     pop ra
     ret
 
+# fs_touch: create an empty non-directory file at absolute path
+# a0: absolute file path of parent directory
+# a1: uncompressed str of new file name
+fs_touch:
+    # seek to parent directory
+    push ra
+    push a1  # save new file name
+    call fs_abs_seek
+    li a2, 1 # new file type = file
+    pop a3  # new file name
+    call fs_create_file
+    pop ra
+    ret
+
+
 
 # Helper functions for file system operations
+
+
+# fs_create_file
+# args: a0: block index of parent dir, a1: file entry of this parent dir (in parent of parent dir),
+# a2: type of new file (1 = file, 2 = dir), a3: uncompressed str of new file name
+# returns: a0: -1 if error, else address of file entry in parent dir
+fs_create_file:
+    # check for error
+    blt a0, zero, 1f
+    # a0: block index of parent dir, a1: file entry of this parent dir (in parent of parent dir)
+    # check if a0 is actually a dir
+    lw t0, 0(a1)
+    li t1, 2
+    bne t0, t1, 1f # error: not a dir
+    # check if file type is either 1 or 2
+    ble a2, zero, 1f # error: invalid type
+    bgt a2, t1, 1f # error: invalid type
+
+    # allocate a new file -> ask for a new block
+    push ra
+    push a0 # block index of parent dir
+    push a2 # type of new file
+    push a3 # uncompressed file name
+    call fs_request_new_block
+    blt a0, zero, 2f # error: could not allocate new block
+    # a0: block index of new block
+    push a0
+    # get filename string
+    lw a0, 1(sp) # load uncompressed file name
+    # compute length
+    call len_str  # -> a0 is unchanged, length of str is in a1
+    # check if 0 < length <= 8
+    ble a1, zero, 3f # error: length 0
+    li t0, 8
+    bgt a1, t0, 3f # error: length > 8
+    # get the actual filename string
+    call str_to_file_name
+    # a1/a2: compressed file name
+    pop t7 # block index of new block
+    addi sp, sp, 1 # jump over uncompressed file name, as it is already processed
+
+    # find address of parent dir
+    # load fs mount address
+    lw t0, 1058(zero) # fs mount address
+    pop t6 # type of new file (mem dep resolve)
+    # load block size
+    lw t1, 2(t0) # block size
+    pop t5 # block index of parent dir (mem dep resolve)
+    mul t1, t1, t5 # block size * block index of parent dir
+    # already precompute the address for the new file (only needed if a dir is created, but it makes sense to do it now since all the offsets are loaded)
+    mul t4, t1, t7 # block size * block index of new file
+    add t1, t0, t1 # address of parent dir block
+    add t4, t0, t4 # address of new file block
+
+    # find empty entry in parent dir
+    addi t0, t1, 250 # max 50 * 5 = 250 entries per dir (one entry is 5 words)
+    5:
+    beq t0, t1, 4f # error if no empty entry found
+    lw t2, 0(t1)
+    addi t1, t1, 5 # count up (solve mem dep)
+    beqz t2, 6f # empty entry found
+    j 5b
+    6:
+    subi t1, t1, 5 # undo one counting (faster like this for mem dep resolve)
+
+    # everything ready to create the file entry in the parent dir
+    sw t6, 0(t1)    # type of new file
+    sw a1, 1(t1)    # first part of name
+    sw a2, 2(t1)    # second part of name
+    sw t7, 3(t1)    # block index of new file
+    sw zero, 4(t1)  # size of new file = 0
+
+    push t1 # save address of new file entry for later cleanup
+
+    # create file entry table if new file is a directory
+    li t0, 2
+    bne t6, t0, 7f
+    # new file is a directory, address of new file block is in t4
+    addi t1, t4, 250 # address of the last directory entries to initialize + 5. Serves as counter variable
+    # initialize empty directory entries. Do-while Loop from back to front
+    li t3, -1  # start block index for unused file/directory entries
+    8:
+    subi t1, t1, 5
+    # type: unused
+    sw zero, 0(t1)
+    # name: empty string
+    sw zero, 1(t1)
+    sw zero, 2(t1)
+    # start block index: not occupied, so -1
+    sw t3, 3(t1)
+    # size: 0
+    sw zero, 4(t1)
+    bne t1, t4, 8b
+    # done creating new dir
+    7:
+    # cleanup and return: no error
+    pop a0  # file entry address of new file
+    pop ra
+    ret
+
+    3:
+    addi sp, sp, 1 # clean up stack
+    2:
+    addi sp, sp, 3  # clean up stack
+    4:
+    pop ra
+    1:
+    # error
+    li a0, -1
+    ret
+
+
+# Ask for a new block from the FS
+# returns: a0: block idx of new block, or -1 if error (e.g. full disk)
+fs_request_new_block:
+    # load fs mount address
+    lw t0, 1058(zero) # fs boot address
+    # find out how many blocks there are
+    lw t1, 3(t0) # total blocks
+    addi t0, t0, 5 # address of the first possible free word in the freemap
+    mv t7, t0  # store reference of first address to find the correct block
+    add t2, t0, t1 # end index of possible free block
+    # loop and find next free block
+    # do 2 blocks at a time for faster processing
+    1:
+    bgt t0, t2, 2f
+    lw t3, 0(t0)
+    lw t4, 1(t0)
+    beqz t3, 3f  # 0 = free block
+    beqz t4, 4f
+    addi t0, t0, 2
+    j 1b
+    2:
+    # error case
+    li a0, -1
+    ret
+    4:
+    # add 1 to t0 since we have an offset of 1 in the loop
+    inc t0
+    3:
+    # set this block to 1
+    li t3, 1
+    sw t3, 0(t0)
+    sub a0, t0, t7  # current address - start address = block index
+    ret
+
+
+# fs_free_block: given block idx in a0, mark it as free in the free table. do not need to delete any data in the block
+# returns: block idx if successful, -1 if block outside of range
+fs_free_block:
+    # load fs mount address
+    lw t0, 1058(zero) # fs boot address
+    # find out how many blocks there are
+    lw t1, 3(t0) # total blocks
+    bge a0, t1, 1f # error: block idx out of range
+    blt a0, zero, 1f # error: block idx out of range
+    add t0, t0, a0 # add block index
+    # set block to 0
+    sw zero, 5(t0) # free map starts 5 words after fs boot address
+    ret
+    1:
+    # error:
+    li a0, -1
+    ret
+
+
+# Seek helpers:
 
 # find file in current dir (a0: current block index, a1/a2: file name, a3: fs mount point, a4: block size)
 # returns: address of file directory entry, or -1 if not found
@@ -1031,6 +1230,7 @@ str_to_file_name:
     mv a2, t1
     ret
 
+# end seek helpers
 
 .data
 
