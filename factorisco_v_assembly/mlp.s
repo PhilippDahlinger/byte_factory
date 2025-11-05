@@ -1,8 +1,130 @@
 .text
 .globl _start
 _start:
+	# print input
+
+	#### First layer
+	li a0, 10 
+	li a7, 2
+	ecall # sbrk for 10 words to store result of first layer
+	mv s0, a0 # output address
+	
+	
+	
+	#### Second layer
+	# iterate over 10 neurons
+	li a0, 10 
+	li a7, 2
+	ecall # sbrk for 10 words to store result of second layer
+	mv s4, a0 # output address
+	
+	
+	
+	# find out maximum
+	# print output
+
 	li a7, 1
 	ecall
+	
+compute_layer:
+	# a0: layer weight address
+	# a1: layer bias address
+	# a2: input address
+	# a3: input size
+	# a4: output address
+	# a5: 0: no relu apply, 1: apply relu
+	
+	# a5 change it to 1: no relu apply, 0: relu apply
+	xori a5, a5, 1
+	
+	# create stack with old s1-s3 and a0-a4
+	addi sp, sp, -8
+	sw a0, 7(sp)
+	sw a1, 6(sp)
+	sw a2, 5(sp)
+	sw a3, 4(sp)
+	sw a4, 3(sp)
+	sw a5, 2(sp)
+	sw s1, 1(sp)
+	sw s2, 0(sp)
+	
+	
+	li s1, 0 # neuron counter
+	li s2, 10 # max neurons
+	# iterate over the 10 neurons
+	0:
+	beq s1, s2, 1f
+	# call compute neuron
+	# take weight set -> add by s1 * weight size
+	lw a3, 4(sp) # weight size
+	lw a0, 7(sp) # weight base address
+	lw a1, 6(sp) # bias base address
+	lw a2, 5(sp) # input address
+	mul t0, s1, a3
+	add a0, a0, t0 # correct weight address
+	add a1, a1, s1 # correct bias address
+	lw a1, 0(a1) # load bias
+	call compute_neuron # result is in a0
+		
+	lw a4, 3(sp) # load output address here for mem dependency resolve
+	
+	# activation function
+	lw a5, 2(sp)
+	bge a0, zero, 2f
+	mul a0, a0, a5 # if a5 is 0: apply relu, if a5 is 1: do nothing
+	2:
+	
+	# store result
+	add a4, a4, s1
+	sw a0, 0(a4)
+	
+	inc s1
+	j 0b
+	1:
+	
+	# pop stored values
+	lw s1, 1(sp)
+	lw s2, 0(sp)
+	addi sp, sp, 8
+	
+compute_neuron:
+	# a0: weight address
+	# a1: bias value (int)
+	# a2: input address
+	# a3: input size (int)
+	#returns value of neuron in a0
+	# computes \sum_{i=0,..a3 - 1} (a0)[i] * ((a2)[i] + a1
+	
+	# Implementation: assumes input size % 2 = 0
+	li t0, 0 # output sum
+	li t1, 0 # counter i
+	0:
+	beq t1, a3, 1f
+	# load weight i and i + 1
+	add t2, a0, t1
+	lw t3, 0(t2)
+	lw t4, 1(t2)
+	# load inputs i and i +1
+	add t2, a2, t1
+	lw t5, 0(t2)
+	lw t6, 1(t2)
+	# compute products and add to it
+	mul t2, t3, t5
+	add t0, t0, t2
+	mul t2, t4, t6
+	add t0, t0, t2
+	
+	# update counter
+	addi t1, t1, 2
+	j 0b
+	1:
+	# add bias and move output to a0
+	add a0, t0, a1
+	ret
+	
+	
+	
+
 	
 .data
 fc1.weight: .word -7, -82, 17, -48, 656, 865, 1096, -173, 78, -82, -68, -45, -5, -20, 484, 547, 192, -165, -90, -214, -154, 2334, -769, -21, -18, -728, -175, -11, 232, 125, 89, 94, 48, 50, 969, -58, 26, -413, -551, 234, 460, 533, 515, -102, -259, -14, 403, 370, -307, -46, 238, 648, 949, -124, -711, -818, -793, -430, 24, 58, 80, -52, 433, 254, -79, -324, 425, 255, 353, 350, -344, 1039, -66, 1012, -242, 206, 498, 664, 834, 333, 14, -411, -909, -828, -75, -125, -419, 21, 681, 877, 603, 32, -148, -483, 70, 62, -14, 14, -200, -358, -71, 332, 403, 71, 105, 28, 350, -3, -30, -917, -51, 235, -15, 194, 0, -128, -77, 608, 482, 43, 18, -1451, -650, -41, 128, 225, 296, 390, 868, 1852, -140, -6, 15, 1, -1352, -633, 1080, 150, 80, -485, -381, -336, -21, 57
