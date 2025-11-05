@@ -847,7 +847,7 @@ fs_abs_seek:
     call find_file_in_dir
     # a0: address of file directory entry, or -1 if not found
     # have to get the end of current chunk back
-    pop t7  # store it somewhere for later reference
+    pop t7  # store current end of chunk somewhere for later reference
     # check if not found
     li t0, -1
     beq a0, t0, 5f # error case
@@ -1094,14 +1094,30 @@ find_file_in_dir:
     li t2, 250 # max 50 * 5 = 250 entries per dir (one entry is 5 words)
     add t2, t0, t2 # end address of dir block
     1:
+	push a0
+	push a1
+	push a2
+	push t0
+	push t2
+	push ra
+	mv a0, t0
+	call print_int
+	call set_cursor_to_next_line
+	pop ra
+	pop t2
+	pop t0
+	pop a2
+	pop a1
+	pop a0
+	
     beq t0, t2, 3f # end of loop: file not found
     # check if entry is empty, if so: continue
     lw t3, 0(t0)
     addi t0, t0, 5 # solve mem dependency
     beqz t3, 1b
-    # load entry name
-    lw t3, 1(t0)
-    lw t4, 2(t0)
+    # load entry name, since we already added 5 -> have to subtract 5 (want 1/2 of old t0 -> -4, -3 of new one)
+    lw t3, -4(t0)
+    lw t4,-3(t0)
     # compare with a1/a2, mismatch: continue
     bne a1, t3, 1b
     bne a2, t4, 1b

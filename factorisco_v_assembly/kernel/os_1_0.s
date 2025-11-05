@@ -91,10 +91,10 @@ boot:
 	li a7, 38 # mkdir
 	ecall
 	# TODO: right now the file is created in the root directory. that should not happen
-	# la a0, debug_path_2
-	# la a1, debug_name_2
-	# li a7, 37 # create file
-	# ecall
+	la a0, debug_path_2
+	la a1, debug_name_2
+	li a7, 37 # create file
+	ecall
 
 
 	li s10, 8743

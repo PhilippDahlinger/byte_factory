@@ -36,7 +36,7 @@ display_controller:
     wrap: 14
   # other parameters
   width: 20
-  vis_height: 6
+  vis_height: 15
   total_height: 128
 
 color_display_controller:
