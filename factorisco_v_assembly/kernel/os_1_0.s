@@ -67,16 +67,34 @@ boot:
 	call fs_init
 
 	# Debugging the file System: TODO: delete this block later
-	# load a debug string
 	la a0, debug_path
+	li a7, 35 # len_str
+	ecall
+	
+	# request that much RAM (+1 since we want to save the 0x0 at the end of the string too)
+	addi a0, a1, 1
+	li a7, 2 # sbrk
+	ecall
+	la t0, debug_path
+	# copy string to Memory
+	push a0
+	1:
+	lw t1, 0(t0)
+	inc t0
+	sw t1, 0(a0)
+	inc a0
+	beqz t1, 2f # end of string
+	j 1b
+	2:
+	pop a0  # now a0 is the location of the string in RAM
 	la a1, debug_name
 	li a7, 38 # mkdir
 	ecall
 	# TODO: right now the file is created in the root directory. that should not happen
-	la a0, debug_path_2
-	la a1, debug_name_2
-	li a7, 37 # create file
-	ecall
+	# la a0, debug_path_2
+	# la a1, debug_name_2
+	# li a7, 37 # create file
+	# ecall
 
 
 	li s10, 8743

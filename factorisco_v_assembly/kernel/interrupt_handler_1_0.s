@@ -813,7 +813,16 @@ fs_abs_seek:
     # load block size
     lw s4, 2(s3) # block size
     # root dir is at block 1
-
+	
+	# eliminate last slash of the string
+	call len_str
+	add t0, a0, a1 # end of str
+	lw t1, -1(t0) # load last char
+	li t2, 47 # "/"
+	bne t1, t2, 1f # start parsing loop if last char is not a slash
+	# replace last char with 0x0
+	sw zero, -1(t0)
+	
     # parsing loop
     1:
     call next_chunk
@@ -1140,10 +1149,8 @@ next_chunk:
     2:
     # check if length == 0 or length > 8: error
     li t3, 8
-    bne a1, zero, 3f
-    ble a1, t3, 3f
-    li a0, -1
-    ret
+    beq a1, zero, 4f
+    bgt a1, t3, 4f
     3:
     # save current pos of cursor
     subi t0, t0, 1
@@ -1156,6 +1163,11 @@ next_chunk:
     pop ra
     pop a0 # return end of current chunk
     ret
+	
+	4:
+	# error
+	li a0, -1
+	ret
 
 
 # str_to_file_name (a0: start pointer address of string, a1: length of string)

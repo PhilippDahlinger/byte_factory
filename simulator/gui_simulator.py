@@ -64,9 +64,45 @@ class SimulatorGUI:
         frame = ttk.LabelFrame(self.root, text="Register Stack (x0–x31)")
         frame.pack(side="left", fill="y", padx=5, pady=5)
 
+        # RISC-V / FactoRISCo V ABI nicknames for registers
+        reg_names = [
+            "zero",  # x0
+            "ra",  # x1
+            "sp",  # x2
+            "gp",  # x3
+            "t7",  # x4
+            "t0",  # x5
+            "t1",  # x6
+            "t2",  # x7
+            "s0",  # x8
+            "s1",  # x9
+            "a0",  # x10
+            "a1",  # x11
+            "a2",  # x12
+            "a3",  # x13
+            "a4",  # x14
+            "a5",  # x15
+            "a6",  # x16
+            "a7",  # x17
+            "s2",  # x18
+            "s3",  # x19
+            "s4",  # x20
+            "s5",  # x21
+            "s6",  # x22
+            "s7",  # x23
+            "s8",  # x24
+            "s9",  # x25
+            "s10",  # x26
+            "s11",  # x27
+            "t3",  # x28
+            "t4",  # x29
+            "t5",  # x30
+            "t6",  # x31
+        ]
+
         self.reg_labels = []
-        for i in range(32):
-            lbl = ttk.Label(frame, text=f"x{i:02}: 0", width=15)
+        for i, name in enumerate(reg_names):
+            lbl = ttk.Label(frame, text=f"{name:>4} (x{i:02}): 0", width=18)
             lbl.pack(anchor="w", padx=4)
             self.reg_labels.append(lbl)
 
@@ -138,12 +174,19 @@ class SimulatorGUI:
 
         addr_frame = ttk.Frame(frame)
         addr_frame.pack(fill="x", pady=2)
+
         ttk.Label(addr_frame, text="Start Addr:").pack(side="left")
+
         self.addr_entry = ttk.Entry(addr_frame, width=10)
         self.addr_entry.pack(side="left", padx=5)
-        self.addr_entry.insert(0, "0")
+        self.addr_entry.insert(0, "66560")  # Default view starts at FS base address
 
-        ttk.Button(addr_frame, text="View", command=self.update_memory_view).pack(side="left")
+        # View + navigation buttons
+        ttk.Button(addr_frame, text="View", command=self.update_memory_view).pack(side="left", padx=(2, 2))
+        ttk.Button(addr_frame, text="<<", width=3, command=lambda: self._mem_jump(-256)).pack(side="left", padx=(2, 0))
+        ttk.Button(addr_frame, text="<", width=2, command=lambda: self._mem_jump(-32)).pack(side="left", padx=(2, 0))
+        ttk.Button(addr_frame, text=">", width=2, command=lambda: self._mem_jump(32)).pack(side="left", padx=(2, 0))
+        ttk.Button(addr_frame, text=">>", width=3, command=lambda: self._mem_jump(256)).pack(side="left", padx=(2, 5))
 
         self.mem_text = tk.Text(
             frame,
@@ -156,6 +199,20 @@ class SimulatorGUI:
         )
         self.mem_text.pack(fill="both", expand=True)
         self.mem_text.config(state="disabled")
+
+    def _mem_jump(self, delta):
+        """Move memory view by a signed delta (±32 or ±256 words)."""
+        try:
+            start_addr = int(self.addr_entry.get())
+        except ValueError:
+            start_addr = 0
+
+        new_addr = start_addr + delta
+        new_addr = max(0, min(len(self.sim.address_room) - 32, new_addr))
+
+        self.addr_entry.delete(0, tk.END)
+        self.addr_entry.insert(0, str(new_addr))
+        self.update_memory_view(auto=True)
 
     def _build_status(self):
         frame = ttk.Frame(self.root)
@@ -265,8 +322,19 @@ class SimulatorGUI:
         self.speed_label.config(text=f"Speed: {self.ips_value:,.0f} IPS")
 
         if full:
+            # RISC-V / FactoRISCo V register nicknames
+            reg_names = [
+                "zero", "ra", "sp", "t7", "tp", "t0", "t1", "t2",
+                "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
+                "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
+                "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6",
+            ]
+
             for i, lbl in enumerate(self.reg_labels):
-                lbl.config(text=f"x{i:02}: {self.sim.reg_stack[i]}")
+                lbl.config(
+                    text=f"{reg_names[i]:>4} (x{i:02}): {self.sim.reg_stack[i]}"
+                )
+
             self.update_memory_view(auto=True)
 
     def _refresh_display_only(self):
@@ -337,9 +405,17 @@ class SimulatorGUI:
             start_addr = int(self.addr_entry.get())
         except ValueError:
             start_addr = 0
+
         end_addr = start_addr + 32
         self.mem_text.config(state="normal")
         self.mem_text.delete("1.0", tk.END)
+
         for addr in range(start_addr, min(end_addr, len(self.sim.address_room))):
-            self.mem_text.insert(tk.END, f"{addr:06}: {self.sim.address_room[addr]}\n")
+            val = self.sim.address_room[addr]
+            # Format: decimal + hex (always ends with "x0" style per your request)
+            self.mem_text.insert(
+                tk.END,
+                f"{addr:06}: {val} / 0x{val:X}\n"
+            )
+
         self.mem_text.config(state="disabled")
