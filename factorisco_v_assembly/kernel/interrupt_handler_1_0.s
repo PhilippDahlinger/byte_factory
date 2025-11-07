@@ -105,6 +105,7 @@ main:
 	mret
 
 invalid_instruction_address_interrupt:
+	li s10, -1
     # TODO
     nop
     nop
@@ -117,11 +118,13 @@ invalid_instruction_address_interrupt:
     nop
 
 invalid_instruction_interrupt:
+	li s10, -2
     # TODO
     nop
     nop
     nop
     nop
+
     halt
     nop
     nop
@@ -130,6 +133,7 @@ invalid_instruction_interrupt:
 
 invalid_load_store_address_interrupt:
     # TODO
+	li s10, -3
     nop
     nop
     nop
@@ -932,29 +936,39 @@ fs_create_file:
     # check if file type is either 1 or 2
     ble a2, zero, 1f # error: invalid type
     bgt a2, t1, 1f # error: invalid type
-
-    # allocate a new file -> ask for a new block
-    push ra
-    push a0 # block index of parent dir
-    push a2 # type of new file
-    push a3 # uncompressed file name
-    call fs_request_new_block
-    blt a0, zero, 2f # error: could not allocate new block
-    # a0: block index of new block
-    push a0
-    # get filename string
-    lw a0, 1(sp) # load uncompressed file name
+	push ra
+	push a0 # block index of parent dir
+	push a2 # type
+	
+	# get filename string
+    mv a0, a3 # load uncompressed file name
     # compute length
     call len_str  # -> a0 is unchanged, length of str is in a1
     # check if 0 < length <= 8
-    ble a1, zero, 3f # error: length 0
+    ble a1, zero, 2f # error: length 0
     li t0, 8
-    bgt a1, t0, 3f # error: length > 8
+    bgt a1, t0, 2f # error: length > 8
     # get the actual filename string
     call str_to_file_name
     # a1/a2: compressed file name
-    pop t7 # block index of new block
-    addi sp, sp, 1 # jump over uncompressed file name, as it is already processed
+	push a1
+	push a2
+	
+	# check if the file name already exists in parent dir
+	# load fs mount address
+    lw a3, 1058(zero) # fs mount address
+	lw a0, 3(sp) # block index of parent dir
+	lw a4, 2(a3) # block size
+	call find_file_in_dir
+	# if a0 is now not -1: the file already exist -> throw error
+	bge a0, zero, 3f  # >= 0: file found
+	
+    # allocate a new file -> ask for a new block
+    call fs_request_new_block
+    blt a0, zero, 3f # error: could not allocate new block
+    # a0: block index of new block
+	pop a2
+	pop a1  # restore file name
 
     # find address of parent dir
     # load fs mount address
@@ -965,7 +979,7 @@ fs_create_file:
     pop t5 # block index of parent dir (mem dep resolve)
     mul t1, t1, t5 # block size * block index of parent dir
     # already precompute the address for the new file (only needed if a dir is created, but it makes sense to do it now since all the offsets are loaded)
-    mul t4, t1, t7 # block size * block index of new file
+    mul t4, t1, a0 # block size * block index of new file
     add t1, t0, t1 # address of parent dir block
     add t4, t0, t4 # address of new file block
 
@@ -984,7 +998,7 @@ fs_create_file:
     sw t6, 0(t1)    # type of new file
     sw a1, 1(t1)    # first part of name
     sw a2, 2(t1)    # second part of name
-    sw t7, 3(t1)    # block index of new file
+    sw a0, 3(t1)    # block index of new file
     sw zero, 4(t1)  # size of new file = 0
 
     push t1 # save address of new file entry for later cleanup
@@ -1016,9 +1030,9 @@ fs_create_file:
     ret
 
     3:
-    addi sp, sp, 1 # clean up stack
+    addi sp, sp, 2 # clean up stack
     2:
-    addi sp, sp, 3  # clean up stack
+    addi sp, sp, 2  # clean up stack
     4:
     pop ra
     1:
@@ -1093,23 +1107,7 @@ find_file_in_dir:
     add t0, t0, a3
     li t2, 250 # max 50 * 5 = 250 entries per dir (one entry is 5 words)
     add t2, t0, t2 # end address of dir block
-    1:
-	push a0
-	push a1
-	push a2
-	push t0
-	push t2
-	push ra
-	mv a0, t0
-	call print_int
-	call set_cursor_to_next_line
-	pop ra
-	pop t2
-	pop t0
-	pop a2
-	pop a1
-	pop a0
-	
+    1:	
     beq t0, t2, 3f # end of loop: file not found
     # check if entry is empty, if so: continue
     lw t3, 0(t0)
