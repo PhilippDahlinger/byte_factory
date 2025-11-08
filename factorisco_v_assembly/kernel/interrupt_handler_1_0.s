@@ -918,6 +918,141 @@ fs_mkdir:
     pop ra
     ret
 
+
+# fs_write_to_file: 
+# a0: uncompressed absolute path to file 
+# a1: Start address of data in RAM
+# a2: How many words to write
+# Returns:
+# a0: 0 if successful, -1 if error
+fs_write_to_file:
+	push s0 # address of current block
+	push s1 # link of current block  to next block
+	push s2 # RAM start Address
+	push s3 # number of words to write
+	push s4 # file system mount Address
+	push ra
+	# TODO: Check MPP. if prev mode was user: check that RAM start and end addresses are in user space, else raise error
+	mv s2, a1
+	mv s3, a2
+	lw s4, 1058(zero)
+	call fs_abs_seek
+	blt a0, zero, 1f # raise error 
+	# a0: block index of file start
+	# a1: address of dir entry of that file
+	# check if current file type is actually a file (not a dir or empty)
+	lw t0, 0(a1)
+	li t1, 1
+	bne t0, t1, 1f # if not file -> error
+	# write new length into dir entry
+	sw s3, 4(a1)
+	
+	# load file start address 
+	muli t0, a0, 256 # multiply with block size
+	add s0, s4, t0 # address of current block
+	lw s1, 255(s0)
+	# erase all links of file
+	2:
+	ble s1, zero, 3f # stop when link is -1. As safety measure: when block is 0 also stop (masterblock will never be linked)
+	mv a0, s1
+	# compute address of new block
+	muli t0, s1, 256
+	add t0, s4, t0
+	# load next link
+	lw s1, 255(t0)
+	# free block $a0
+	call fs_free_block
+	j 2b
+	3:
+	# now all blocks except the first one are freed
+	# set link of first block to -1
+	li t0, -1
+	lw t0, 255(s0)
+	
+	# start writing
+	4:
+	li t0, 255
+	ble s3, t0, 7f # less than 255 words to write -> fits in one block
+	# save the next 255 words, get a new link, connect and update regs
+	# do 15 words at a time for less loops -> less overhead
+	5:
+	beqz t0, 6f # use t0 as a counter
+	lw t1, 0(s2)
+	lw t2, 1(s2)
+	sw t1, 0(s0)
+	sw t2, 1(s0)
+	lw t1, 2(s2)
+	lw t2, 3(s2)
+	sw t1, 2(s0)
+	sw t2, 3(s0)
+	lw t1, 4(s2)
+	lw t2, 5(s2)
+	sw t1, 4(s0)
+	sw t2, 5(s0)
+	lw t1, 6(s2)
+	lw t2, 7(s2)
+	sw t1, 6(s0)
+	sw t2, 7(s0)
+	lw t1, 8(s2)
+	lw t2, 9(s2)
+	sw t1, 8(s0)
+	sw t2, 9(s0)
+	lw t1, 10(s2)
+	lw t2, 11(s2)
+	sw t1, 10(s0)
+	sw t2, 11(s0)
+	lw t1, 12(s2)
+	lw t2, 13(s2)
+	lw t3, 14(s2)
+	sw t1, 12(s0)
+	sw t2, 13(s0)
+	sw t3, 14(s0)
+	
+	subi t0, t0, 15
+	addi s0, s0, 15
+	addi s2, s2, 15
+	j 5b
+	6:
+	# get new link and update regs
+	# new remaining length is s3 - 255
+	subi s3, s3, 255
+	# ask for new block
+	call fs_request_new_block
+	# check for -1 -> disk full
+	blt a0, zero, 1f
+	# write that link index to last word of current block
+	# since s0 was updated by 255 over the loop -> correct address
+	sw a0, 0(s0)
+	# compute new address of block in s0
+	muli s0, a0, 256
+	add s0, s0, s4
+	j 4b # continue writing to disk
+	7:
+	# compute end address
+	add t0, s2, s3
+	8:
+	beq s2, t0, 0f #done
+	# lw of RAM, put it into file system storage
+	lw t1, 0(s2)
+	inc s2
+	sw t1, 0(s0)
+	inc s0
+	j 8b
+	0:
+	pop ra
+	pop s4
+	pop s3
+	pop s2
+	pop s1
+	pop s0
+	ret
+	
+	1:
+	# error case
+	li a0, -1
+	j 0b
+
+
 # Helper functions for file system operations
 
 
@@ -1022,6 +1157,9 @@ fs_create_file:
     # size: 0
     sw zero, 4(t1)
     bne t1, t4, 8b
+	
+	# set address 250: the parent dir block (stored in t5). used maybe at some point for cd command
+	sw t5, 250(t4)
     # done creating new dir
     7:
     # cleanup and return: no error
@@ -1073,6 +1211,16 @@ fs_request_new_block:
     li t3, 1
     sw t3, 0(t0)
     sub a0, t0, t7  # current address - start address = block index
+	# Go into the data of this new block and set its link to -1
+	# Newly requested blocks never have a link, and this initializes the link correctly
+	lw t0, 1058(zero) # fs boot address
+	addi t2, a0, 1  # go to end of that file
+	lw t1, 2(t0)
+	mul t1, t1, t2 
+	add t1, t1, t0
+	li t3, -1
+	sw t3, -1(t1)  # -1 as last word of the new allocated block
+	
     ret
 
 

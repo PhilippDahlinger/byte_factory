@@ -186,7 +186,7 @@ fs_init:
     # -> Define the first directory entry as the root dir itself
     li t3, 2
     sw t3, 0(t0)    # type: directory (2)
-    # empty name ( TODO: revisit that)
+    # empty name
     sw zero, 1(t0) # name part 1
     sw zero, 2(t0) # name part 2
     # start block index: root dir is at block 1
@@ -196,6 +196,9 @@ fs_init:
 
     # set parent directory index to self (1)
     sw t3, 250(t0)   # parent dir index
+	# set link of next block to -1 (dirs never link)
+	li t4, -1
+	sw t4, 255(t0)
 
     # save start of superblock address in OS RAM
     sw a0, 1058(zero) # fs base address save
