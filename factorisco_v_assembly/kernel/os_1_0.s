@@ -115,6 +115,18 @@ boot:
 	la a1, debug_name_2
 	li a7, 37 # create file
 	ecall
+	
+	# write content of interupt handler into that file
+	la a0, debug_path_3
+	li a1, 41000
+	li a2, 915 # len
+	li a7, 39
+	ecall
+	
+	# load content of that file into RAM
+	la a0, debug_path_3
+	li a7, 40
+	ecall
 
 
 	li s10, 8743
@@ -215,7 +227,8 @@ fs_init:
 	welcome: .asciz "FactOS 1.0.0\n"
 	debug_path: .asciz "/"
 	debug_name: .asciz "BIN"
-	debug_path_2: .asciz "/"
-	debug_name_2: .asciz "BIN"
+	debug_path_2: .asciz "/BIN"
+	debug_name_2: .asciz "INT1.b"
+	debug_path_3: .asciz "/BIN/INT1.b"
 
 	

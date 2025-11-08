@@ -17,37 +17,37 @@ main:
     # Handle ECALL: no need to jump since we are at the end of the table
 	# Save all registers which we modify here
 	# Use space 1026 -> 1056 for that (# todo: maybe find a better space / do a shadow swap in hardware)
-	sw x1, 1024(zero)
-	sw x2, 1025(zero)
-	sw x3, 1026(zero)
-	sw x4, 1027(zero)
-	sw x5, 1028(zero)
-	sw x6, 1029(zero)
-	sw x7, 1030(zero)
-	sw x8, 1031(zero)
-	sw x9, 1032(zero)
-	sw x10, 1033(zero)
-	sw x11, 1034(zero)
-	sw x12, 1035(zero)
-	sw x13, 1036(zero)
-	sw x14, 1037(zero)
-	sw x15, 1038(zero)
-	sw x16, 1039(zero)
-	sw x17, 1040(zero)
-	sw x18, 1041(zero)
-	sw x19, 1042(zero)
-	sw x20, 1043(zero)
-	sw x21, 1044(zero)
-	sw x22, 1045(zero)
-	sw x23, 1046(zero)
-	sw x24, 1047(zero)
-    sw x25, 1048(zero)
-    sw x26, 1049(zero)
-    sw x27, 1050(zero)
-    sw x28, 1051(zero)
-    sw x29, 1052(zero)
-    sw x30, 1053(zero)
-    sw x31, 1054(zero)
+	sw x1, 1026(zero)
+	sw x2, 1027(zero)
+	sw x3, 1028(zero)
+	sw x4, 1029(zero)
+	sw x5, 1030(zero)
+	sw x6, 1031(zero)
+	sw x7, 1032(zero)
+	sw x8, 1033(zero)
+	sw x9, 1034(zero)
+	sw x10, 1035(zero)
+	sw x11, 1036(zero)
+	sw x12, 1037(zero)
+	sw x13, 1038(zero)
+	sw x14, 1039(zero)
+	sw x15, 1040(zero)
+	sw x16, 1041(zero)
+	sw x17, 1042(zero)
+	sw x18, 1043(zero)
+	sw x19, 1044(zero)
+	sw x20, 1045(zero)
+	sw x21, 1046(zero)
+	sw x22, 1047(zero)
+	sw x23, 1048(zero)
+	sw x24, 1049(zero)
+    sw x25, 1050(zero)
+    sw x26, 1051(zero)
+    sw x27, 1052(zero)
+    sw x28, 1053(zero)
+    sw x29, 1054(zero)
+    sw x30, 1055(zero)
+    sw x31, 1056(zero)
 
     # check if MPP is user mode (00), if so: load OS sp, else: use existing sp, since we are already in OS mode
     lw t0, 21(zero) # load MPP
@@ -74,29 +74,29 @@ main:
 	lw x1, 1024(zero)
 	sw t0, 20(zero) # store back
 
-	lw x2, 1025(zero)
-	lw x3, 1026(zero)
-	lw x4, 1027(zero)
-	lw x5, 1028(zero)
-	lw x6, 1029(zero)
-	lw x7, 1030(zero)
-	lw x8, 1031(zero)
-	lw x9, 1032(zero)
+	lw x2, 1027(zero)
+	lw x3, 1028(zero)
+	lw x4, 1029(zero)
+	lw x5, 1030(zero)
+	lw x6, 1031(zero)
+	lw x7, 1032(zero)
+	lw x8, 1033(zero)
+	lw x9, 1034(zero)
 	# do not restore a0-a7, since we need them as an output of the ECALL
-	lw x18, 1041(zero)
-	lw x19, 1042(zero)
-	lw x20, 1043(zero)
-	lw x21, 1044(zero)
-	lw x22, 1045(zero)
-	lw x23, 1046(zero)
-	lw x24, 1047(zero)
-    lw x25, 1048(zero)
-    lw x26, 1049(zero)
-    lw x27, 1050(zero)
-    lw x28, 1051(zero)
-    lw x29, 1052(zero)
-    lw x30, 1053(zero)
-    lw x31, 1054(zero)
+	lw x18, 1043(zero)
+	lw x19, 1044(zero)
+	lw x20, 1045(zero)
+	lw x21, 1046(zero)
+	lw x22, 1047(zero)
+	lw x23, 1048(zero)
+	lw x24, 1049(zero)
+    lw x25, 1050(zero)
+    lw x26, 1051(zero)
+    lw x27, 1052(zero)
+    lw x28, 1053(zero)
+    lw x29, 1054(zero)
+    lw x30, 1055(zero)
+    lw x31, 1056(zero)
     # enable interrupts again (they were disabled by the ECALL)
     li t0, 1
     sw t0, 18(zero)
@@ -185,6 +185,8 @@ jump_table:
 	jal zero, fs_abs_seek  # 36
 	jal zero, fs_touch # 37
 	jal zero, fs_mkdir # 38
+	jal zero, fs_write_to_file # 39
+	jal zero, fs_load_file # 40
 	
 invalid_input:
 	# TODO
@@ -967,7 +969,7 @@ fs_write_to_file:
 	# now all blocks except the first one are freed
 	# set link of first block to -1
 	li t0, -1
-	lw t0, 255(s0)
+	sw t0, 255(s0)
 	
 	# start writing
 	4:
@@ -1039,6 +1041,8 @@ fs_write_to_file:
 	inc s0
 	j 8b
 	0:
+	# return 0 for Success
+	li a0, 0
 	pop ra
 	pop s4
 	pop s3
@@ -1052,6 +1056,122 @@ fs_write_to_file:
 	li a0, -1
 	j 0b
 
+
+# fs_load_file:
+# a0: uncompressed absolute path to file to load (has to be a file, not a dir)
+# returns:
+# a0: RAM address of loaded file (use sbrk of current mode to get the mem)
+# a1: Length of file in RAM
+fs_load_file:
+	push s0 # address of current block in file system
+	push s2 # address of RAM (where to write to)
+	push s3 # Length of remaining file to write
+	push s4 # FS mount address
+	push ra
+	# seek to file
+	call fs_abs_seek
+	# a0: block index of file, a1: address of dir entry
+	# check for error
+	blt a0, zero, 1f
+	# check if current file is not a dir
+	lw t0, 0(a1)
+	lw s4, 1058(zero) # mount point
+	li t1, 1 # correct file type
+	bne t0, t1, 1f # if not file -> error
+	lw s3, 4(a1) # load file length
+	# load address of current block in file system
+	muli s0, a0, 256
+	add s0, s0, s4 # add offset
+	# sbrk for memory
+	mv a0, s3
+	call sbrk
+	# a0: RAM address where to start loading the file
+	mv s2, a0
+	# start writing
+	# push RAM start and file length for later return reference
+	push s2
+	push s3
+	4:
+	li t0, 255
+	ble s3, t0, 7f # less than 255 words to write -> fits in one block
+	# load the next 255 words, get a new link, connect and update regs
+	# do 15 words at a time for less loops -> less overhead
+	5:
+	beqz t0, 6f # use t0 as a counter
+	lw t1, 0(s0)
+	lw t2, 1(s0)
+	sw t1, 0(s2)
+	sw t2, 1(s2)
+	lw t1, 2(s0)
+	lw t2, 3(s0)
+	sw t1, 2(s2)
+	sw t2, 3(s2)
+	lw t1, 4(s0)
+	lw t2, 5(s0)
+	sw t1, 4(s2)
+	sw t2, 5(s2)
+	lw t1, 6(s0)
+	lw t2, 7(s0)
+	sw t1, 6(s2)
+	sw t2, 7(s2)
+	lw t1, 8(s0)
+	lw t2, 9(s0)
+	sw t1, 8(s2)
+	sw t2, 9(s2)
+	lw t1, 10(s0)
+	lw t2, 11(s0)
+	sw t1, 10(s2)
+	sw t2, 11(s2)
+	lw t1, 12(s0)
+	lw t2, 13(s0)
+	lw t3, 14(s0)
+	sw t1, 12(s2)
+	sw t2, 13(s2)
+	sw t3, 14(s2)
+	
+	subi t0, t0, 15
+	addi s0, s0, 15
+	addi s2, s2, 15
+	j 5b
+	6:
+	# get new link and update regs
+	# new remaining length is s3 - 255
+	subi s3, s3, 255
+	
+	# load link of current block
+	# since s0 was updated by 255 over the loop -> correct address
+	lw a0, 0(s0)
+	# compute new address of block in s0
+	muli s0, a0, 256
+	add s0, s0, s4
+	j 4b # continue loading from disk
+	7:
+	# compute end address
+	add t0, s0, s3
+	8:
+	beq s0, t0, 0f #done
+	# lw of file, put it into RAM
+	lw t1, 0(s0)
+	inc s0
+	sw t1, 0(s2)
+	inc s2
+	j 8b
+	0:
+	# get return RAM address and length
+	pop a1
+	pop a0
+	# restore stack
+	pop ra
+	pop s4
+	pop s3
+	pop s2
+	pop s0
+	ret
+	1:
+	# error Case
+	li a0, -1
+	j 0b
+	
 
 # Helper functions for file system operations
 
