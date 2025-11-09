@@ -127,6 +127,16 @@ boot:
 	la a0, debug_path_3
 	li a7, 40
 	ecall
+	
+	# delete file
+	la a0, debug_path_3
+	li a7, 41
+	ecall
+	
+	# delete dir
+	la a0, debug_path_2
+	li a7, 42
+	ecall
 
 
 	li s10, 8743
@@ -140,7 +150,7 @@ fs_init:
     li t0, 1128813396 # magic number 'CHST'
     sw t0, 0(a0)      # fs_base + 0: magic number
     li t0, 1
-    sw t0, 1(a0)      # fs_base + 1: version, currently 1
+    sw t0, 1(a0)      # fs_base + 1: version, currently 
     sw a1, 2(a0)      # fs_base + 2: block size
     sw a2, 3(a0)      # fs_base + 3: number of blocks
     li t0, 1

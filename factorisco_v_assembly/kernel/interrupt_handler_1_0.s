@@ -187,6 +187,8 @@ jump_table:
 	jal zero, fs_mkdir # 38
 	jal zero, fs_write_to_file # 39
 	jal zero, fs_load_file # 40
+	jal zero, fs_del_file # 41
+	jal zero, fs_del_dir # 42
 	
 invalid_input:
 	# TODO
@@ -1172,9 +1174,103 @@ fs_load_file:
 	li a0, -1
 	j 0b
 	
+	
+# fs_del_file
+# a0: abs path to file
+# return a0: 0 if success, -1 if error
+fs_del_file:
+	push ra
+	call fs_abs_seek
+	# a0: block index of file, a1: dir entry
+	blt a0, zero, 1f # if -1: error ret
+	# check if type is actually a file
+	lw t0, 0(a1)
+	li t1, 1 # file type
+	bne t0, t1, 1f
+	# a1: dir entry of file to delete
+	call internal_del_file
+	li a0, 0 # Success
+	0:
+	pop ra
+	ret
+	# error
+	1:
+	li a0, -1
+	j 0b
+
+
+# fs_del_dir
+fs_del_dir:
+# a0: abs path to empty (!) folder
+# return a0: 0 if success, -1 if error
+	push ra
+	call fs_abs_seek
+	# a0: block index of file, a1: dir entry
+	blt a0, zero, 1f # if -1: error ret
+	# check if type is actually a dir
+	lw t0, 0(a1)
+	li t1, 2 # dir type
+	bne t0, t1, 1f
+	# check if directory is empty
+	# load address of dir
+	lw t0, 1058(zero)
+	muli a0, a0, 256
+	add a0, a0, t0 # address of dir
+	addi t0, a0, 250 # last file entry 
+	2:
+	beq a0, t0, 3f
+	lw t1, 0(a0) # load type of file
+	addi a0, a0, 5 # go to next file
+	bnez t1, 1f # error if not empty file
+	j 2b
+	3:
+	# dir is empty, can safely delete
+	# a1: dir entry of file to delete
+	call internal_del_file
+	li a0, 0 # Success
+	0:
+	pop ra
+	ret
+	# error
+	1:
+	li a0, -1
+	j 0b
 
 # Helper functions for file system operations
 
+# internal_del_file
+# a1: address of dir entry of file to delete
+internal_del_file:
+	push s0 # dir entry address
+	push s1 # next block idx
+	push s2 # fs mount point
+	push ra
+	lw s2, 1058(zero) # mount point of fs
+	lw s1, 3(a1) # load first block index in s1
+	mv s0, a1
+	1:
+	ble s1, zero, 2f # if last block is reached: stop
+	# go to block in s1
+	muli t0, s1, 256
+	add t0, t0, s2 # address of next block
+	mv a0, s1
+	# load link
+	lw s1, 255(t0)
+	# free block
+	call fs_free_block
+	j 1b
+	2:
+	# delete dir entry of that file
+	sw zero, 0(s0) # type is 0 = unused
+	li t0, -1
+	sw t0, 3(s0)  # first block is -1 = non existent
+	sw zero, 4(s0) # size is 0
+	pop ra
+	pop s2
+	pop s1
+	pop s0
+	ret
+#
 
 # fs_create_file
 # args: a0: block index of parent dir, a1: file entry of this parent dir (in parent of parent dir),
