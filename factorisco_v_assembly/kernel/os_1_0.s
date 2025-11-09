@@ -13,6 +13,8 @@
 # 1026-1056: Shadow register save area
 # 1057: User mbrk pointer
 # 1058: File System Base address (current hardware: 66560)
+# 1059: OS Main Loop start address
+# 1060: OS mbrk start of main loop safe
 
 # 1100-2999: Heap area for mbrk for OS
 # 2999-4999: Stack area for OS
@@ -59,6 +61,8 @@ boot:
 	li sp, 4999  # init OS sp
 	li t0, 1100 # initial value of mbrk pointer
 	sw t0, 1024(zero) # mbrk pointer init
+	la t0, main_loop
+	sw t0, 1059(zero) # main_loop start address. Needed for returning from user program
 
 	# init file system (later on, implement that as an installation step. basically have an OS installer on a ROM)
 	li a0, 66560 # fs base address
@@ -66,85 +70,44 @@ boot:
 	li a2, 64       # number of blocks
 	call fs_init
 	
-	
-	# Debugging the file System: TODO: delete this block later
-	la a0, debug_path
-	li a7, 35 # len_str
+	# start the OS
+	la a0, welcome
+	li a7, 17
 	ecall
+	call main_loop
 	
-	# request that much RAM (+1 since we want to save the 0x0 at the end of the string too)
-	addi a0, a1, 1
-	li a7, 2 # mbrk
-	ecall
 	
-	la t0, debug_path
-	# copy string to Memory
-	push a0
-	1:
-	lw t1, 0(t0)
-	inc t0
-	sw t1, 0(a0)
-	inc a0
-	beqz t1, 2f # end of string
-	j 1b
-	2:
-	pop a0  # now a0 is the location of the string in RAM
+main_loop:
+# Save current mbrk pointer
+# Wait for command using "input" (request for 40 chars, make sure to wrap input)
+# Set cursor to new line
+# Parse string by space -> get substrings <command> <arg1> <arg2> ...
+    # Pointers to these strings are saved in an array at a fixed location
+# Parse <command> string: compute "hash":
+    # currenthash *= 10, add ASCII of string until string ends
+# Compare with fixed array of valid command hashes
+    # If collision: check correct number of arguments, load string pointers to a0–a1, call command subroutine
+    # If no collision found: output "unknown command"
+# Clean up mbrk pointer to position at start of main loop
 
-	la a1, debug_name
-	li a7, 38 # mkdir
+	# save mbrk pointer at start of loop. Returns to that at end of loop -> no memory leaks
+	lw t0, 1024(zero)
+	la a0, prompt # mem dep solve
+	sw t0, 1060(zero)
+	# print the command prompt 
+	li a7, 16
+	ecall
+	# request an input
+	li a0, 0 # use mbrk
+	li a1, 40 # max 40 chars
+	li a7, 26
 	ecall
 	
-	la a0, debug_path_2
-	li a7, 35 # len_str
-	ecall
-	
-	
-	# request that much RAM (+1 since we want to save the 0x0 at the end of the string too)
-	addi a0, a1, 1
-	li a7, 2 # mbrk
-	ecall
-	la t0, debug_path_2
-	# copy string to Memory
-	push a0
-	1:
-	lw t1, 0(t0)
-	inc t0
-	sw t1, 0(a0)
-	inc a0
-	beqz t1, 2f # end of string
-	j 1b
-	2:
-	pop a0
-	
-	la a1, debug_name_2
-	li a7, 37 # create file
-	ecall
-	
-	# write content of interupt handler into that file
-	la a0, debug_path_3
-	li a1, 41000
-	li a2, 915 # len
-	li a7, 39
-	ecall
-	
-	# load content of that file into RAM
-	la a0, debug_path_3
-	li a7, 40
-	ecall
-	
-	# delete file
-	la a0, debug_path_3
-	li a7, 41
-	ecall
-	
-	# delete dir
-	la a0, debug_path_2
-	li a7, 42
-	ecall
-
-
-	li s10, 8743
+	li s10, 1234
 	halt
+
+	
+	
 
 
 # fs_init(a0=fs_base, a1=block_size, a2=num_blocks)
@@ -238,11 +201,7 @@ fs_init:
 
 	
 .data
-	welcome: .asciz "FactOS 1.0.0\n"
-	debug_path: .asciz "/"
-	debug_name: .asciz "BIN"
-	debug_path_2: .asciz "/BIN"
-	debug_name_2: .asciz "INT1.b"
-	debug_path_3: .asciz "/BIN/INT1.b"
+	welcome: .asciz "FactOS 1.1.0\n"
+	prompt: .asciz "> "
 
 	
