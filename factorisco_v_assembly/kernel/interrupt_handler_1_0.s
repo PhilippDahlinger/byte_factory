@@ -295,6 +295,22 @@ cls:
 
 print:
 	# a0: start address
+	# It will ensure that the print is visible: adapts the fdr so that cursor - fdr <= 5 at all times
+	
+	# load cursor to adapt fdr if necessary
+	lw t3, 5(zero) # cursor
+	lw t4, 9(zero) # fdr
+	li t5, 5
+	sub t6, t3, t4 # cursor - fdr
+	blt t6, t5, 3f
+	# set fdr so that print is last line
+	# that means fdr = cursor - 5
+	subi t4, t3, 5
+	# set fdr
+	sw t4, 9(zero)
+	# update display
+	sw zero, 12(zero)
+	3:
 	# t0: char index, starts at a0
 	# t1: data reg
 	# t2: check for \n = 10
@@ -302,21 +318,30 @@ print:
 	li t2, 10
 	0:
 	lw t1, 0(t0)
+	inc t0
 	beqz t1, 1f
-	# check for \n (and possible \t?). Solve this in hardware maybe?
+	# check for \n
 	beq t1, t2, 2f
 	# print char
 	sw t1, 7(zero)
-	inc t0
 	j 0b
 	2:
-	# \n case, move cursor one row, set col to 0
-	lw t3, 5(zero)
-	sw zero, 6(zero) # solve data dependency by adding the sw here
+	# \n case, move cursor one row, set col to 0, current cursor already loaded in t3
+	# reset cursor col to 0
+	sw zero, 6(zero)
 	inc t3
 	sw t3, 5(zero)
-	# repeat end of loop to save a jump -> faster
-	inc t0
+	# check if new cursor row is outside of the display -> update fdr if necessary
+	sub t6, t3, t4 # cursor - fdr
+	blt t6, t5, 3f
+	# set fdr so that print is last line
+	# that means fdr = cursor - 5
+	subi t4, t3, 5
+	# set fdr
+	sw t4, 9(zero)
+	# update display
+	sw zero, 12(zero)
+	3:
 	j 0b
 	1:
 	# refresh
@@ -335,6 +360,7 @@ println:
 	ret
 
 print_char:
+	# TODO: check for FDR if the print is visible (or don't, print_char is a debug thing anyway)
 	# check for \n
 	li t2, 10
 	beq a0, t2, 2f
