@@ -6,15 +6,15 @@
 # 20: MEPC
 # 21: MPP
 # 0-1023: Hardware I/O
-# 1024-1099: direct mapped OS reserved: sbrk pointer starts at 1100
+# 1024-1099: direct mapped OS reserved: mbrk pointer starts at 1100
 
-# 1024: OS Sbrk pointer
+# 1024: OS mbrk pointer
 # 1025: OS Stack pointer save if user program running
 # 1026-1056: Shadow register save area
-# 1057: User Sbrk pointer
+# 1057: User mbrk pointer
 # 1058: File System Base address (current hardware: 66560)
 
-# 1100-2999: Heap area for sbrk for OS
+# 1100-2999: Heap area for mbrk for OS
 # 2999-4999: Stack area for OS
 # 5000-17407: User program area
 
@@ -57,14 +57,15 @@ boot:
 	li x31, 0
 
 	li sp, 4999  # init OS sp
-	li t0, 1100 # initial value of sbrk pointer
-	sw t0, 1024(zero) # sbrk pointer init
+	li t0, 1100 # initial value of mbrk pointer
+	sw t0, 1024(zero) # mbrk pointer init
 
 	# init file system (later on, implement that as an installation step. basically have an OS installer on a ROM)
 	li a0, 66560 # fs base address
 	li a1, 256      # block size
 	li a2, 64       # number of blocks
 	call fs_init
+	
 	
 	# Debugging the file System: TODO: delete this block later
 	la a0, debug_path
@@ -73,8 +74,9 @@ boot:
 	
 	# request that much RAM (+1 since we want to save the 0x0 at the end of the string too)
 	addi a0, a1, 1
-	li a7, 2 # sbrk
+	li a7, 2 # mbrk
 	ecall
+	
 	la t0, debug_path
 	# copy string to Memory
 	push a0
@@ -87,6 +89,7 @@ boot:
 	j 1b
 	2:
 	pop a0  # now a0 is the location of the string in RAM
+
 	la a1, debug_name
 	li a7, 38 # mkdir
 	ecall
@@ -95,9 +98,10 @@ boot:
 	li a7, 35 # len_str
 	ecall
 	
+	
 	# request that much RAM (+1 since we want to save the 0x0 at the end of the string too)
 	addi a0, a1, 1
-	li a7, 2 # sbrk
+	li a7, 2 # mbrk
 	ecall
 	la t0, debug_path_2
 	# copy string to Memory

@@ -15,45 +15,13 @@ main:
     j invalid_load_store_address_interrupt
 
     # Handle ECALL: no need to jump since we are at the end of the table
-	# Save all registers which we modify here
-	# Use space 1026 -> 1056 for that (# todo: maybe find a better space / do a shadow swap in hardware)
-	sw x1, 1026(zero)
-	sw x2, 1027(zero)
-	sw x3, 1028(zero)
-	sw x4, 1029(zero)
-	sw x5, 1030(zero)
-	sw x6, 1031(zero)
-	sw x7, 1032(zero)
-	sw x8, 1033(zero)
-	sw x9, 1034(zero)
-	sw x10, 1035(zero)
-	sw x11, 1036(zero)
-	sw x12, 1037(zero)
-	sw x13, 1038(zero)
-	sw x14, 1039(zero)
-	sw x15, 1040(zero)
-	sw x16, 1041(zero)
-	sw x17, 1042(zero)
-	sw x18, 1043(zero)
-	sw x19, 1044(zero)
-	sw x20, 1045(zero)
-	sw x21, 1046(zero)
-	sw x22, 1047(zero)
-	sw x23, 1048(zero)
-	sw x24, 1049(zero)
-    sw x25, 1050(zero)
-    sw x26, 1051(zero)
-    sw x27, 1052(zero)
-    sw x28, 1053(zero)
-    sw x29, 1054(zero)
-    sw x30, 1055(zero)
-    sw x31, 1056(zero)
-
     # check if MPP is user mode (00), if so: load OS sp, else: use existing sp, since we are already in OS mode
     lw t0, 21(zero) # load MPP
+	# save stack pointer
+	sw sp, 1027(zero)
     bne t0, zero, 1f
-    # do not need to save user sp, since it is already done in the register shadow swap
-    lw sp, 1025(zero) # load OS sp
+	# load OS sp
+    lw sp, 1025(zero) 
     1:
 
     # TODO: adapt to the final ecall limit
@@ -69,38 +37,13 @@ main:
 
 	# add 1 to the previous PC: we want to skip the ECALL which caused the interrupt
 	lw t0, 20(zero) # load previous PC
+	# restore sp
+	lw sp, 1027(zero)
 	inc t0
-	# restore registers, do sw 1 later for dependency resolve
-	lw x1, 1024(zero)
 	sw t0, 20(zero) # store back
-
-	lw x2, 1027(zero)
-	lw x3, 1028(zero)
-	lw x4, 1029(zero)
-	lw x5, 1030(zero)
-	lw x6, 1031(zero)
-	lw x7, 1032(zero)
-	lw x8, 1033(zero)
-	lw x9, 1034(zero)
-	# do not restore a0-a7, since we need them as an output of the ECALL
-	lw x18, 1043(zero)
-	lw x19, 1044(zero)
-	lw x20, 1045(zero)
-	lw x21, 1046(zero)
-	lw x22, 1047(zero)
-	lw x23, 1048(zero)
-	lw x24, 1049(zero)
-    lw x25, 1050(zero)
-    lw x26, 1051(zero)
-    lw x27, 1052(zero)
-    lw x28, 1053(zero)
-    lw x29, 1054(zero)
-    lw x30, 1055(zero)
-    lw x31, 1056(zero)
     # enable interrupts again (they were disabled by the ECALL)
     li t0, 1
     sw t0, 18(zero)
-
 	# go back to the user program
 	mret
 
@@ -148,7 +91,7 @@ jump_table:
 	# indirect jump to correct function. the ret will bring it back to the main function
 	jal zero, reset #0
 	jal zero, exit #1
-	jal zero, sbrk #2
+	jal zero, mbrk #2
 	jal zero, raise_exception #3
 	jal zero, get_time #4
 	jal zero, sleep #5
@@ -199,13 +142,14 @@ reset:
 	ret
 	
 exit:
+	# TODO: update to v3 version
 	push ra
 	# user program ends, go back to os
 	# need to reset stack, set ra correctly on the stack, increment kernel mode to be in kernel mode after ecall decrements it again
 	# TODO: set correct values
 	# li sp, 33000  # reset sp
-	# li t0, 1000 # reset value of sbrk pointer
-	sw t0, 256(zero) # address 256 = sbrk pointer
+	# li t0, 1000 # reset value of mbrk pointer
+	sw t0, 256(zero) # address 256 = mbrk pointer
 	li a0, 0 # font
 	li a1, 1 # stride
 	li a2, 0 # no wrap
@@ -224,25 +168,25 @@ exit:
 	jalr zero, 0(t0)
 	ret
 
-sbrk:
-    # a0: number of bytes to increase sbrk pointer
-    # load correct sbrk pointer depending on MPP
+mbrk:
+    # a0: number of bytes to increase mbrk pointer
+    # load correct mbrk pointer depending on MPP
     lw t3, 21(zero) # load MPP
     bne t3, zero, 1f
-    # sbrk was called from user mode
-	lw t0, 1057(zero) # load old user sbrk pointer
+    # mbrk was called from user mode
+	lw t0, 1057(zero) # load old user mbrk pointer
 	j 2f
 	1:
-	# sbrk was called from OS mode
-	lw t0, 1024(zero) # load old OS sbrk pointer
+	# mbrk was called from OS mode
+	lw t0, 1024(zero) # load old OS mbrk pointer
 	2:
 	add t1, t0, a0 # update
 	# check for invalid state
 	# TODO: update this depending on memory map
 	# li t2, 1000
 	# blt t1, t2, 1f # if < 1000: memory regime of kernel -> throw exception
-	# bge t1, sp, 1f # check if sbrk is in stack regime. sp can grow into sbrk though currently
-	# write back updated sbrk pointer, MPP should be still in regs
+	# bge t1, sp, 1f # check if mbrk is in stack regime. sp can grow into mbrk though currently
+	# write back updated mbrk pointer, MPP should be still in regs
     bne t3, zero, 2f
     # user mode
 	sw t1, 1057(zero)
@@ -251,8 +195,8 @@ sbrk:
 	# OS mode
 	sw t1, 1024(zero)
 	3:
-	# return old sbrk pointer
-	mv a0, t0 # old sbrk pointer
+	# return old mbrk pointer
+	mv a0, t0 # old mbrk pointer
 	ret
 	1:
 	# TODO: raise memory exception, or StackOverFlow exception!
@@ -350,7 +294,6 @@ cls:
 	ret
 
 print:
-    # TODO: FDR movements
 	# a0: start address
 	# t0: char index, starts at a0
 	# t1: data reg
@@ -417,7 +360,7 @@ print_int:
 	call print
 	
 	li a0, -12 # free 12 characters long, for now this is fixed in int_to_str
-	call sbrk
+	call mbrk
 	pop ra
 	ret
 
@@ -473,8 +416,8 @@ wait_for_next_key:
 	ret
 
 input:
-	# If #1 != 0: saves output string in address #1. else gets more memory from sbrk. 
-	# #2: maximum length of str, truncates after that. Writes asciz string until "enter" is pressed or maxium length exceeded
+	# If a0 != 0: saves output string in address a0. else gets more memory from mbrk. 
+	# a1: maximum length of str, truncates after that. Writes asciz string until "enter" is pressed or maxium length exceeded
 	# Also prints input to str.
 	# t0: if stream was open before call
 	lw t0, 3(zero)
@@ -501,24 +444,24 @@ input:
 	# s3: persistent temp
 	# s4: animation state
 	
-	# update fdr so that current cursor is at least the second to bottom row -> cursor - fdr <= 10
+	# update fdr so that current cursor is at least the second to bottom row -> cursor - fdr <= 4
 	lw t0, 5(zero) # cursor row
 	lw t1, 9(zero) # FDR
-	li t3, 10
+	li t3, 4
 	sub t2, t0, t1
 	ble t2, t3, 0f
-	# set fdr to 10 rows behind cursor
+	# set fdr to 4 rows behind cursor
 	push a0
-	subi a0, t0, 10
+	subi a0, t0, 4
 	call set_fdr
 	pop a0
 	0:
 	
 	mv s1, a1
 	bnez a0, 1f
-	# a0 == 0 case: get mem from sbrk
-	mv a0, a1 # request max length of memory
-	call sbrk
+	# a0 == 0 case: get mem from mbrk
+	addi a0, a1, 1 # request max length of memory (+1 to write 0x0 at end of string)
+	call mbrk
 	1:
 	mv s0, a0 # correct start address, this is the moving pointer
 	mv s2, a0 # save start address for return
@@ -528,7 +471,6 @@ input:
 	li s4, 0 # init animation reg
 	
 	# main part: wait for key input, save it in string, and print it
-	# TODO: handle backspace
 	2:
 	beq s0, s1, 4f  # max length: break
 	
@@ -715,7 +657,7 @@ int_to_str:
 	push s0
 	mv s0, a0  # s0: current int to parse
 	li a0, 12 # max 12 characters long, can be refined
-	call sbrk
+	call mbrk
 	# a0: current mem location to write char
 	addi a0, a0, 10 # go backward
 	sw zero, 1(a0) # trailing zero for string end
@@ -1062,7 +1004,7 @@ fs_write_to_file:
 # fs_load_file:
 # a0: uncompressed absolute path to file to load (has to be a file, not a dir)
 # returns:
-# a0: RAM address of loaded file (use sbrk of current mode to get the mem)
+# a0: RAM address of loaded file (use mbrk of current mode to get the mem)
 # a1: Length of file in RAM
 fs_load_file:
 	push s0 # address of current block in file system
@@ -1084,9 +1026,9 @@ fs_load_file:
 	# load address of current block in file system
 	muli s0, a0, 256
 	add s0, s0, s4 # add offset
-	# sbrk for memory
+	# mbrk for memory
 	mv a0, s3
-	call sbrk
+	call mbrk
 	# a0: RAM address where to start loading the file
 	mv s2, a0
 	# start writing
