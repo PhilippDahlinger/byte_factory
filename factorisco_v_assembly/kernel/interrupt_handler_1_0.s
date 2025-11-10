@@ -533,7 +533,7 @@ input:
 	# ToDo check for valid input char
 	# check if key >= 32 to ensure printable char
 	li t0, 32
-	ble a0, t0, 8f
+	blt a0, t0, 8f
 	# store in string
 	sw a0, 0(s0)
 	# print char

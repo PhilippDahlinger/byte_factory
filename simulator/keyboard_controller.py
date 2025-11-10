@@ -38,7 +38,6 @@ class KeyboardController:
             "BackSpace": 11,
             "space": 32,
         }
-
         # Check for special keys
         if key_symbol in keymap:
             return keymap[key_symbol]

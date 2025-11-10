@@ -89,7 +89,7 @@ main_loop:
     # If collision: check correct number of arguments, load string pointers to a0–a1, call command subroutine
     # If no collision found: output "unknown command"
 # Clean up mbrk pointer to position at start of main loop
-
+	
 	# save mbrk pointer at start of loop. Returns to that at end of loop -> no memory leaks
 	lw t0, 1024(zero)
 	la a0, prompt # mem dep solve
@@ -102,7 +102,53 @@ main_loop:
 	li a1, 40 # max 40 chars
 	li a7, 26
 	ecall
+	mv s0, a0 # s0: input string
+	# set cursor to new line
+	li a7, 33
+	ecall
 	
+	# parse input string
+	# request array to store the pointers to the split string
+	li a0, 20 # max 20 words (since 40 is the string long)
+	li a7, 2 # mbrk
+	ecall
+	mv s1, a0 # s1: base address for token array
+	li s2, 0 # s2: number of tokens
+	mv t0, s0 # t0: current cursor to parse string
+	li t1, 32 # t1: " " 
+	
+	# move over all empty spaces
+	0:
+	lw t2, 0(t0)  # t2: current char to parse
+	bne t1, t2, 1f
+	# t2 is space -> increment counter
+	inc t0
+	j 0b
+	1:
+	# actual loop for parsing
+	# if t2 is 0x0: break parsing Loop
+	beqz t2, 2f
+	# save current start of string in the array
+	add t3, s1, s2 # address of current token to save
+	sw t0, 0(t3) # save current cursor pos = start of string in array
+	# inc length
+	inc s2
+	# inner loop to go over the word
+	3:
+	beq t2, t1, 4f # found " "
+	beqz t2, 2f # end of string: done parsing
+	lw t2, 1(t0) # load next char, do it like this to solve a mem dep
+	inc t0
+	j 3b
+	
+	4: # found a " "
+	# replace " " with 0x0 to mark the end of this string
+	sw zero, 0(t0)
+	inc t0
+	j 0b # continue with the next token
+	
+	# Done parsing
+	2:
 	li s10, 1234
 	halt
 
