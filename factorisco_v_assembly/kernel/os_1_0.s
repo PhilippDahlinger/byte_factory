@@ -61,8 +61,8 @@ boot:
 	li sp, 4999  # init OS sp
 	li t0, 1100 # initial value of sbrk pointer
 	sw t0, 1024(zero) # sbrk pointer init
-	la t0, main_loop
-	sw t0, 1059(zero) # main_loop start address. Needed for returning from user program
+	la t0, end_main_loop
+	sw t0, 1059(zero) # main_loop end address. Needed for returning from user program
 	
 	# reset display
 	li a7, 15
@@ -184,12 +184,19 @@ main_loop:
 	jalr ra, 0(a7)
 	# command is executed
 	
-	li s10, 1234
-	halt
+	end_main_loop:
+	# restore sbrk
+	lw t0, 1060(zero)
+	sw t0, 1024(zero)
+	j main_loop
 	
 	invalid_cmd:
-	li s10, 9999
-	halt
+	# write that command is unknown
+	la a0, unknown_cmd
+	li a7, 17
+	ecall # println
+	j end_main_loop # cleanup sbrk
+	
 
 #----------------------------------------
 # Command implementations	
@@ -209,7 +216,7 @@ cmd_ls:
 	ret
 	
 cmd_mkdir:
-	li s9, 12
+	
 	ret
 
 cmd_touch:
@@ -355,5 +362,6 @@ fs_init:
 	prompt: .asciz "> "
 	cmd_hashes: .word 1083, 1228, 510, 834, 1679, 120, 1599, 1240, 193
 	# "LS","MKDIR","TOUCH","CP","CPROM","RUN","RUNROM","MV","RM"
+	unknown_cmd: .asciz "Error: Unknown cmd"
 
 	
