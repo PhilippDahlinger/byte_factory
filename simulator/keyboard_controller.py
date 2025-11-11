@@ -37,6 +37,8 @@ class KeyboardController:
             "Return": 10,
             "BackSpace": 11,
             "space": 32,
+            "slash": 47,
+            "period": 46,
         }
         # Check for special keys
         if key_symbol in keymap:
@@ -51,6 +53,7 @@ class KeyboardController:
             return ord(key_symbol)
 
         # Ignore other keys for now
+        print("Ignored: ", key_symbol)
         return None
 
     def get_next_key(self) -> int | None:

@@ -75,7 +75,7 @@ boot:
 	li a7, 9
 	li a0, 0 # font
 	li a1, 1 # stride
-	li a2, 0 # no wrap
+	li a2, 1 # allow wrap
 	ecall
 	# set fdr to 0
 	li a0, 0
@@ -216,10 +216,63 @@ cmd_ls:
 	ret
 	
 cmd_mkdir:
-	
+	push ra
+	# check that total number of args is 3
+	li t0, 3
+	beq s2, t0, 0f
+	la a0, error_invalid_args
+	li a7, 17
+	ecall
+	pop ra
+	ret
+	0:
+	# execute command
+	# load args 
+	lw a0, 1(s1)
+	lw a1, 2(s1)
+	li a7, 38
+	ecall # mkdir
+	# check if cmd was succesful
+	bge a0, zero, 1f
+	# error executing MKDIR
+	la a0, error_execution
+	li a7, 17
+	ecall
+	pop ra
+	ret
+	1:
+	# return
+	pop ra
 	ret
 
 cmd_touch:
+	push ra
+	# check that total number of args is 3
+	li t0, 3
+	beq s2, t0, 0f
+	la a0, error_invalid_args
+	li a7, 17
+	ecall
+	pop ra
+	ret
+	0:
+	# execute command
+	# load args 
+	lw a0, 1(s1)
+	lw a1, 2(s1)
+	li a7, 37
+	ecall # touch
+	# check if cmd was succesful
+	bge a0, zero, 1f
+	# error executing TOUCH
+	la a0, error_execution
+	li a7, 17
+	ecall
+	pop ra
+	ret
+	1:
+	# return
+	pop ra
 	ret
 
 cmd_cp:
@@ -362,6 +415,8 @@ fs_init:
 	prompt: .asciz "> "
 	cmd_hashes: .word 1083, 1228, 510, 834, 1679, 120, 1599, 1240, 193
 	# "LS","MKDIR","TOUCH","CP","CPROM","RUN","RUNROM","MV","RM"
-	unknown_cmd: .asciz "Error: Unknown cmd"
+	unknown_cmd: .asciz "Error: Unknown Cmd"
+	error_invalid_args: .asciz "Error: Invalid number of arguments"
+	error_execution: .asciz "Error executing Cmd"
 
 	
