@@ -6,17 +6,17 @@
 # 20: MEPC
 # 21: MPP
 # 0-1023: Hardware I/O
-# 1024-1099: direct mapped OS reserved: mbrk pointer starts at 1100
+# 1024-1099: direct mapped OS reserved: sbrk pointer starts at 1100
 
-# 1024: OS mbrk pointer
+# 1024: OS sbrk pointer
 # 1025: OS Stack pointer save if user program running
 # 1026-1056: Shadow register save area
-# 1057: User mbrk pointer
+# 1057: User sbrk pointer
 # 1058: File System Base address (current hardware: 66560)
 # 1059: OS Main Loop start address
-# 1060: OS mbrk start of main loop safe
+# 1060: OS sbrk start of main loop safe
 
-# 1100-2999: Heap area for mbrk for OS
+# 1100-2999: Heap area for sbrk for OS
 # 2999-4999: Stack area for OS
 # 5000-17407: User program area
 
@@ -59,10 +59,28 @@ boot:
 	li x31, 0
 
 	li sp, 4999  # init OS sp
-	li t0, 1100 # initial value of mbrk pointer
-	sw t0, 1024(zero) # mbrk pointer init
+	li t0, 1100 # initial value of sbrk pointer
+	sw t0, 1024(zero) # sbrk pointer init
 	la t0, main_loop
 	sw t0, 1059(zero) # main_loop start address. Needed for returning from user program
+	
+	# reset display
+	li a7, 15
+	ecall # cls
+	li a0, 0
+	li a1, 0
+	li a7, 6
+	ecall # set cursor to 0,0
+	# set font to default: no wrap, and stride is 1
+	li a7, 9
+	li a0, 0 # font
+	li a1, 1 # stride
+	li a2, 0 # no wrap
+	ecall
+	# set fdr to 0
+	li a0, 0
+	li a7, 11
+	ecall
 
 	# init file system (later on, implement that as an installation step. basically have an OS installer on a ROM)
 	li a0, 66560 # fs base address
@@ -78,7 +96,7 @@ boot:
 	
 	
 main_loop:
-# Save current mbrk pointer
+# Save current sbrk pointer
 # Wait for command using "input" (request for 40 chars, make sure to wrap input)
 # Set cursor to new line
 # Parse string by space -> get substrings <command> <arg1> <arg2> ...
@@ -88,9 +106,8 @@ main_loop:
 # Compare with fixed array of valid command hashes
     # If collision: check correct number of arguments, load string pointers to a0–a1, call command subroutine
     # If no collision found: output "unknown command"
-# Clean up mbrk pointer to position at start of main loop
-	
-	# save mbrk pointer at start of loop. Returns to that at end of loop -> no memory leaks
+# Clean up sbrk pointer to position at start of main loop
+	# save sbrk pointer at start of loop. Returns to that at end of loop -> no memory leaks
 	lw t0, 1024(zero)
 	la a0, prompt # mem dep solve
 	sw t0, 1060(zero)
@@ -98,19 +115,16 @@ main_loop:
 	li a7, 16
 	ecall
 	# request an input
-	li a0, 0 # use mbrk
+	li a0, 0 # use sbrk
 	li a1, 40 # max 40 chars
 	li a7, 26
 	ecall
 	mv s0, a0 # s0: input string
-	# set cursor to new line
-	li a7, 33
-	ecall
 	
 	# parse input string
 	# request array to store the pointers to the split string
 	li a0, 20 # max 20 words (since 40 is the string long)
-	li a7, 2 # mbrk
+	li a7, 2 # sbrk
 	ecall
 	mv s1, a0 # s1: base address for token array
 	li s2, 0 # s2: number of tokens
@@ -149,11 +163,101 @@ main_loop:
 	
 	# Done parsing
 	2:
+	# for the command (first argument) compute the hash
+	lw a0, 0(s1)
+	call hash64_word_38
+	# find the hash in the list
+	la t0, cmd_hashes
+	# end of array
+	addi t2, t0, 9
+	5:
+	beq t0, t2, invalid_cmd
+	lw t1, 0(t0)
+	inc t0
+	bne a0, t1, 5b # branch if incorrect hash
+	dec t0 # correct address is one less since it is inc 1 before check
+	la t1, cmd_hashes
+	sub a7, t0, t1 # offset in the array
+	la t0, jump_table  
+	add a7, a7, t0
+	# execute CMD
+	jalr ra, 0(a7)
+	# command is executed
+	
 	li s10, 1234
 	halt
+	
+	invalid_cmd:
+	li s10, 9999
+	halt
+
+#----------------------------------------
+# Command implementations	
+jump_table:
+	jal zero, cmd_ls #0
+	jal zero, cmd_mkdir #1
+	jal zero, cmd_touch #2
+	jal zero, cmd_cp #3
+	jal zero, cmd_cprom #4
+	jal zero, cmd_run #5
+	jal zero, cmd_runrom #6
+	jal zero, cmd_mv #7
+	jal zero, cmd_rm #8
+
+cmd_ls:
+	li s9, 11
+	ret
+	
+cmd_mkdir:
+	li s9, 12
+	ret
+
+cmd_touch:
+	ret
+
+cmd_cp:
+	ret
+
+cmd_cprom:
+	ret
+
+cmd_run:
+	ret
+
+cmd_runrom:
+	ret
+	
+cmd_mv:
+	ret
+	
+cmd_rm:
+	ret
+	
+# end of Command implementations
+#----------------------------------------
 
 	
-	
+#------------------------------------------------------------
+# hash64_word_38(a0)
+# Input : a0 = pointer to string (1 char per 32-bit word, low byte used)
+# Output: a0 = hash in 0..63
+# Clobbers: t0, t1
+# Formula: h = (h * 38) XOR c
+#------------------------------------------------------------
+hash64_word_38:
+    li    t0, 5384        # h = 5384 (seed)
+0:
+    lw    t1, 0(a0)       # load 32-bit word (char)
+    beqz  t1, 1f          # if 0: end of string
+    muli  t0, t0, 38      # h *= 38
+    xor   t0, t0, t1      # h ^= c  (low byte only relevant)
+	# li t2, 16777215
+	# and  t0, t0, t2
+    inc   a0              # next word (next char)
+    j     0b
+1:
+    andi  a0, t0, 2047      # map to 0..20473
+    ret
 
 
 # fs_init(a0=fs_base, a1=block_size, a2=num_blocks)
@@ -249,5 +353,7 @@ fs_init:
 .data
 	welcome: .asciz "FactOS 1.1.0\n"
 	prompt: .asciz "> "
+	cmd_hashes: .word 1083, 1228, 510, 834, 1679, 120, 1599, 1240, 193
+	# "LS","MKDIR","TOUCH","CP","CPROM","RUN","RUNROM","MV","RM"
 
 	

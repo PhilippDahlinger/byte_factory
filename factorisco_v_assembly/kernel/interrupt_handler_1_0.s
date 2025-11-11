@@ -91,7 +91,7 @@ jump_table:
 	# indirect jump to correct function. the ret will bring it back to the main function
 	jal zero, reset #0
 	jal zero, exit #1
-	jal zero, mbrk #2
+	jal zero, sbrk #2
 	jal zero, raise_exception #3
 	jal zero, get_time #4
 	jal zero, sleep #5
@@ -148,8 +148,8 @@ exit:
 	# need to reset stack, set ra correctly on the stack, increment kernel mode to be in kernel mode after ecall decrements it again
 	# TODO: set correct values
 	# li sp, 33000  # reset sp
-	# li t0, 1000 # reset value of mbrk pointer
-	sw t0, 256(zero) # address 256 = mbrk pointer
+	# li t0, 1000 # reset value of sbrk pointer
+	sw t0, 256(zero) # address 256 = sbrk pointer
 	li a0, 0 # font
 	li a1, 1 # stride
 	li a2, 0 # no wrap
@@ -168,25 +168,25 @@ exit:
 	jalr zero, 0(t0)
 	ret
 
-mbrk:
-    # a0: number of bytes to increase mbrk pointer
-    # load correct mbrk pointer depending on MPP
+sbrk:
+    # a0: number of bytes to increase sbrk pointer
+    # load correct sbrk pointer depending on MPP
     lw t3, 21(zero) # load MPP
     bne t3, zero, 1f
-    # mbrk was called from user mode
-	lw t0, 1057(zero) # load old user mbrk pointer
+    # sbrk was called from user mode
+	lw t0, 1057(zero) # load old user sbrk pointer
 	j 2f
 	1:
-	# mbrk was called from OS mode
-	lw t0, 1024(zero) # load old OS mbrk pointer
+	# sbrk was called from OS mode
+	lw t0, 1024(zero) # load old OS sbrk pointer
 	2:
 	add t1, t0, a0 # update
 	# check for invalid state
 	# TODO: update this depending on memory map
 	# li t2, 1000
 	# blt t1, t2, 1f # if < 1000: memory regime of kernel -> throw exception
-	# bge t1, sp, 1f # check if mbrk is in stack regime. sp can grow into mbrk though currently
-	# write back updated mbrk pointer, MPP should be still in regs
+	# bge t1, sp, 1f # check if sbrk is in stack regime. sp can grow into sbrk though currently
+	# write back updated sbrk pointer, MPP should be still in regs
     bne t3, zero, 2f
     # user mode
 	sw t1, 1057(zero)
@@ -195,8 +195,8 @@ mbrk:
 	# OS mode
 	sw t1, 1024(zero)
 	3:
-	# return old mbrk pointer
-	mv a0, t0 # old mbrk pointer
+	# return old sbrk pointer
+	mv a0, t0 # old sbrk pointer
 	ret
 	1:
 	# TODO: raise memory exception, or StackOverFlow exception!
@@ -296,7 +296,6 @@ cls:
 print:
 	# a0: start address
 	# It will ensure that the print is visible: adapts the fdr so that cursor - fdr <= 5 at all times
-	
 	# load cursor to adapt fdr if necessary
 	lw t3, 5(zero) # cursor
 	lw t4, 9(zero) # fdr
@@ -386,7 +385,7 @@ print_int:
 	call print
 	
 	li a0, -12 # free 12 characters long, for now this is fixed in int_to_str
-	call mbrk
+	call sbrk
 	pop ra
 	ret
 
@@ -442,7 +441,7 @@ wait_for_next_key:
 	ret
 
 input:
-	# If a0 != 0: saves output string in address a0. else gets more memory from mbrk. 
+	# If a0 != 0: saves output string in address a0. else gets more memory from sbrk. 
 	# a1: maximum length of str, truncates after that. Writes asciz string until "enter" is pressed or maxium length exceeded
 	# Also prints input to str.
 	# t0: if stream was open before call
@@ -485,9 +484,9 @@ input:
 	
 	mv s1, a1
 	bnez a0, 1f
-	# a0 == 0 case: get mem from mbrk
+	# a0 == 0 case: get mem from sbrk
 	addi a0, a1, 1 # request max length of memory (+1 to write 0x0 at end of string)
-	call mbrk
+	call sbrk
 	1:
 	mv s0, a0 # correct start address, this is the moving pointer
 	mv s2, a0 # save start address for return
@@ -683,7 +682,7 @@ int_to_str:
 	push s0
 	mv s0, a0  # s0: current int to parse
 	li a0, 12 # max 12 characters long, can be refined
-	call mbrk
+	call sbrk
 	# a0: current mem location to write char
 	addi a0, a0, 10 # go backward
 	sw zero, 1(a0) # trailing zero for string end
@@ -1030,7 +1029,7 @@ fs_write_to_file:
 # fs_load_file:
 # a0: uncompressed absolute path to file to load (has to be a file, not a dir)
 # returns:
-# a0: RAM address of loaded file (use mbrk of current mode to get the mem)
+# a0: RAM address of loaded file (use sbrk of current mode to get the mem)
 # a1: Length of file in RAM
 fs_load_file:
 	push s0 # address of current block in file system
@@ -1052,9 +1051,9 @@ fs_load_file:
 	# load address of current block in file system
 	muli s0, a0, 256
 	add s0, s0, s4 # add offset
-	# mbrk for memory
+	# sbrk for memory
 	mv a0, s3
-	call mbrk
+	call sbrk
 	# a0: RAM address where to start loading the file
 	mv s2, a0
 	# start writing
