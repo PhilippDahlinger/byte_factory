@@ -111,6 +111,8 @@ main_loop:
 	lw t0, 1024(zero)
 	la a0, prompt # mem dep solve
 	sw t0, 1060(zero)
+	# save current stack pointer to mem. will be loaded when user program ends
+	sw sp, 1025(zero)
 	# print the command prompt 
 	li a7, 16
 	ecall
@@ -285,7 +287,56 @@ cmd_run:
 	ret
 
 cmd_runrom:
+	push ra
+	# check that total number of args is 2 ( one for the command, one for the rom number)
+	li t0, 2
+	beq s2, t0, 0f
+	la a0, error_invalid_args
+	li a7, 17
+	ecall
+	pop ra
 	ret
+	0:
+	# check that input is either 0 or 1
+	lw a0, 1(s1)
+	# convert str to int
+	li a7, 31
+	ecall # str to int
+	li t0, 1
+	blt a0, zero, 2f
+	bgt a0, t0, 2f
+	# execute Command
+	push a0
+	# reset user sbrk
+	li t0, 5000
+	sw t0, 1057(zero)
+	li a0, 10
+	li a7, 18
+	ecall # print new line
+	li a7, 23
+	ecall # close key stream
+	pop a0
+	# set user stack pointer
+	li sp, 17400
+	# set mode to user
+	sw zero, 17(zero)
+	# load correct address
+	la t0, rom_start_addresses
+	add t0, t0, a0
+	lw a2, 0(t0) # load start address
+	# the actual start address is shifted by 1, since the first word contains the number of words stored on this ROM
+	inc a2
+	# execute user program
+	jr a2
+	2:
+	# error
+	la a0, error_execution
+	li a7, 17
+	ecall
+	pop ra
+	ret
+	
+	
 	
 cmd_mv:
 	ret
@@ -418,5 +469,6 @@ fs_init:
 	unknown_cmd: .asciz "Error: Unknown Cmd"
 	error_invalid_args: .asciz "Error: Invalid number of arguments"
 	error_execution: .asciz "Error executing Cmd"
+	rom_start_addresses: .word 50176, 58368
 
 	

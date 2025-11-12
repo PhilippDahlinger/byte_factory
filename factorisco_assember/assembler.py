@@ -32,7 +32,8 @@ def assemble(assembly_code, output_file, output_version="v3", kernel_mode=False,
     assert len(code_line_labels) == len(code)
     code, code_line_labels = replace_instructions(code, code_line_labels)
     assert len(code_line_labels) == len(code)
-    machine_code = create_machine_code(code, data, code_line_labels)
+    # if user program is generated, write the length as the first address. used for copying file to disk
+    machine_code = create_machine_code(code, data, code_line_labels, add_length=not kernel_mode)
     if verbose:
         for i, line in enumerate(code):
             print(f"{i}: {line}")
@@ -80,4 +81,4 @@ if __name__ == "__main__":
     kernel_program("interrupt_handler_1_0", verbose=verbose)
     # kernel_program("debug_boot", verbose=verbose)
     kernel_program("os_1_0", verbose=verbose)
-    # user_program("congress_boot", verbose=verbose)
+    user_program("trainer", verbose=verbose)

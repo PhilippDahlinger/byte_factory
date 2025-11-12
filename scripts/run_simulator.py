@@ -12,7 +12,7 @@ if __name__ == "__main__":
     kernel_program("os_1_0", verbose=False)
 
     config = yaml.safe_load(open("simulator/sim_config_v3.yaml"))
-    simulator = Simulator(config, [
+    simulator = Simulator(config, ["output/factorisco/trainer_machine_code.txt"
     ])
 
     root = tk.Tk()

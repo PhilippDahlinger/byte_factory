@@ -53,13 +53,15 @@ def convert_to_word(line, line_label):
         word -= 2**32
     return word
 
-def create_machine_code(code, data, code_line_labels):
+def create_machine_code(code, data, code_line_labels, add_length=False):
     output_words = []
     for i, line in enumerate(code):
         output_words.append(convert_to_word(line, code_line_labels[i]))
     for i, line in enumerate(data):
         # every word is in its own list
         output_words.append(int(line[0]))
+    if add_length:
+        output_words.insert(0, len(output_words))
     return output_words
 
 
