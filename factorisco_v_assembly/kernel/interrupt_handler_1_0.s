@@ -132,6 +132,7 @@ jump_table:
 	jal zero, fs_load_file # 40
 	jal zero, fs_del_file # 41
 	jal zero, fs_del_dir # 42
+	jal zero, fs_file_name_to_str # 43
 	
 invalid_input:
 	# TODO
@@ -1197,6 +1198,93 @@ fs_del_dir:
 	1:
 	li a0, -1
 	j 0b
+	
+# fs_file_name_to_str
+# a0/a1: file name string
+# returns: a0: pointer to uncompressed string (created using sbrk). Always request 9 words for that (easier to delete once done with it)
+fs_file_name_to_str:
+	push a0
+	push a1
+	push ra
+	li a0, 9
+	call sbrk # request 9 new words
+	mv t6, a0 # store start Address
+	mv t5, a0 # ref for start of string
+	pop ra
+	pop a1
+	pop a0
+	
+	# load first byte
+	srai t0, a0, 24
+	andi t0, t0, 255
+	beqz t0, 0f
+	# write byte
+	sw t0, 0(t6)
+	inc t6
+	
+	# load second byte
+	srai t0, a0, 16
+	andi t0, t0, 255
+	beqz t0, 0f
+	# write byte
+	sw t0, 0(t6)
+	inc t6
+	
+	# load 3. byte
+	srai t0, a0, 8
+	andi t0, t0, 255
+	beqz t0, 0f
+	# write byte
+	sw t0, 0(t6)
+	inc t6
+	
+	# load 4. byte
+	# already correctly shifted
+	andi t0, a0, 255
+	beqz t0, 0f
+	# write byte
+	sw t0, 0(t6)
+	inc t6
+	
+	# load 5. byte
+	srai t0, a1, 24
+	andi t0, t0, 255
+	beqz t0, 0f
+	# write byte
+	sw t0, 0(t6)
+	inc t6
+	
+	# load 6. byte
+	srai t0, a1, 16
+	andi t0, t0, 255
+	beqz t0, 0f
+	# write byte
+	sw t0, 0(t6)
+	inc t6
+	
+	# load 7. byte
+	srai t0, a1, 8
+	andi t0, t0, 255
+	beqz t0, 0f
+	# write byte
+	sw t0, 0(t6)
+	inc t6
+	
+	# load 8. byte
+	# already correctly shifted
+	andi t0, a1, 255
+	beqz t0, 0f
+	# write byte
+	sw t0, 0(t6)
+	inc t6
+	
+	# if code reaches this: all 8 chars are added
+	0:
+	# add zero byte to current cursor
+	sw zero, 0(t6)
+	mv a0, t5
+	ret
+
 
 # Helper functions for file system operations
 

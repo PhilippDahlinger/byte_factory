@@ -214,8 +214,79 @@ jump_table:
 	jal zero, cmd_rm #8
 
 cmd_ls:
-	li s9, 11
+	push ra
+	# check that total number of args is 2
+	li t0, 2
+	beq s2, t0, 0f
+	la a0, error_invalid_args
+	li a7, 17
+	ecall
+	pop ra
 	ret
+	0:
+	# execute command
+	# load arg
+	lw a0, 1(s1)
+	li a7, 36
+	ecall # abs_seek
+	# check if cmd was succesful
+	blt a0, zero, 1f
+	# check file type
+	lw t0, 0(a1)
+	li t1, 2
+	beq t0, t1, 2f
+	# invalid type of file (not a dir)
+	j 1f
+	2: # DIR type
+	push s0
+	push s1
+	# load file address
+	lw t0, 1058(zero) # superblock address
+	muli a0, a0, 256 # multiply with block size
+	add s0, a0, t0 # correct address in a0
+	# end of dir
+	addi s1, s0, 250
+	# loop over all possible file names
+	3:
+	beq s0, s1, 4f
+	# load type
+	lw t0, 0(s0)
+	addi s0, s0, 5
+	beqz t0, 3b # if unused entry: go next
+	# write "DIR" in front of the name if file is a dir
+	li t1, 2
+	bne t0, t1, 5f
+	# write DIR
+	la a0, dir_string
+	li a7, 16
+	ecall # print without new line
+	5:
+	# load filename, s0 increment, so subtract 5
+	lw a0, -4(s0)
+	lw a1, -3(s0)
+	li a7, 43
+	ecall
+	# got new string in a0 -> print that with new line
+	li a7, 17
+	ecall # println
+	# dont worry about the memory, os sbrk will be resetted after this command
+	j 3b
+	4:
+	# return
+	pop s1
+	pop s0
+	pop ra
+	ret
+	1:
+	# error executing RM
+	la a0, error_execution
+	li a7, 17
+	ecall
+	pop ra
+	ret
+	
+	
+	
 	
 cmd_mkdir:
 	push ra
@@ -342,6 +413,54 @@ cmd_mv:
 	ret
 	
 cmd_rm:
+	push ra
+	# check that total number of args is 2
+	li t0, 2
+	beq s2, t0, 0f
+	la a0, error_invalid_args
+	li a7, 17
+	ecall
+	pop ra
+	ret
+	0:
+	# execute command
+	# load arg
+	lw a0, 1(s1)
+	li a7, 36
+	ecall # abs_seek
+	# check if cmd was succesful
+	blt a0, zero, 1f
+	# check file type
+	lw t0, 0(a1)
+	li t1, 1
+	beq t0, t1, 2f
+	li t1, 2
+	beq t0, t1, 3f
+	# invalid type of file
+	j 1f
+	2: # FILE type
+	lw a0, 1(s1)
+	li a7, 41
+	ecall # del file
+	blt a0, zero, 1f
+	# correct execution
+	j 4f
+	3: # DIR type
+	lw a0, 1(s1)
+	li a7, 42
+	ecall # del folder
+	blt a0, zero, 1f
+	# don't need to jump, already at correct line
+	4:
+	# return
+	pop ra
+	ret
+	1:
+	# error executing RM
+	la a0, error_execution
+	li a7, 17
+	ecall
+	pop ra
 	ret
 	
 # end of Command implementations
@@ -470,5 +589,6 @@ fs_init:
 	error_invalid_args: .asciz "Error: Invalid number of arguments"
 	error_execution: .asciz "Error executing Cmd"
 	rom_start_addresses: .word 50176, 58368
+	dir_string: .asciz "DIR "
 
 	
