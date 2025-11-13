@@ -6,7 +6,7 @@ interrupt_handler_file: "output/factorisco/kernel/interrupt_handler_1_0_machine_
 os_address: 33792
 interrupt_start_address: 41000 # todo: correct address
 user_program_addresses: [50176, 58368]  # todo: correct address
-kernel_restricted_addresses: 8000  # first addresses are reserved for kernel
+kernel_restricted_addresses: 4999  # first addresses are reserved for kernel
 
 mode: 17
 mie: 18

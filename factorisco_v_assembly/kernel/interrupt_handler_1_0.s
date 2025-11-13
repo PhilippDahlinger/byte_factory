@@ -142,31 +142,26 @@ reset:
 	ret
 	
 exit:
-	# TODO: update to v3 version
-	push ra
 	# user program ends, go back to os
-	# need to reset stack, set ra correctly on the stack, increment kernel mode to be in kernel mode after ecall decrements it again
-	# TODO: set correct values
-	# li sp, 33000  # reset sp
-	# li t0, 1000 # reset value of sbrk pointer
-	sw t0, 256(zero) # address 256 = sbrk pointer
+	# need to reset stack: load OS stack pointer from before the call of user program
+	lw sp, 1025(zero)
+	# don't have to update sbrk pointer since there are 2 sbrk pointer, one for user, one for os
+	
+	# reset display 
 	li a0, 0 # font
 	li a1, 1 # stride
-	li a2, 0 # no wrap
+	li a2, 1 # use wrap
 	call set_font
 	call set_cursor_to_next_line
-	call get_cursor
-	subi a0, a0, 10
-	call set_fdr # make print statement at the bottom of the screen to see the output easily
 	
-	
-	pop ra # stack clean up
+	# don't have to update kernel mode, since we are not calling mret this time -> keep machine mode
+	# enable interrupts again (they were disabled by the ECALL)
+    li t1, 1
 	# load entry point of OS
-	lw t0, 1050(zero) # OS entry point stored at address 1050
-	0:
-	j 0b
+	lw t0, 1059(zero) # OS entry point stored at address 1059 (end of main loop)
+    sw t1, 18(zero)
 	jalr zero, 0(t0)
-	ret
+	
 
 sbrk:
     # a0: number of bytes to increase sbrk pointer
