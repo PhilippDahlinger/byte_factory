@@ -398,7 +398,56 @@ cmd_cprom:
 	
 
 cmd_run:
+	push ra
+	# check that total number of args is 2 ( one for the command, one for the file path)
+	li t0, 2
+	beq s2, t0, 0f
+	la a0, error_invalid_args
+	li a7, 17
+	ecall
+	pop ra
 	ret
+	0:
+	lw a0, 1(s1)
+	# execute Command
+	# load path to user space -> for that set sbrk os point temporary to 5000 and call load file
+	lw t0, 1024(zero)
+	li t1, 5000
+	push t0
+	sw t1, 1024(zero)
+	# now call load file
+	li a7, 40
+	ecall # load file
+	# before checking if successful, restore sbrk, but keep the new one in t_2 
+	pop t0
+	lw t2, 1024(zero)
+	sw t0, 1024(zero)
+	# now check if successful
+	blt a0, zero, 2f
+	# a0: start address of program
+	push a0	
+	# reset user sbrk: starts at end of program
+	sw t2, 1057(zero)
+	li a0, 10
+	li a7, 18
+	ecall # print new line
+	li a7, 23
+	ecall # close key stream
+	# load correct address
+	pop a0
+	# set user stack pointer
+	li sp, 17400
+	# set mode to user
+	sw zero, 17(zero)
+	jr a0
+	2:
+	# error
+	la a0, error_execution
+	li a7, 17
+	ecall
+	pop ra
+	ret
+	
 
 cmd_runrom:
 	push ra

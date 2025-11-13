@@ -1026,7 +1026,7 @@ fs_write_to_file:
 # fs_load_file:
 # a0: uncompressed absolute path to file to load (has to be a file, not a dir)
 # returns:
-# a0: RAM address of loaded file (use sbrk of current mode to get the mem)
+# a0: RAM address of loaded file (use sbrk of current mode to get the mem). -1 if not successful
 # a1: Length of file in RAM
 fs_load_file:
 	push s0 # address of current block in file system
@@ -1126,6 +1126,7 @@ fs_load_file:
 	# get return RAM address and length
 	pop a1
 	pop a0
+	9:
 	# restore stack
 	pop ra
 	pop s4
@@ -1136,7 +1137,7 @@ fs_load_file:
 	1:
 	# error Case
 	li a0, -1
-	j 0b
+	j 9b
 	
 	
 # fs_del_file

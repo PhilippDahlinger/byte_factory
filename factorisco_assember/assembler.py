@@ -81,4 +81,4 @@ if __name__ == "__main__":
     kernel_program("interrupt_handler_1_0", verbose=verbose)
     # kernel_program("debug_boot", verbose=verbose)
     kernel_program("os_1_0", verbose=verbose)
-    user_program("trainer", verbose=verbose)
+    user_program("long_program_test", verbose=verbose)
