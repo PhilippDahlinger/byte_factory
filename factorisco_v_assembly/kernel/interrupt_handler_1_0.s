@@ -1008,6 +1008,7 @@ fs_write_to_file:
 	0:
 	# return 0 for Success
 	li a0, 0
+	9:
 	pop ra
 	pop s4
 	pop s3
@@ -1019,7 +1020,7 @@ fs_write_to_file:
 	1:
 	# error case
 	li a0, -1
-	j 0b
+	j 9b
 
 
 # fs_load_file:

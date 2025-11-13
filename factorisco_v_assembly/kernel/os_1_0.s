@@ -352,7 +352,50 @@ cmd_cp:
 	ret
 
 cmd_cprom:
+	push ra
+	# check that total number of args is 3
+	li t0, 3
+	beq s2, t0, 0f
+	la a0, error_invalid_args
+	li a7, 17
+	ecall
+	pop ra
 	ret
+	0:
+	# execute command
+	# load args 
+	lw a0, 1(s1)
+	# convert str to int
+	li a7, 31
+	ecall # str to int
+	# check if a1 is -1
+	blt a1, zero, 2f
+	li t0, 1
+	blt a0, zero, 2f
+	bgt a0, t0, 2f
+	# 0 or 1 in a0
+	# load start of ROM
+	la t0, rom_start_addresses
+	add t0, t0, a0
+	lw a1, 0(t0)
+	inc a1 # start of file is one word later
+	lw a2, -1(a1) # since in first word is the length of the program
+	lw a0, 2(s1)
+	li a7, 39
+	ecall # fs_write_to_file
+	blt a0, zero, 2f # check for errors	
+	1:
+	# return
+	pop ra
+	ret
+	2:
+	# error
+	la a0, error_execution
+	li a7, 17
+	ecall
+	pop ra
+	ret
+	
 
 cmd_run:
 	ret
@@ -373,6 +416,8 @@ cmd_runrom:
 	# convert str to int
 	li a7, 31
 	ecall # str to int
+	# check if a1 is -1
+	blt a1, zero, 2f
 	li t0, 1
 	blt a0, zero, 2f
 	bgt a0, t0, 2f
