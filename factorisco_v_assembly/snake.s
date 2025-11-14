@@ -140,6 +140,50 @@ game_loop:
 	sw t0, 1(s0)
 	1:
 	# done processing key
+	
+	# update head pos
+	lw t0, 0(s0)
+	lw t1, 1(s0)
+	lw t2, 2(s0)
+	lw t3, 3(s0)
+	add t2, t2, t0
+	add t3, t3, t1
+	sw t2, 2(s0) # head posx 
+	sw t3, 3(s0) # head posy
+	
+	# Traverse Snake: any collisions with head?
+	lw t0, 6(s0) # address of head element
+	# skip first head since we know that there can't be a collision
+	li t1, 1 # counter for list. when length reached -> stop
+	lw t4, 8(s0) # length
+	lw t0, 2(t0) # first element to check
+	
+	2:
+	beq t1, t4, 3f
+	# load current element pos
+	lw a0, 0(t0)
+	lw a1, 1(t0)
+	bne a0, t2, 4f
+	bne a1, t3, 4f
+	# collision! end game_loop
+	j game_over
+	4:
+	# no colllision with current element
+	inc t1
+	# follow pointer
+	lw t0, 2(t0)
+	j 2b
+	3:
+	# no collision with snake
+	# check collision with walls
+	blt t2, zero, game_over
+	blt t3, zero, game_over
+	li t4, 32 # max width/height
+	bge t2, t4, game_over
+	bge t3, t4, game_over
+	# no collision with walls
+	
+	
 	j game_loop
 
 
