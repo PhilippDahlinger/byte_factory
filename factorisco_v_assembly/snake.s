@@ -108,9 +108,39 @@ game_loop:
 	ecall # read_key_stream
 	beqz a0, 1f
 	# update current direction
-	
+	li t0, 6 # left
+	bne a0, t0, 2f
+	# change dir to x=-1 y=0
+	li t0, -1
+	sw t0, 0(s0)
+	sw zero, 1(s0)
+	j 1f
+	2:
+	li t0, 7 # right
+	bne a0, t0, 2f
+	# change dir to x=1 y=0
+	li t0, 1
+	sw t0, 0(s0)
+	sw zero, 1(s0)
+	j 1f
+	2:
+	li t0, 8 # down
+	bne a0, t0, 2f
+	# change dir to x=0 y=1
+	li t0, 1
+	sw zero, 0(s0)
+	sw t0, 1(s0)
+	j 1f
+	2:
+	li t0, 9 # up
+	bne a0, t0, 1f
+	# change dir to x=0 y=-1
+	li t0, -1
+	sw zero, 0(s0)
+	sw t0, 1(s0)
 	1:
 	# done processing key
+	j game_loop
 
 
 game_over:

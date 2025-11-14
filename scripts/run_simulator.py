@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     config = yaml.safe_load(open("simulator/sim_config_v3.yaml"))
     simulator = Simulator(config, ["output/factorisco/trainer_machine_code.txt",
-                                   "output/factorisco/long_program_test_machine_code.txt"
+                                   "output/factorisco/snake_machine_code.txt"
     ])
 
     root = tk.Tk()
