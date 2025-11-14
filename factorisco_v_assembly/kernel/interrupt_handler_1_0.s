@@ -135,6 +135,7 @@ jump_table:
 	jal zero, fs_file_name_to_str # 43
 	jal zero, draw_pixel # 44
 	jal zero, set_color # 45
+	jal zero, cls_color_display # 46
 	
 invalid_input:
 	# TODO
@@ -1302,6 +1303,10 @@ draw_pixel:
 # a0: hex color code
 set_color:
 	sw a0, 27(zero)
+	ret
+	
+cls_color_display:
+	sw zero, 30(zero)
 	ret
 
 # Helper functions for file system operations

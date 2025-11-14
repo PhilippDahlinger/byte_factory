@@ -1,5 +1,9 @@
 .text
 init:
+	# reset color display
+	li a7, 46
+	ecall # cls color display
+
     # memory setup
 	li a0, 20 # expect 20 vars needed
 	li a7, 2
@@ -15,9 +19,17 @@ init:
 	sw t0, 2(s0)
 	sw t0, 3(s0)
 	# random initial food pos
+	# set food color first
+	la a0, food_color
+	lw a0, 0(a0)
+	li a7, 45
+	ecall # set color
 	call gen_new_food
 	sw a0, 4(s0)
 	sw a1, 5(s0)
+	# draw pixel
+	li a7, 44
+	ecall # draw pixel
 	# initial snake Length
 	li t0, 3
 	sw t0, 8(s0)
@@ -71,6 +83,7 @@ init:
 	
 	# set initial screen pixels of snake
 	la a0, snake_color
+	lw a0, 0(a0)
 	li a7, 45
 	ecall # set color
 	li a0, 10
@@ -85,9 +98,6 @@ init:
 	li a1, 10
 	li a7, 44 
 	ecall # set pixels
-	
-	li s10, 9990
-	halt
 	
 	
 	
@@ -214,7 +224,11 @@ game_loop:
 	j 6f
 	5:
 	# MOVE
-	# t0 still has address of last block
+	# load last segment
+	lw t0, 7(s0)
+	# save pos to remove that pixel later
+	lw s3, 0(t0)
+	lw s4, 1(t0)
 	# predecessor: t1
 	lw t1, 3(t0)
 	# set pointer to next element to itself
@@ -233,7 +247,26 @@ game_loop:
 	sw t0, 6(s0)
 	# queue updated
 	
-	
+	# save head pos
+	mv s1, t2
+	mv s2, t3
+	# update color display
+	la a0, snake_color
+	lw a0, 0(a0)
+	li a7, 45
+	ecall # set color
+	mv a0, s1
+	mv a1, s2
+	li a7, 44
+	ecall # draw pixel
+	# remove tail
+	li a0, 0
+	li a7, 45
+	ecall # set color
+	mv a0, s3
+	mv a1, s4
+	li a7,44
+	ecall # draw pixel
 	6:
 	
 	

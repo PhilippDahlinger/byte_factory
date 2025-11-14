@@ -81,6 +81,10 @@ boot:
 	li a0, 0
 	li a7, 11
 	ecall
+	
+	# reset color display
+	li a7, 46
+	ecall # cls color display
 
 	# init file system (later on, implement that as an installation step. basically have an OS installer on a ROM)
 	li a0, 66560 # fs base address
