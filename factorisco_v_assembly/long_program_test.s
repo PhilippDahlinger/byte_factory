@@ -1,4 +1,7 @@
 .text
+la a0, str_dot
+li a7, 17
+ecall # println
 nop
 nop
 nop
