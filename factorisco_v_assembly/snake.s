@@ -69,6 +69,28 @@ init:
 	li a7, 19
 	ecall # print_int
 	
+	# set initial screen pixels of snake
+	la a0, snake_color
+	li a7, 45
+	ecall # set color
+	li a0, 10
+	li a1, 10
+	li a7, 44 
+	ecall
+	li a0, 9
+	li a1, 10
+	li a7, 44 
+	ecall
+	li a0, 8
+	li a1, 10
+	li a7, 44 
+	ecall # set pixels
+	
+	li s10, 9990
+	halt
+	
+	
+	
 	# start listening to keyboard
 	li a7, 22
 	ecall # open_key_stream
@@ -183,6 +205,37 @@ game_loop:
 	bge t3, t4, game_over
 	# no collision with walls
 	
+	# check food
+	lw a0, 4(s0)
+	lw a1, 5(s0)
+	bne a0, t2, 5f
+	bne a1, t3, 5f
+	# EAT: todo
+	j 6f
+	5:
+	# MOVE
+	# t0 still has address of last block
+	# predecessor: t1
+	lw t1, 3(t0)
+	# set pointer to next element to itself
+	sw t1, 2(t1)
+	# set last element pointer to t1
+	sw t1, 7(s0)
+	# last element removed
+	# set new head position to t0
+	sw t2, 0(t0)
+	sw t3, 1(t0)
+	# load current head
+	lw t1, 6(s0)
+	sw t0, 3(t0) # prev element is not defined, since it is the new head
+	sw t1, 2(t0) # next element is old head
+	# set head of queue
+	sw t0, 6(s0)
+	# queue updated
+	
+	
+	6:
+	
 	
 	j game_loop
 
@@ -231,3 +284,6 @@ gen_new_food:
 
 .data
 	score_label: .asciz "Score: "
+	snake_color: .word 3137097
+	food_color: .word 15744550
+	

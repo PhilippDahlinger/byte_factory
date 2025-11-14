@@ -133,6 +133,8 @@ jump_table:
 	jal zero, fs_del_file # 41
 	jal zero, fs_del_dir # 42
 	jal zero, fs_file_name_to_str # 43
+	jal zero, draw_pixel # 44
+	jal zero, set_color # 45
 	
 invalid_input:
 	# TODO
@@ -1287,6 +1289,20 @@ fs_file_name_to_str:
 	mv a0, t5
 	ret
 
+# draw_pixel
+# a0: x coord 
+# a1: y coord
+# returns nothing, to optimize speed
+draw_pixel:
+	sw a0, 22(zero)
+	sw a1, 23(zero)
+	sw zero, 29(zero) # draw based on hex color
+	ret
+	
+# a0: hex color code
+set_color:
+	sw a0, 27(zero)
+	ret
 
 # Helper functions for file system operations
 
