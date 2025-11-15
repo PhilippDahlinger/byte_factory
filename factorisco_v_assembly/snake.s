@@ -75,7 +75,7 @@ init:
 	li a7, 8
 	ecall # get_cursor
 	sw a0, 9(s0)
-	sw a1, 10(s1)
+	sw a1, 10(s0)
 	# print initial score (0)
 	li a0, 0
 	li a7, 19
@@ -220,8 +220,69 @@ game_loop:
 	lw a1, 5(s0)
 	bne a0, t2, 5f
 	bne a1, t3, 5f
-	# EAT: todo
-	j 6f
+	# EAT
+	# request for new element
+	# save head pos
+	mv s1, t2
+	mv s2, t3 
+	li a0, 4
+	li a7, 2
+	ecall # sbrk
+	# new head element in a0, all other elements are the same.
+	# set new head position to a0
+	sw s1, 0(a0)
+	sw s2, 1(a0)
+	# load current head
+	lw t1, 6(s0)
+	sw a0, 3(a0) # prev element is not defined, since it is the new head
+	sw t1, 2(a0) # next element is old head
+	# mark back reference from t1 to a0
+	sw a0, 3(t1)
+	# set head of queue (after mem dep resolve)
+	# update length of snake
+	lw t0, 8(s0)
+	sw a0, 6(s0)
+	# queue updated
+	
+	inc t0
+	sw t0, 8(s0) # new length
+	
+	# draw new head pixel, don't remove tail
+	# update color display
+	la a0, snake_color
+	lw a0, 0(a0)
+	li a7, 45
+	ecall # set color
+	mv a0, s1
+	mv a1, s2
+	li a7, 44
+	ecall # draw pixel
+	
+	# update Score
+	lw a0, 9(s0)
+	lw a1, 10(s0)
+	li a7, 6
+	ecall # set cursor to score pos
+	lw a0, 8(s0)
+	li a7, 19
+	subi a0, a0, 3 # initial snake was 3 long -> score is length - 3
+	ecall # print_int
+	
+	# get new food
+	# set food color first
+	la a0, food_color
+	lw a0, 0(a0)
+	li a7, 45
+	ecall # set color
+	call gen_new_food
+	# save it in mem
+	sw a0, 4(s0)
+	sw a1, 5(s0)
+	# draw food pixel
+	li a7, 44
+	ecall # draw pixel
+	j game_loop
+	
 	5:
 	# MOVE
 	# load last segment
@@ -243,6 +304,8 @@ game_loop:
 	lw t1, 6(s0)
 	sw t0, 3(t0) # prev element is not defined, since it is the new head
 	sw t1, 2(t0) # next element is old head
+	# mark back reference from t1 to t0
+	sw t0, 3(t1)
 	# set head of queue
 	sw t0, 6(s0)
 	# queue updated
@@ -267,9 +330,6 @@ game_loop:
 	mv a1, s4
 	li a7,44
 	ecall # draw pixel
-	6:
-	
-	
 	j game_loop
 
 
@@ -278,16 +338,9 @@ game_over:
 	li a7, 1
 	ecall # exit
 
-
 gen_new_food:
-# a0: xpos of current head -> move to s0
-# a1: ypos of current head -> move to s1
-# returns: a0|a1: pos of new food. It makes sure it is not extremely close (TODO) to the head position
-	push s0
-	push s1
+# returns: a0|a1: pos of new food. It makes sure that it is not inside the snake
 	push ra
-	mv s0, a0
-	mv s1, a1
 	0:
 	# generate new random number
 	li a7, 28
@@ -297,22 +350,32 @@ gen_new_food:
 	# get y: shift and 0-31
 	srai a0, a0, 5
 	andi t1, a0, 31
-	# check that it is not the head pos
-	# TODO: check a region around the head
-	bne t0, s0, 1f
+	lw t2, 8(s0) # len
+	lw t3, 6(s0) # first elem
+	li t4, 0 # counter
+	1:
+	beq t4, t2, 3f # done, no collision
+	# load element pos
+	lw t5, 0(t3)
+	lw t6, 1(t3)
+	# check that food pos and element pos are different
+	bne t0, t5, 2f
 	# not the same x coord -> done
-	bne t1, s1, 1f
+	bne t1, s1, 2f
 	# not the same y coord -> done
 	# both are the same -> try again
 	j 0b
-	1:
+	2:
+	# this element passed
+	lw t3, 2(t3) # update pointer
+	inc t4
+	j 1b # check next element
+	3:
 	# prepare output
 	mv a0, t0
 	mv a1, t1
 	# return
 	pop ra
-	pop s1
-	pop s0
 	ret
 
 .data

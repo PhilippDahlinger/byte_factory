@@ -172,10 +172,14 @@ main_loop:
 	# for the command (first argument) compute the hash
 	lw a0, 0(s1)
 	call hash64_word_38
+	
+	# end of array
+	# get the length of the commands
+	la t3, num_commands
 	# find the hash in the list
 	la t0, cmd_hashes
-	# end of array
-	addi t2, t0, 9
+	lw t3, 0(t3)
+	add t2, t0, t3
 	5:
 	beq t0, t2, invalid_cmd
 	lw t1, 0(t0)
@@ -720,6 +724,7 @@ fs_init:
 	welcome: .asciz "FactOS 1.1.0\n"
 	prompt: .asciz "> "
 	cmd_hashes: .word 1083, 1228, 510, 834, 1679, 120, 1599, 1240, 193, 188, 189
+	num_commands: .word 11 # TODO: When you add a command, increment this length counter!
 	# "LS","MKDIR","TOUCH","CP","CPROM","RUN","RUNROM","MV","RM"
 	unknown_cmd: .asciz "Error: Unknown Cmd"
 	error_invalid_args: .asciz "Error: Invalid number of arguments"
