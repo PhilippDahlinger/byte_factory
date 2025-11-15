@@ -220,6 +220,7 @@ game_loop:
 	lw a1, 5(s0)
 	bne a0, t2, 5f
 	bne a1, t3, 5f
+	
 	# EAT
 	# request for new element
 	# save head pos
@@ -252,10 +253,19 @@ game_loop:
 	la a0, snake_color
 	lw a0, 0(a0)
 	li a7, 45
+	
+	li s10, 9999
+	nop
+	nop
+	nop
+	nop
+	halt
+	
 	ecall # set color
 	mv a0, s1
 	mv a1, s2
 	li a7, 44
+	
 	ecall # draw pixel
 	
 	# update Score
