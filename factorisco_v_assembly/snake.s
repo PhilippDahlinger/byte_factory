@@ -14,10 +14,11 @@ init:
 	li t0, 1
 	sw t0, 0(s0) # initially go right
 	sw zero, 1(s0) # don't go up or down
-	# head pos is 10|10
-	li t0, 10
+	# head pos is 5|10
+	li t0, 5
+	li t1, 10
 	sw t0, 2(s0)
-	sw t0, 3(s0)
+	sw t1, 3(s0)
 	# random initial food pos
 	# set food color first
 	la a0, food_color
@@ -46,7 +47,7 @@ init:
 	addi t0, a0, 8 # address of tail element
 	sw t0, 7(s0)
 	# actual data inside the queue
-	li t0, 10
+	li t0, 5
 	li t1, 10
 	sw t0, 0(a0)
 	sw t1, 1(a0)
@@ -86,19 +87,46 @@ init:
 	lw a0, 0(a0)
 	li a7, 45
 	ecall # set color
-	li a0, 10
+	li a0, 5
 	li a1, 10
 	li a7, 44 
 	ecall
-	li a0, 9
+	li a0, 4
 	li a1, 10
 	li a7, 44 
 	ecall
-	li a0, 8
+	li a0, 3
 	li a1, 10
 	li a7, 44 
 	ecall # set pixels
 	
+	# set walls to get a 16x16 field (0-15 coords)
+	la a0, wall_color
+	lw a0, 0(a0)
+	li a7, 45
+	ecall # set color
+	li a0, 16
+	li a1, 0
+	li a2, 17
+	0:
+	beq a1, a2, 1f
+	# draw pixel at a0|a1
+	li a7, 44 
+	ecall
+	inc a1
+	j 0b
+	1:
+	li a0, 0
+	li a1, 16
+	li a2, 17
+	2:
+	beq a0, a2, 3f
+	# draw pixel at a0|a1
+	li a7, 44 
+	ecall
+	inc a0
+	j 2b
+	3:
 	
 	
 	# start listening to keyboard
@@ -186,12 +214,13 @@ game_loop:
 	# Traverse Snake: any collisions with head?
 	lw t0, 6(s0) # address of head element
 	# skip first head since we know that there can't be a collision
-	li t1, 1 # counter for list. when length reached -> stop
+	li t1, 2 # counter for list. when length reached -> stop
+	# t1 is 2: because we don't check the head. but we also do not check the tail, since this will be moved in this update.
 	lw t4, 8(s0) # length
 	lw t0, 2(t0) # first element to check
 	
 	2:
-	beq t1, t4, 3f
+	bge t1, t4, 3f
 	# load current element pos
 	lw a0, 0(t0)
 	lw a1, 1(t0)
@@ -210,7 +239,7 @@ game_loop:
 	# check collision with walls
 	blt t2, zero, game_over
 	blt t3, zero, game_over
-	li t4, 32 # max width/height
+	li t4, 16 # max width/height
 	bge t2, t4, game_over
 	bge t3, t4, game_over
 	# no collision with walls
@@ -347,11 +376,11 @@ gen_new_food:
 	# generate new random number
 	li a7, 28
 	ecall # random word
-	# get x : 0-31
-	andi t0, a0, 31
-	# get y: shift and 0-31
-	srai a0, a0, 5
-	andi t1, a0, 31
+	# get x : 0-15
+	andi t0, a0, 15
+	# get y: shift and 0-15
+	srai a0, a0, 4
+	andi t1, a0, 15
 	lw t2, 8(s0) # len
 	lw t3, 6(s0) # first elem
 	li t4, 0 # counter
@@ -363,7 +392,7 @@ gen_new_food:
 	# check that food pos and element pos are different
 	bne t0, t5, 2f
 	# not the same x coord -> done
-	bne t1, s1, 2f
+	bne t1, t6, 2f
 	# not the same y coord -> done
 	# both are the same -> try again
 	j 0b
@@ -384,4 +413,5 @@ gen_new_food:
 	score_label: .asciz "Score: "
 	snake_color: .word 3137097
 	food_color: .word 15744550
+	wall_color: .word 14737632
 	

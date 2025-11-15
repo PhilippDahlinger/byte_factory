@@ -29,6 +29,7 @@ if __name__ == "__main__":
         "RM",
         "R0",
         "R1",
+        "FSINIT",
     ]
     for command in commands:
         # create ascii word
