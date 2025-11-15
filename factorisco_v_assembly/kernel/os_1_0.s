@@ -216,6 +216,8 @@ jump_table:
 	jal zero, cmd_runrom #6
 	jal zero, cmd_mv #7
 	jal zero, cmd_rm #8
+	jal zero, cmd_r0 #9
+	jal zero, cmd_r1 #10
 
 cmd_ls:
 	push ra
@@ -475,6 +477,17 @@ cmd_runrom:
 	blt a0, zero, 2f
 	bgt a0, t0, 2f
 	# execute Command
+	call internal_runrom
+	2:
+	# error
+	la a0, error_execution
+	li a7, 17
+	ecall
+	pop ra
+	ret
+
+internal_runrom:
+	# a0: 0 or 1
 	push a0
 	# reset user sbrk
 	li t0, 5000
@@ -497,13 +510,6 @@ cmd_runrom:
 	inc a2
 	# execute user program
 	jr a2
-	2:
-	# error
-	la a0, error_execution
-	li a7, 17
-	ecall
-	pop ra
-	ret
 	
 	
 	
@@ -560,6 +566,38 @@ cmd_rm:
 	ecall
 	pop ra
 	ret
+	
+cmd_r0:
+	push ra
+	# check that total number of args is 1
+	li t0, 1
+	beq s2, t0, 0f
+	la a0, error_invalid_args
+	li a7, 17
+	ecall
+	pop ra
+	ret
+	0:
+	# execute command
+	li a0, 0
+	call internal_runrom
+	
+cmd_r1:
+	push ra
+	# check that total number of args is 1
+	li t0, 1
+	beq s2, t0, 0f
+	la a0, error_invalid_args
+	li a7, 17
+	ecall
+	pop ra
+	ret
+	0:
+	# execute command
+	li a0, 1
+	call internal_runrom
+
+	
 	
 # end of Command implementations
 #----------------------------------------
@@ -681,7 +719,7 @@ fs_init:
 .data
 	welcome: .asciz "FactOS 1.1.0\n"
 	prompt: .asciz "> "
-	cmd_hashes: .word 1083, 1228, 510, 834, 1679, 120, 1599, 1240, 193
+	cmd_hashes: .word 1083, 1228, 510, 834, 1679, 120, 1599, 1240, 193, 188, 189
 	# "LS","MKDIR","TOUCH","CP","CPROM","RUN","RUNROM","MV","RM"
 	unknown_cmd: .asciz "Error: Unknown Cmd"
 	error_invalid_args: .asciz "Error: Invalid number of arguments"
