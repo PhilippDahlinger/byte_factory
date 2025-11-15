@@ -253,19 +253,11 @@ game_loop:
 	la a0, snake_color
 	lw a0, 0(a0)
 	li a7, 45
-	
-	li s10, 9999
-	nop
-	nop
-	nop
-	nop
-	halt
-	
 	ecall # set color
+	
 	mv a0, s1
 	mv a1, s2
 	li a7, 44
-	
 	ecall # draw pixel
 	
 	# update Score
