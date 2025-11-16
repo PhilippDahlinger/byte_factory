@@ -19,21 +19,6 @@ init:
 	li t1, 5
 	sw t0, 2(s0)
 	sw t1, 3(s0)
-	# random initial food pos
-	# set food color first
-	la a0, food_color
-	lw a0, 0(a0)
-	li a7, 45
-	ecall # set color
-	call gen_new_food
-	sw a0, 4(s0)
-	sw a1, 5(s0)
-	# draw pixel
-	li a7, 44
-	ecall # draw pixel
-	# initial snake Length
-	li t0, 3
-	sw t0, 8(s0)
 	
 	# queue init
 	# request initial queue memory. this will grow once more snake elements are created
@@ -41,6 +26,7 @@ init:
 	li a0, 12
 	li a7, 2
 	ecall # sbrk
+	
 	# set up the initial queue by hand, first element is the head initially
 	# a0 is address of queue head element
 	sw a0, 6(s0)
@@ -68,6 +54,12 @@ init:
 	addi t0, t0, 4
 	sw t0, 6(a0)
 	sw t0, 10(a0) # self ref tail
+	
+	# initial snake Length
+	li t0, 3
+	sw t0, 8(s0)
+	
+	
 	# print the Score label and initial score (length - 3)
 	la a0, score_label
 	li a7, 16
@@ -81,6 +73,20 @@ init:
 	li a0, 0
 	li a7, 19
 	ecall # print_int
+	
+	# random initial food pos
+	# set food color first
+	la a0, food_color
+	lw a0, 0(a0)
+	li a7, 45
+	ecall # set color
+	call gen_new_food
+	sw a0, 4(s0)
+	sw a1, 5(s0)
+	# draw pixel
+	li a7, 44
+	ecall # draw pixel
+
 	
 	# set initial screen pixels of snake
 	la a0, snake_color
@@ -100,7 +106,7 @@ init:
 	li a7, 44 
 	ecall # set pixels
 	
-	# set walls to get a 16x16 field (0-7 coords)
+	# set walls to get a 8x8 field (0-7 coords)
 	la a0, wall_color
 	lw a0, 0(a0)
 	li a7, 45
@@ -128,11 +134,9 @@ init:
 	j 2b
 	3:
 	
-	
 	# start listening to keyboard
 	li a7, 22
 	ecall # open_key_stream
-	
 	# all initialized, start game_loop
 	j game_loop
 
@@ -200,7 +204,6 @@ game_loop:
 	sw t0, 1(s0)
 	1:
 	# done processing key
-	
 	# update head pos
 	lw t0, 0(s0)
 	lw t1, 1(s0)
