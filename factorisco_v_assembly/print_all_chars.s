@@ -1,7 +1,11 @@
 .text
 _start:
 	# create string which contains all symbols
-	li t0, 5000 # start address of string
+	li a0, 300
+	li a7, 2 
+	ecall # sbrk for enough space
+	mv t0, a0  # start address of string
+	mv s0, a0 # save ref
 	li t1, 30 # data
 	li t2, 128 # last code
 	0:
@@ -21,7 +25,7 @@ _start:
 	ecall
 	
 	li a7, 17 
-	li a0, 5000  # load string
+	mv a0, s0  # load string
 	ecall # println
 		
 	li a7, 1

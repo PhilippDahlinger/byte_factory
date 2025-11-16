@@ -165,7 +165,6 @@ nop
 nop
 nop
 nop
-halt
 nop
 nop
 nop
