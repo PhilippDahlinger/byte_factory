@@ -227,6 +227,7 @@ jump_table:
 	jal zero, cmd_r0 #9
 	jal zero, cmd_r1 #10
 	jal zero, cmd_init_fs #11
+	jal zero, cmd_cls # 12
 
 cmd_ls:
 	push ra
@@ -623,6 +624,22 @@ cmd_init_fs:
 	li a2, 64       # number of blocks
 	call fs_init
 
+cmd_cls:
+	push ra
+	# check that total number of args is 1
+	li t0, 1
+	beq s2, t0, 0f
+	la a0, error_invalid_args
+	li a7, 17
+	ecall
+	pop ra
+	ret
+	0:
+	# execute command
+	li a7, 15
+	ecall # cls
+	pop ra
+	ret
 	
 # end of Command implementations
 #----------------------------------------
@@ -744,8 +761,8 @@ fs_init:
 .data
 	welcome: .asciz "FactOS 1.1.0\n"
 	prompt: .asciz "> "
-	cmd_hashes: .word 1083, 1228, 510, 834, 1679, 120, 1599, 1240, 193, 188, 189, 178
-	num_commands: .word 12 # TODO: When you add a command, increment this length counter!
+	cmd_hashes: .word 1083, 1228, 510, 834, 1679, 120, 1599, 1240, 193, 188, 189, 178, 1959
+	num_commands: .word 13 # TODO: When you add a command, increment this length counter!
 	unknown_cmd: .asciz "Error: Unknown Cmd"
 	error_invalid_args: .asciz "Error: Invalid number of arguments"
 	error_execution: .asciz "Error executing Cmd"

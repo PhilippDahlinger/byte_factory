@@ -96,4 +96,4 @@ if __name__ == "__main__":
     kernel_program("os_1_0", verbose=verbose)
     user_program("aoc2024_03", verbose=verbose)
     user_program("mem_test_3", verbose=verbose)
-    read_data("aoc24_03_input", verbose=verbose)
+    read_data("aoc24_04_input", verbose=verbose)

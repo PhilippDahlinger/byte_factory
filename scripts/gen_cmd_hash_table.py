@@ -30,6 +30,7 @@ if __name__ == "__main__":
         "R0",
         "R1",
         "FSINIT",
+        "CLS",
     ]
     for command in commands:
         # create ascii word
