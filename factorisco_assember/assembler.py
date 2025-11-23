@@ -92,9 +92,8 @@ def read_data(file_name, verbose=True):
 
 if __name__ == "__main__":
     verbose = False
-    # kernel_program("interrupt_handler_1_0", verbose=verbose)
-    # # kernel_program("debug_boot", verbose=verbose)
-    # kernel_program("os_1_0", verbose=verbose)
+    kernel_program("interrupt_handler_1_0", verbose=verbose)
+    kernel_program("os_1_0", verbose=verbose)
     user_program("aoc2024_03", verbose=verbose)
-    # read_data("aoc24_03_input", verbose=verbose)
+    user_program("mem_test_3", verbose=verbose)
     read_data("aoc24_03_input", verbose=verbose)

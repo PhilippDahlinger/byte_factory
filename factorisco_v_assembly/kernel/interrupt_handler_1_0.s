@@ -893,7 +893,7 @@ fs_mkdir:
 
 # fs_write_to_file: 
 # a0: uncompressed absolute path to file 
-# a1: Start address of data in RAM
+# a1: Start address of data in RAM/ROM
 # a2: How many words to write
 # Returns:
 # a0: 0 if successful, -1 if error
