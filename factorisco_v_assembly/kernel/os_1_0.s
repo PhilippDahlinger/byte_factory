@@ -81,13 +81,21 @@ boot:
 	li a0, 0
 	li a7, 11
 	ecall
+	
+	# reset color display
+	li a7, 46
+	ecall # cls color display
 
-	# init file system (later on, implement that as an installation step. basically have an OS installer on a ROM)
+	# init file system, only if magic string is not present
 	li a0, 66560 # fs base address
+	lw t1, 0(a0)
+	li t0, 1128813396 # magic string "CHST"
+	beq t0, t1, 1f
+	# current mountpoint does not have magic string -> init file system
 	li a1, 256      # block size
 	li a2, 64       # number of blocks
 	call fs_init
-	
+	1:
 	# start the OS
 	la a0, welcome
 	li a7, 17
@@ -168,10 +176,14 @@ main_loop:
 	# for the command (first argument) compute the hash
 	lw a0, 0(s1)
 	call hash64_word_38
+	
+	# end of array
+	# get the length of the commands
+	la t3, num_commands
 	# find the hash in the list
 	la t0, cmd_hashes
-	# end of array
-	addi t2, t0, 9
+	lw t3, 0(t3)
+	add t2, t0, t3
 	5:
 	beq t0, t2, invalid_cmd
 	lw t1, 0(t0)
@@ -212,6 +224,9 @@ jump_table:
 	jal zero, cmd_runrom #6
 	jal zero, cmd_mv #7
 	jal zero, cmd_rm #8
+	jal zero, cmd_r0 #9
+	jal zero, cmd_r1 #10
+	jal zero, cmd_init_fs #11
 
 cmd_ls:
 	push ra
@@ -471,6 +486,17 @@ cmd_runrom:
 	blt a0, zero, 2f
 	bgt a0, t0, 2f
 	# execute Command
+	call internal_runrom
+	2:
+	# error
+	la a0, error_execution
+	li a7, 17
+	ecall
+	pop ra
+	ret
+
+internal_runrom:
+	# a0: 0 or 1
 	push a0
 	# reset user sbrk
 	li t0, 5000
@@ -493,13 +519,6 @@ cmd_runrom:
 	inc a2
 	# execute user program
 	jr a2
-	2:
-	# error
-	la a0, error_execution
-	li a7, 17
-	ecall
-	pop ra
-	ret
 	
 	
 	
@@ -556,6 +575,54 @@ cmd_rm:
 	ecall
 	pop ra
 	ret
+	
+cmd_r0:
+	push ra
+	# check that total number of args is 1
+	li t0, 1
+	beq s2, t0, 0f
+	la a0, error_invalid_args
+	li a7, 17
+	ecall
+	pop ra
+	ret
+	0:
+	# execute command
+	li a0, 0
+	call internal_runrom
+	
+cmd_r1:
+	push ra
+	# check that total number of args is 1
+	li t0, 1
+	beq s2, t0, 0f
+	la a0, error_invalid_args
+	li a7, 17
+	ecall
+	pop ra
+	ret
+	0:
+	# execute command
+	li a0, 1
+	call internal_runrom
+
+cmd_init_fs:
+	push ra
+	# check that total number of args is 1
+	li t0, 1
+	beq s2, t0, 0f
+	la a0, error_invalid_args
+	li a7, 17
+	ecall
+	pop ra
+	ret
+	0:
+	# execute command
+	li a0, 66560 # fs base address
+	li a1, 256      # block size
+	li a2, 64       # number of blocks
+	call fs_init
+
 	
 # end of Command implementations
 #----------------------------------------
@@ -677,8 +744,8 @@ fs_init:
 .data
 	welcome: .asciz "FactOS 1.1.0\n"
 	prompt: .asciz "> "
-	cmd_hashes: .word 1083, 1228, 510, 834, 1679, 120, 1599, 1240, 193
-	# "LS","MKDIR","TOUCH","CP","CPROM","RUN","RUNROM","MV","RM"
+	cmd_hashes: .word 1083, 1228, 510, 834, 1679, 120, 1599, 1240, 193, 188, 189, 178
+	num_commands: .word 12 # TODO: When you add a command, increment this length counter!
 	unknown_cmd: .asciz "Error: Unknown Cmd"
 	error_invalid_args: .asciz "Error: Invalid number of arguments"
 	error_execution: .asciz "Error executing Cmd"

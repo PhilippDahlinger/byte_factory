@@ -26,7 +26,10 @@ if __name__ == "__main__":
         "RUN",
         "RUNROM",
         "MV",
-        "RM"
+        "RM",
+        "R0",
+        "R1",
+        "FSINIT",
     ]
     for command in commands:
         # create ascii word

@@ -14,9 +14,9 @@ init:
 	li t0, 1
 	sw t0, 0(s0) # initially go right
 	sw zero, 1(s0) # don't go up or down
-	# head pos is 5|10
+	# head pos is 5|5
 	li t0, 5
-	li t1, 10
+	li t1, 5
 	sw t0, 2(s0)
 	sw t1, 3(s0)
 	
@@ -34,7 +34,7 @@ init:
 	sw t0, 7(s0)
 	# actual data inside the queue
 	li t0, 5
-	li t1, 10
+	li t1, 5
 	sw t0, 0(a0)
 	sw t1, 1(a0)
 	dec t0
@@ -94,26 +94,26 @@ init:
 	li a7, 45
 	ecall # set color
 	li a0, 5
-	li a1, 10
+	li a1, 5
 	li a7, 44 
 	ecall
 	li a0, 4
-	li a1, 10
+	li a1, 5
 	li a7, 44 
 	ecall
 	li a0, 3
-	li a1, 10
+	li a1, 5
 	li a7, 44 
 	ecall # set pixels
 	
-	# set walls to get a 16x16 field (0-15 coords)
+	# set walls to get a 8x8 field (0-7 coords)
 	la a0, wall_color
 	lw a0, 0(a0)
 	li a7, 45
 	ecall # set color
-	li a0, 16
+	li a0, 8
 	li a1, 0
-	li a2, 17
+	li a2, 9
 	0:
 	beq a1, a2, 1f
 	# draw pixel at a0|a1
@@ -123,8 +123,8 @@ init:
 	j 0b
 	1:
 	li a0, 0
-	li a1, 16
-	li a2, 17
+	li a1, 8
+	li a2, 9
 	2:
 	beq a0, a2, 3f
 	# draw pixel at a0|a1
@@ -242,7 +242,7 @@ game_loop:
 	# check collision with walls
 	blt t2, zero, game_over
 	blt t3, zero, game_over
-	li t4, 16 # max width/height
+	li t4, 8 # max width/height
 	bge t2, t4, game_over
 	bge t3, t4, game_over
 	# no collision with walls
@@ -379,11 +379,11 @@ gen_new_food:
 	# generate new random number
 	li a7, 28
 	ecall # random word
-	# get x : 0-15
-	andi t0, a0, 15
+	# get x : 0-7
+	andi t0, a0, 7
 	# get y: shift and 0-15
 	srai a0, a0, 4
-	andi t1, a0, 15
+	andi t1, a0, 7
 	lw t2, 8(s0) # len
 	lw t3, 6(s0) # first elem
 	li t4, 0 # counter

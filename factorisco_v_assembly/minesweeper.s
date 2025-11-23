@@ -1,5 +1,4 @@
 .text
-.globl _start
 _start:
 	call init
 	game_loop:
@@ -98,7 +97,8 @@ _start:
 	# check if it is in bounds
 	blt s5, zero, 1f
 	blt s6, zero, 1f
-	bge s5, s9, 1f
+	li t6, 6 # num rows
+	bge s5, t6, 1f
 	bge s6, s9, 1f
 	# delete current animation
 	add t0, s3, s0 # array address + offset
@@ -125,8 +125,8 @@ stop:
 	push a0
 	# set font and move cursor to correct printing pos
 	# move cursor to location below bomb text
-	li a0, 2
-	addi a1, s9, 1 # 1 field right to the game
+	li a0, 7
+	li a1, 0 # 1 field right to the game
 	li a7, 6
 	ecall # set cursor abs
 	# set stride to 1
@@ -151,7 +151,7 @@ stop:
 	li a7, 23
 	ecall # close key stream
 	# move cursor to the end of the field
-	mv a0, s9
+	li a0, 7
 	li a1, 0
 	li a7, 6
 	ecall # set cursor abs
@@ -175,8 +175,9 @@ update_status:
 	# set border flags 0: is close to border, 1: is a binnengebiet
 	slt t2, zero, s1 # t0 = (s1 > 0), for top row
 	slt t3, zero, s2 # for left col
-	subi t0, s9, 1  
-	slt t4, s1, t0 # t4 = (s1 < dim - 1), for bot row
+	li t0, 5  
+	slt t4, s1, t0 # t4 = (s1 < 6 - 1), for bot row
+	subi t0, s9, 1
 	slt t5, s2, t0 # for right col
 	
 	
@@ -402,14 +403,13 @@ init:
 	# s5/s6: temps which are save after ecalls
 	li s7, 0 # animation state, switches between 0 and 1
 	li s8, 1 # constant 1 for stuff
-	li s9, 9 # game dim
-	mul s10, s9, s9 # total size of field
+	li s9, 12 # game columns
+	muli s10, s9, 6 # total size of field (uses 6 rows)
 	# s11: number of non-bombs fields still unexplored. if 0: you win
 	
 	# memory maps
 	# bombs
-	# mv a0, s10  <- Correct line
-	li a0, 256  # debug line
+	mv a0, s10 # <- Correct line
 	li a7, 2
 	ecall  # sbrk
 	push a0 # save ref
@@ -450,8 +450,7 @@ init:
 	
 	1:
 	# status 
-	# mv a0, s10  <- Correct line
-	li a0, 256  # debug line
+	mv a0, s10  # <- Correct line
 	li a7, 2
 	ecall  # sbrk
 	push a0 # save ref
@@ -519,17 +518,14 @@ init_field:
 	# .word 136, 136, 136, 136, 10
 	# .word 136, 136, 136, 136,0
 	
-	str_init_field: .word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
-	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
-	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
-	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
-	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
-	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
-	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
-	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
-	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 0
+	str_init_field: .word 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
+	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
+	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
+	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
+	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 10
+	.word 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 0
 	
 	
-	str_bombs: .asciz "Bombs: "
+	str_bombs: .asciz "Bombs:"
 	str_loose: .asciz "Boom!"
 	str_win: .asciz "Good job!"
