@@ -39,6 +39,8 @@ class KeyboardController:
             "space": 32,
             "slash": 47,
             "period": 46,
+            "minus": 45,
+            "plus": 43,
         }
         # Check for special keys
         if key_symbol in keymap:

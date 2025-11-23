@@ -1,6 +1,8 @@
 import re
 from collections import defaultdict
 
+from factorisco_assember.input_encodings.create_data_blueprint import create_data_blueprint
+
 instruction_key_words = ["add", "addi", "and", "andi", "auipc", "beq", "bge", "bgeu", "blt", "bltu", "bne", "div",
                          "divu", "ecall", "add", "j", "jal", "jalr", "lb", "lbu", "lh", "lhu", "lui", "lw", "mul",
                          "mulh", "mulhsu", "mulhu", "or", "ori", "rem", "addi", "remu", "sb", "sh", "sll", "slli",
@@ -631,3 +633,50 @@ def compute_data_values(data, line_labels):
             # compressed string with 4 character per word, also with 0 as final (or multiple finals to fill the remaining word)
             raise NotImplementedError("ascic not implemented")
     return output_data, output_line_labels
+
+
+def convert_data(source_code, output_file, verbose):
+    output = []
+    current_word = 0
+    inter_word_counter = 0
+    current_string_pos = 0
+    while current_string_pos < len(source_code):
+        # read char
+        current_char = source_code[current_string_pos]
+        # char "\n" will be converted to 10 -> expected behavior
+        ascii_code = ord(current_char)
+        if verbose and current_string_pos < 12:
+            print(hex(ascii_code))
+        current_word = current_word << 8
+        current_word += ascii_code
+        inter_word_counter += 1
+        if inter_word_counter == 4:
+            # dispatch the word
+            output.append(current_word)
+            current_word = 0
+            inter_word_counter = 0
+        current_string_pos += 1
+    # add a zero to the string
+    current_word = current_word << 8
+    current_word += 0
+    inter_word_counter += 1
+    if inter_word_counter == 4:
+        # dispatch the word
+        output.append(current_word)
+        current_word = 0
+        inter_word_counter = 0
+    # fill the current word with zeros to get a valid packed string
+    if inter_word_counter != 0:
+        while inter_word_counter < 4:
+            current_word = current_word << 8
+            inter_word_counter += 1
+        output.append(current_word)
+
+    # add the length of the data as a first word
+    output.insert(0, len(output))
+    create_data_blueprint(output, output_file=output_file)
+    machine_code_output_file = output_file.replace(".txt", "_machine_code.txt")
+    with open(machine_code_output_file, 'w') as f:
+        for word in output:
+            f.write(f"{word}\n")
+    return True

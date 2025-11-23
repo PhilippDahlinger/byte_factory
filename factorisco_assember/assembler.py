@@ -2,7 +2,7 @@ import os
 
 from bython_compiler.create_low_level_code import remove_white_space, remove_comments
 from factorisco_assember.assembler_util import get_text_segment, tokenize, replace_pseudo_instructions, collect_labels, \
-    replace_labels, replace_instructions, get_data_segment, compute_data_values
+    replace_labels, replace_instructions, get_data_segment, compute_data_values, convert_data
 from factorisco_assember.input_encodings.create_data_blueprint import create_data_blueprint
 from factorisco_assember.machine_language import create_machine_code
 
@@ -76,9 +76,25 @@ def user_program(file_name, verbose=True):
     print(f"File Name: {file_name}")
     print("--------------------------------------------------------")
 
+def read_data(file_name, verbose=True):
+    print("--------------------------------------------------------")
+    output_version = "v3"
+    input_file = os.path.join("factorisco_v_assembly", "data", f"{file_name}.txt")
+    output_file = os.path.join("output", "factorisco", "data", f"{file_name}.txt")
+    with open(input_file, 'r') as infile:
+        source_code = infile.read()
+        # split by line
+        print("Source code read successfully.")
+    convert_data(source_code, output_file, verbose=verbose)
+    print(f"File Name: {file_name}")
+    print("--------------------------------------------------------")
+
+
 if __name__ == "__main__":
     verbose = False
-    kernel_program("interrupt_handler_1_0", verbose=verbose)
-    # kernel_program("debug_boot", verbose=verbose)
-    kernel_program("os_1_0", verbose=verbose)
-    user_program("snake", verbose=verbose)
+    # kernel_program("interrupt_handler_1_0", verbose=verbose)
+    # # kernel_program("debug_boot", verbose=verbose)
+    # kernel_program("os_1_0", verbose=verbose)
+    user_program("aoc2024_03", verbose=verbose)
+    # read_data("aoc24_03_input", verbose=verbose)
+    read_data("aoc24_03_input", verbose=verbose)
