@@ -94,5 +94,5 @@ if __name__ == "__main__":
     verbose = False
     # kernel_program("interrupt_handler_1_0", verbose=verbose)
     # kernel_program("os_1_0", verbose=verbose)
+    read_data("aoc25_02_debug", verbose=verbose)
     user_program("aoc2025_02", verbose=verbose)
-    # read_data("aoc25_01_input", verbose=verbose)
