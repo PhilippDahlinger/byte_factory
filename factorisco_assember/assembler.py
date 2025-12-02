@@ -92,7 +92,7 @@ def read_data(file_name, verbose=True):
 
 if __name__ == "__main__":
     verbose = False
-    kernel_program("interrupt_handler_1_0", verbose=verbose)
-    kernel_program("os_1_0", verbose=verbose)
-    user_program("aoc2025_01", verbose=verbose)
-    read_data("aoc25_01_input", verbose=verbose)
+    # kernel_program("interrupt_handler_1_0", verbose=verbose)
+    # kernel_program("os_1_0", verbose=verbose)
+    user_program("aoc2025_02", verbose=verbose)
+    # read_data("aoc25_01_input", verbose=verbose)
