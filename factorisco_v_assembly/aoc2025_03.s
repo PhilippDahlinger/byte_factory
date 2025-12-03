@@ -147,7 +147,7 @@ read_next_char:
 	
 
 .data
-	path_to_data: .asciz "/DATA/2503D"
+	path_to_data: .asciz "/DATA/2503"
 	loaded_data: .asciz "Data loaded."
 	loading_failed: .asciz "Data could not be loaded. Wrong path?"
 	password_str: .asciz "Password: "
