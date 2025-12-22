@@ -1,5 +1,0 @@
-r13 = pc + 3
-push(r13)
-pc = pop()
-exit(success)
-
