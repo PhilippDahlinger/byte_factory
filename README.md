@@ -1,6 +1,7 @@
 # FactoRISCo V - Factorio RISC-V CPU
 This repository contains the code for the Factorio CPU, including an assembler and a python simulator.
 
+![docs/title.png](docs/title.png)
 ### Specs of the CPU
 - 5 Stage Pipelined Architektur
 - 32 General Purpose Register
