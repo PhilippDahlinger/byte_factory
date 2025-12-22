@@ -1,4 +1,4 @@
-# FactiRISCo V - Factorio RISC CPU
+# FactoRISCo V - Factorio RISC-V CPU
 This repository contains the code for the Factorio CPU, including an assembler and a python simulator.
 
 ### Specs of the CPU
