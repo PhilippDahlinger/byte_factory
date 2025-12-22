@@ -1,7 +1,7 @@
 import yaml
 import tkinter as tk
 
-from factorisco_assember.assembler import kernel_program, read_data, user_program
+from factorisco_assembler.assembler import kernel_program, read_data, user_program
 from simulator.gui_simulator import SimulatorGUI
 from simulator.simulator import Simulator
 

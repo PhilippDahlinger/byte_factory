@@ -1,10 +1,10 @@
 import os
 
 from bython_compiler.create_low_level_code import remove_white_space, remove_comments
-from factorisco_assember.assembler_util import get_text_segment, tokenize, replace_pseudo_instructions, collect_labels, \
+from factorisco_assembler.assembler_util import get_text_segment, tokenize, replace_pseudo_instructions, collect_labels, \
     replace_labels, replace_instructions, get_data_segment, compute_data_values, convert_data
-from factorisco_assember.input_encodings.create_data_blueprint import create_data_blueprint
-from factorisco_assember.machine_language import create_machine_code
+from factorisco_assembler.input_encodings.create_data_blueprint import create_data_blueprint
+from factorisco_assembler.machine_language import create_machine_code
 
 
 def assemble(assembly_code, output_file, output_version="v3", kernel_mode=False, verbose=True):
@@ -92,7 +92,4 @@ def read_data(file_name, verbose=True):
 
 if __name__ == "__main__":
     verbose = False
-    # kernel_program("interrupt_handler_1_0", verbose=verbose)
-    # kernel_program("os_1_0", verbose=verbose)
-    read_data("aoc25_04_input", verbose=verbose)
-    user_program("aoc2025_04", verbose=verbose)
+    user_program("fib_5", verbose=verbose)

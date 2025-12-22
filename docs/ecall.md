@@ -1,5 +1,8 @@
 # 🧩 FactoRISCo V — ECALL Reference Manual
 
+TODO: currently this is a ChatGPT generated stub.
+
+
 This document describes every **ECALL (Environment Call)** implemented in the **FactoRISCo V Runtime**.
 ECALLs provide a system-level interface between **user programs** and the **FactoRISCo V kernel** — similar to system calls in traditional operating systems.
 
