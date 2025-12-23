@@ -28,7 +28,7 @@ This repository contains the code for the Factorio CPU, including an assembler a
 - Change the simulation speed up to 64x by checking out the Time tab of the map editor
 - Standard speed has 60 UPS, so 64x can have up to 3700 UPS. However, most laptops will not reach that, and should be areound 700-1000 UPS. Try out 16x or 32x speed up for better scrolling experience (if you speed up by 64x and your machine does not support that, scrolling in the world becomes very slow)
 - If the clouds are going crazy, disable them in the main settings (`Esc` > `Settings`> `Graphics` > `Show clouds`)
-- You need to set a Controls in order to work with Pushbuttons (for example the buttons from the keyboard). For that, go to `Esc` > `Settings` > `Controls` and search for `Toggle Entity`. Set the key of that for example to the middle mouse key or `.`.
+- You need to set a Controls in order to work with Pushbuttons (for example the buttons from the keyboard). For that, go to `Esc` > `Settings` > `Controls` and search for `Toggle Entity`. It should be in the `Debug` category. Set the key of that for example to the middle mouse key or `.`.
 - Then, find the power button in the top right corner of the user display (next to the display). Hit the power button using the key you set in the last step. The terminal should appear
 - For a debug program, enter `R0` in the editor using the keyboard of the CPU (and press one of the 3 buttons symbolizing the `Enter` key).
 - It should print 10 Fibonacci numbers, starting from 2.
