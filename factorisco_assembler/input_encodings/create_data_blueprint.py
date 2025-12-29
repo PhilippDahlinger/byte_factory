@@ -1,6 +1,6 @@
 import json
 
-from bython_compiler.create_blueprint import blueprint_to_json, json_to_blueprint
+from factorisco_assembler.blueprint_util import blueprint_to_json, json_to_blueprint
 
 
 def change_pmem_v1(base_json, x, y, code):
