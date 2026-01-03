@@ -92,4 +92,4 @@ def read_data(file_name, verbose=True):
 
 if __name__ == "__main__":
     verbose = False
-    user_program("fib_5", verbose=verbose)
+    user_program("title", verbose=verbose)
