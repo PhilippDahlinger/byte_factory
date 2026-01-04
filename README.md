@@ -18,8 +18,7 @@ This repository contains the code for the Factorio CPU, including an assembler a
 - We recommend the `uv` [Python Environment manager](https://docs.astral.sh/uv/guides/install-python/). Once installed, use `uv sync` to get the python environment. 
 
 # CPU Installation
-- You need Factorio (main game, not the Space Age expansion). You can get it on steam:
-[Steam Link](https://store.steampowered.com/app/427520/Factorio/)
+- You need Factorio (main game, not the Space Age expansion). You can get it [from the developer](https://www.factorio.com/buy), on [Good Old Games](https://www.gog.com/en/game/factorio), or on [Steam](https://store.steampowered.com/app/427520/Factorio/).
 
 - Place the save file `factoriscoV3_official.zip` (from the main folder of this repository) into your saves folder. You can find the folder using [this](https://wiki.factorio.com/Application_directory) article.
 - Open Factorio and load the world. Confirm to load the needed mods.
