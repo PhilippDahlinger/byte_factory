@@ -2,18 +2,20 @@
 This repository contains the code for the Factorio CPU, including an assembler and a python simulator.
 
 ![docs/title.png](docs/title.png)
+
 ### Specs of the CPU
-- 5 Stage Pipelined Architektur
-- 32 General Purpose Register
+- 5‑stage pipelined architecture  
+- 32 general‑purpose registers
 - 64 kB RAM
-- 128 kB Hard Drive
- -Interrupt Handler
-- ~700 Hz Taktfrequenz
-- Peripherie
-  - ASCII Character Display
-  - Color Display 
-  - Tastatur
+- 128 kB hard drive
+- Interrupt handler
+- ~700 Hz frequency
+- Peripherals
+  - ASCII character display  
+  - Color display  
+  - Keyboard
   - RNG
+
 # Assembler Installation
 - We recommend the `uv` [Python Environment manager](https://docs.astral.sh/uv/guides/install-python/). Once installed, use `uv sync` to get the python environment. 
 
