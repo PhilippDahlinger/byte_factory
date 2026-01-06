@@ -5,8 +5,11 @@ This repository contains the code for the Factorio CPU, including an assembler a
 
 # Videos about this CPU
 I gave a talk at the 39th Chaos Communication Congress, the recording is here:
+
 https://youtu.be/FLUeSurkMOI?si=YZsqRQlXToFtPLAA (German)
+
 Few days later, I recorded an English video at home (basically translating my talk), which you can find here:
+
 https://youtu.be/QcQYEAr0Yos?si=wNPjTUB8BhfNbjCe
 
 ### Specs of the CPU
