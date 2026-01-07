@@ -6,11 +6,13 @@ This repository contains the code for the Factorio CPU, including an assembler a
 # Videos about this CPU
 I gave a talk at the 39th Chaos Communication Congress, the recording is here:
 
-https://youtu.be/FLUeSurkMOI?si=YZsqRQlXToFtPLAA (German)
+- https://media.ccc.de/v/39c3-cpu-entwicklung-in-factorio-vom-d-flip-flop-bis-zum-eigenen-betriebssystem#l=deu (German)
+- https://youtu.be/FLUeSurkMOI (German)
+- https://media.ccc.de/v/39c3-cpu-entwicklung-in-factorio-vom-d-flip-flop-bis-zum-eigenen-betriebssystem#l=eng (English, live-translated)
 
 Few days later, I recorded an English video at home (basically translating my talk), which you can find here:
 
-https://youtu.be/QcQYEAr0Yos?si=wNPjTUB8BhfNbjCe
+- https://youtu.be/QcQYEAr0Yos
 
 ### Specs of the CPU
 - 5‑stage pipelined architecture  
