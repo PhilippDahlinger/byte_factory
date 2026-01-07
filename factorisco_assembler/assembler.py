@@ -39,12 +39,12 @@ def assemble(assembly_code, output_file, output_version="v3", kernel_mode=False,
             print(f"{i}: {line}")
         for i, line in enumerate(machine_code):
             print(f"{i}: {line}")
-    create_data_blueprint(machine_code, output_file=output_file, output_version=output_version)
+    blueprint = create_data_blueprint(machine_code, output_file=output_file, output_version=output_version)
     machine_code_output_file = output_file.replace(".txt", "_machine_code.txt")
     with open(machine_code_output_file, 'w') as f:
         for word in machine_code:
             f.write(f"{word}\n")
-    return True
+    return blueprint
 
 
 def kernel_program(file_name, verbose=True):
@@ -91,5 +91,49 @@ def read_data(file_name, verbose=True):
 
 
 if __name__ == "__main__":
-    verbose = False
-    user_program("title", verbose=verbose)
+    import argparse
+    import sys
+    import pyperclip
+
+    parser = argparse.ArgumentParser(description='Factorisco Assembler')
+    parser.add_argument('source_file', help='The source code filename or path')
+    parser.add_argument('--verbose', '-v', action='store_true', help='Enable verbose output')
+
+    args = parser.parse_args()
+
+    source_file = args.source_file
+    verbose = args.verbose
+
+    if not os.path.exists(source_file):
+        # Fallback to check if it's in the default directory if just a name is provided
+        default_path = os.path.join("factorisco_v_assembly", f"{source_file}.s") if not source_file.endswith(".s") else os.path.join("factorisco_v_assembly", source_file)
+        if os.path.exists(default_path):
+             source_file = default_path
+        else:
+             print(f"Error: File '{source_file}' does not exist.")
+             sys.exit(1)
+
+    # Determine output file path
+    base_name = os.path.splitext(os.path.basename(source_file))[0]
+    output_dir = os.path.join("output", "factorisco")
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, f"{base_name}.txt")
+
+    print("--------------------------------------------------------")
+    with open(source_file, 'r') as infile:
+        source_code = infile.read()
+        source_code = source_code.split("\n")
+        print("Source code read successfully.")
+
+    # Assume user program mode by default
+    blueprint = assemble(source_code, output_file, output_version="v3", kernel_mode=False, verbose=verbose)
+
+    if blueprint:
+        try:
+            pyperclip.copy(blueprint)
+            print("Blueprint copied to clipboard!")
+        except Exception as e:
+            print(f"Could not copy to clipboard: {e}")
+
+    print(f"File Name: {base_name}")
+    print("--------------------------------------------------------")
