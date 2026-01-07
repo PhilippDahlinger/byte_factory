@@ -67,6 +67,7 @@ def create_data_blueprint(outputs, output_file, output_version="v3"):
         outfile.write(updated_blueprint)
     print("Data Blueprint:")
     print(updated_blueprint)
+    return updated_blueprint
 
 
 if __name__ == "__main__":
