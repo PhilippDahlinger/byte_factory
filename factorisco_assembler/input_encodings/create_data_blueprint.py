@@ -1,4 +1,5 @@
 import json
+import os
 
 from factorisco_assembler.blueprint_util import blueprint_to_json, json_to_blueprint
 
@@ -63,6 +64,7 @@ def create_data_blueprint(outputs, output_file, output_version="v3"):
         if code_address >= len(outputs):
             break
     updated_blueprint = json_to_blueprint(base_json)
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
     with open(output_file, 'w') as outfile:
         outfile.write(updated_blueprint)
     print("Data Blueprint:")

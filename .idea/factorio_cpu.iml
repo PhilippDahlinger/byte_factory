@@ -5,6 +5,7 @@
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/output" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/.venv1" />
     </content>
     <orderEntry type="jdk" jdkName="uv (byte_factory)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
