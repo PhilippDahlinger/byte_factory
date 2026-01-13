@@ -92,3 +92,16 @@ Paste the copied string. A column of constant combinators should be loaded.
 Insert them either as the left column of ROM 0 or ROM 1.
 
 Then, you can run the program by entering R0 or R1 inside the CPU terminal.
+
+# How to use the Python Simulator
+First of all, the simulator lacks right now the perfect user experience, but it is runnable with some minor steps:
+- The main script is `scripts/run_simulator.py`
+- You have to set your current working directory to the root of the repository, otherwise the paths won't work (I know... TODO)
+- You need to provide a program to load besides the OS and the interrupt handler code. Right now, the compiled program fib_5 is loaded. You need to specify `output/factorisco/fib_5_machine_code.txt` for the simulator
+  - `fib_5.txt` is the blueprint string and not readable to the simulator. the machine code is just a list of integers (i.e. the machine code in decimal format)
+- If you want to try out your program, adapt the code in `run_simulator.py`:
+  - you can assemble it using `user_program("<Your program>", verbose=False)` and then load it in the user program list.
+- Once the simulator opens, it should behave like the CPU in Factorio. However, the file system is always empty (TODO: Save file system state over multiple runs)
+- Also, the color display is not implemented yet, so the display you see inside the simulator is just a stub
+- Finally, programs like snake don't have a pause programmed, or a max FPS limit, so they will run too fast (nearly instant) in the simulator
+- So to summarize: the simulator is not perfect yet, but it is a start.
