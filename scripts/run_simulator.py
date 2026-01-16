@@ -13,7 +13,7 @@ if __name__ == "__main__":
     # read_data("aoc25_04_input", verbose=False)
     user_program("fib_5", verbose=False)
 
-    config = yaml.safe_load(open("simulator/sim_config_v3.yaml"))
+    config = yaml.safe_load(open("configs/sim_config_v3.yaml"))
     simulator = Simulator(config, ["output/factorisco/fib_5_machine_code.txt",
     ])
 
