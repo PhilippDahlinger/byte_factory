@@ -1,10 +1,10 @@
 import os
 
-from factorisco_assembler.create_low_level_code import remove_white_space, remove_comments
-from factorisco_assembler.assembler_util import get_text_segment, tokenize, replace_pseudo_instructions, collect_labels, \
+from byte_factory.factorisco_assembler.create_low_level_code import remove_white_space, remove_comments
+from byte_factory.factorisco_assembler.assembler_util import get_text_segment, tokenize, replace_pseudo_instructions, collect_labels, \
     replace_labels, replace_instructions, get_data_segment, compute_data_values, convert_data
-from factorisco_assembler.input_encodings.create_data_blueprint import create_data_blueprint
-from factorisco_assembler.machine_language import create_machine_code
+from byte_factory.factorisco_assembler.input_encodings.create_data_blueprint import create_data_blueprint
+from byte_factory.factorisco_assembler.machine_language import create_machine_code
 
 
 def assemble(assembly_code, output_file, output_version="v3", kernel_mode=False, verbose=True):

@@ -1,9 +1,9 @@
 import yaml
 import tkinter as tk
 
-from factorisco_assembler.assembler import kernel_program, read_data, user_program
-from simulator.gui_simulator import SimulatorGUI
-from simulator.simulator import Simulator
+from byte_factory.factorisco_assembler import kernel_program, user_program
+from byte_factory.simulator.gui_simulator import SimulatorGUI
+from byte_factory.simulator.simulator import Simulator
 
 if __name__ == "__main__":
 
