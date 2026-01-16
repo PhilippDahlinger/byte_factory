@@ -1,7 +1,7 @@
 import yaml
 import tkinter as tk
 
-from byte_factory.factorisco_assembler import kernel_program, user_program
+from byte_factory.factorisco_assembler.assembler import kernel_program, user_program
 from byte_factory.simulator.gui_simulator import SimulatorGUI
 from byte_factory.simulator.simulator import Simulator
 
