@@ -1,9 +1,7 @@
 import random
 
-import yaml
-
-from simulator.display_controller import DisplayController
-from simulator.keyboard_controller import KeyboardController
+from byte_factory.simulator.display_controller import DisplayController
+from byte_factory.simulator.keyboard_controller import KeyboardController
 
 
 class Simulator:

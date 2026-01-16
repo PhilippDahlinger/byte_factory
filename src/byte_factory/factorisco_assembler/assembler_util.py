@@ -1,7 +1,7 @@
 import re
 from collections import defaultdict
 
-from factorisco_assembler.input_encodings.create_data_blueprint import create_data_blueprint
+from byte_factory.factorisco_assembler.input_encodings.create_data_blueprint import create_data_blueprint
 
 instruction_key_words = ["add", "addi", "and", "andi", "auipc", "beq", "bge", "bgeu", "blt", "bltu", "bne", "div",
                          "divu", "ecall", "add", "j", "jal", "jalr", "lb", "lbu", "lh", "lhu", "lui", "lw", "mul",

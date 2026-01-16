@@ -1,9 +1,9 @@
 import yaml
 import tkinter as tk
 
-from factorisco_assembler.assembler import kernel_program, read_data, user_program
-from simulator.gui_simulator import SimulatorGUI
-from simulator.simulator import Simulator
+from byte_factory.factorisco_assembler.assembler import kernel_program, user_program
+from byte_factory.simulator.gui_simulator import SimulatorGUI
+from byte_factory.simulator.simulator import Simulator
 
 if __name__ == "__main__":
 
@@ -13,7 +13,7 @@ if __name__ == "__main__":
     # read_data("aoc25_04_input", verbose=False)
     user_program("fib_5", verbose=False)
 
-    config = yaml.safe_load(open("simulator/sim_config_v3.yaml"))
+    config = yaml.safe_load(open("configs/sim_config_v3.yaml"))
     simulator = Simulator(config, ["output/factorisco/fib_5_machine_code.txt",
     ])
 

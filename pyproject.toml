@@ -1,9 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+
 [project]
 name = "byte-factory"
 version = "0.1.0"
-description = "Add your description here"
+description = "Python code for the Factorio CPU."
 requires-python = ">=3.12"
 dependencies = [
     "pyyaml==6.0.3",
     "sv-ttk==2.6.1",
 ]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
