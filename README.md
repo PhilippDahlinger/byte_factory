@@ -50,7 +50,7 @@ Few days later, I recorded an English video at home (basically translating my ta
 
 # FactOS: Command Line Interface
 The command line interface called `FactOS` is attached to the file system `Chest32`. Currently, there is no current working directory, instead you have to enter always the absolute path to a file or a folder.
-Pay attention to the syntax, they are a bit quirky... (TODO: Make better syntax)
+Pay attention to the syntax, they are a bit quirky.. (TODO: Make better syntax)
 
 `FactOS`has currently the following commands implemented:
 - `CLS`: Clears the screen
